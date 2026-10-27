@@ -174,9 +174,11 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 					}),
 					markdown,
 					vault,
+					'Settings → In the Open',
 				);
 			} catch (error) {
-				if (error instanceof ExportError) throw new PublishError(error.message.replace('the Due Credit settings', 'Settings → In the Open'));
+				// Already a sentence: the core's own kind of failure, said as In the Open's.
+				if (error instanceof ExportError) throw new PublishError(error.message);
 				throw error;
 			}
 			return {
