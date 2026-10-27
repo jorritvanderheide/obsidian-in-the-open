@@ -1,0 +1,48 @@
+# Checks on every push to main and every pull request, and before every
+# release. The repository lives on Codeberg and is push-mirrored here, where
+# this runs.
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    workflow_call:
+
+# Read-only unless a job asks for more.
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+            # The version releases are built with.
+            - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              with:
+                  node-version: 24
+                  cache: 'npm'
+            # The core, where `file:../obsidian-citation-core` in package.json
+            # looks, at the commit flake.lock pins.
+            - name: Check out the core
+              run: |
+                  url=$(jq -r '.nodes."citation-core".locked.url' flake.lock)
+                  rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+                  git clone --quiet "$url" ../obsidian-citation-core
+                  git -C ../obsidian-citation-core checkout --quiet "$rev"
+            - run: npm ci
+            - run: npm run build
+            - run: npm run lint
+            - run: npm test
+
+    # The flake's package, so its npmDepsHash can't fall behind package-lock.json,
+    # and the core's checks, its filter tests among them, with the pandoc they expect.
+    nix:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+            - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+            - run: nix flake check -L

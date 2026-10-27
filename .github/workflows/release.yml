@@ -1,0 +1,90 @@
+# On a tag (1.2.3, the version in manifest.json): the CI checks, then main.js,
+# manifest.json and styles.css, attested, in a draft GitHub release named
+# after the plugin, with the version's part of CHANGELOG.md as its notes.
+name: Release Obsidian plugin
+
+on:
+    push:
+        tags:
+            - '*'
+
+# Read-only unless a job asks for more.
+permissions:
+    contents: read
+
+jobs:
+    ci:
+        uses: ./.github/workflows/ci.yml
+
+    build:
+        needs: [ci]
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            contents: write
+            id-token: write
+            attestations: write
+        steps:
+            - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+            # Obsidian installs the release whose tag is the version in
+            # manifest.json, so the three must agree.
+            - name: Tag matches the version
+              run: |
+                  tag="$GITHUB_REF_NAME"
+                  for f in manifest.json package.json; do
+                    v=$(node -p "require('./$f').version")
+                    if [ "$tag" != "$v" ]; then echo "tag $tag, $f $v"; exit 1; fi
+                  done
+                  if ! node -e "process.exit(require('./versions.json')[process.argv[1]] ? 0 : 1)" "$tag"; then
+                    echo "versions.json has no $tag"; exit 1
+                  fi
+
+            - name: Use Node.js
+              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              with:
+                  node-version: 24
+                  cache: 'npm'
+
+            # The core, where `file:../obsidian-citation-core` in package.json
+            # looks, at the commit flake.lock pins.
+            - name: Check out the core
+              run: |
+                  url=$(jq -r '.nodes."citation-core".locked.url' flake.lock)
+                  rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+                  git clone --quiet "$url" ../obsidian-citation-core
+                  git -C ../obsidian-citation-core checkout --quiet "$rev"
+
+            - name: Build plugin
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Check for optional styles
+              id: styles
+              run: |
+                  [ -f styles.css ] && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
+
+            - name: Attest build provenance
+              uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+              with:
+                  subject-path: |
+                      main.js
+                      ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+
+            - name: Create release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  tag="$GITHUB_REF_NAME"
+                  name=$(node -p "require('./manifest.json').name")
+                  # Tags like 1.2.0-beta.1 are pre-releases, for beta testers.
+                  prerelease=()
+                  case "$tag" in *-*) prerelease=(--prerelease) ;; esac
+                  # The notes are the version's part of CHANGELOG.md, if it has one.
+                  awk -v v="## $tag" '$0 == v { on = 1; next } /^## / { on = 0 } on' CHANGELOG.md > notes.md
+                  notes=(--generate-notes)
+                  if grep -q '[^[:space:]]' notes.md; then notes=(--notes-file notes.md); fi
+                  gh release create "$tag" \
+                    --verify-tag --draft "${prerelease[@]}" --title "$name $tag" "${notes[@]}" \
+                    main.js manifest.json ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}

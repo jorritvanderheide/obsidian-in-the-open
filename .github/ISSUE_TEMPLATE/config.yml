@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Read the FAQ
+      url: https://github.com/jorritvanderheide/obsidian-in-the-open/blob/main/FAQ.md
+      about: Answers to the most common questions.
+    - name: Report a security problem
+      url: https://github.com/jorritvanderheide/obsidian-in-the-open/security/advisories/new
+      about: Please report security problems privately, not in a public issue.
