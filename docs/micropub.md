@@ -8,7 +8,9 @@ takes its posts, and a site that implements the extension takes its
 references too.
 
 This page is the contract between In the Open and your site. Where it says
-nothing, Micropub's rules apply.
+nothing, Micropub's rules apply. In the Open sends every request as JSON, and
+updates a post by replacing what changed (`replace`), so a site needs
+neither form-encoded requests nor `add` and `delete`.
 
 ## Finding the endpoint
 
