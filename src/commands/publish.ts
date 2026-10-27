@@ -39,7 +39,9 @@ const WAIT = 5 * 60_000;
 export async function site(context: Context): Promise<Site> {
 	const { app, settings } = context;
 	if (settings.site === '') throw new PublishError("Set your site's address in Settings → In the Open first.");
-	const token = settings.token === '' ? null : app.secretStorage.getSecret(settings.token);
+	// Trimmed, as the receiver trims its own copy: a token pasted with a line
+	// break after it is still the same token.
+	const token = settings.token === '' ? null : (app.secretStorage.getSecret(settings.token)?.trim() ?? null);
 	if (token === null || token === '') throw new PublishError("Choose your site's token in Settings → In the Open first.");
 	return connect(settings.site, token);
 }
