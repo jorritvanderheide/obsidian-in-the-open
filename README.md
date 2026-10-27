@@ -172,8 +172,10 @@ makes sense inside Obsidian:
 | A line of `#tags` | Left out. A tag in a sentence stays as its word. |
 | A link to a note you've published | A link to its post. |
 | A link to a note you haven't published | Its words, as Obsidian shows them. In the Open lists these links before it sends, so you can publish anyway, or publish those notes first. |
-
-<!-- TODO: callouts, highlights and footnotes, once the publish output is settled -->
+| `> [!note] Title` | A quote with the title in bold. |
+| `==highlight==` | Plain text: a site has no highlight of its own. |
+| `[^1]` and `^[inline]` footnotes | Footnotes. |
+| Your headings | A level down, under the post's title, which the site shows as the page's heading. |
 
 ### 6.2 What your site gets
 
@@ -196,7 +198,9 @@ In the Open reads citations exactly as Due Credit does, through the same code:
 `[@marsh2024, p. 12]`, and the rest. Every form is in Due Credit's
 [Citations](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/docs/citations.md).
 
-<!-- TODO: what In the Open does with a link whose key isn't in the bibliography -->
+A link to a paper whose key isn't in your bibliography would go out as its
+plain name, so In the Open lists those before it sends, as Due Credit does
+before an export: you can publish anyway, or fix the key first.
 
 <br/>
 
