@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.0.2
 
 - Messages, settings descriptions and the README use plainer words, with less
   of Micropub's own vocabulary.
