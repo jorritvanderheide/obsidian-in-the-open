@@ -32,8 +32,8 @@ are security problems:
   site a request is redirected to.
 - Writing anywhere in your vault but the `published-url` and `post-status`
   properties of the note you publish, withdraw, restore or discard, its
-  `summary` when you type one in, a note
-  **New post** makes, and `Post.md` in the template folder when it isn't
+  `summary` when you type one in, its `categories` when you set them, a
+  note **New post** makes, and `Post.md` in the template folder when it isn't
   there.
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.

@@ -25,8 +25,9 @@ Open's own: its settings, Micropub, and wiring the core to Obsidian.
 | `src/site.ts` | A site: its endpoint and what it takes, and the requests that carry the token. |
 | `src/commands/publish.ts` | Publishing a note, as a draft or not, updating it, withdrawing and restoring it, and discarding a draft. |
 | `src/commands/new-post.ts` | New post: a note from the template, seeded when it's missing, marked as a post. |
-| `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, the dialogs, and a post's pill and next step in its title bar (`title-bar.ts`). |
-| `src/main.ts` | Registers the five commands, the file menu items, and the title bar, which follows the open notes. |
+| `src/commands/set-categories.ts` | Set categories: the site's categories, from `q=category`, picked and written to the note. |
+| `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, the dialogs, the category picker (`category-picker.ts`), and a post's pill and next step in its title bar (`title-bar.ts`). |
+| `src/main.ts` | Registers the six commands, the file menu items, and the title bar, which follows the open notes. |
 | `styles.css` | The title bar's pill. |
 | `src/modules.d.ts` | What esbuild bundles from the core: its filters as text and its font as bytes. |
 

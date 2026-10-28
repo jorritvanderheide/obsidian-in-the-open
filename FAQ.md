@@ -45,3 +45,10 @@ this note: by hand, or by another tool. Publishing the note again would
 replace that change, so In the Open asks first. **Replace it** sends the note
 as it is. To keep the change, copy it into the note first, then publish. Only
 a site that keeps track of this asks; any other is simply updated.
+
+### "… doesn't list its categories, so In the Open can't offer them."
+
+**Set categories** asks your site which categories it has (`q=category`), and
+your site didn't answer with a list. Not every site does: Micropub leaves it
+to the site. Write the categories in the note's `categories` property
+yourself, the way your site names them.

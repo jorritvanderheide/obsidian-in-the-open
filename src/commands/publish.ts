@@ -356,7 +356,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 }
 
 /** A notice that stays while the work runs, and goes when it's done or fails. */
-async function showing<T>(text: string, work: () => Promise<T>): Promise<T> {
+export async function showing<T>(text: string, work: () => Promise<T>): Promise<T> {
 	const notice = new Notice(text, 0);
 	try {
 		return await work();
@@ -383,7 +383,7 @@ function record(context: Context, file: TFile, status: PostStatus, url?: string 
  * properties blocks once left a note with two of them. Saved first, the
  * editor and the file agree, and there is nothing to merge.
  */
-async function writeProperties(context: Context, file: TFile, change: (frontmatter: Record<string, unknown>) => void): Promise<void> {
+export async function writeProperties(context: Context, file: TFile, change: (frontmatter: Record<string, unknown>) => void): Promise<void> {
 	const { app } = context;
 	for (const leaf of app.workspace.getLeavesOfType('markdown')) {
 		if (leaf.view instanceof MarkdownView && leaf.view.file === file) await leaf.view.save();

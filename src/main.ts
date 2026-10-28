@@ -1,6 +1,7 @@
 import { debounce, Notice, Plugin, TFile } from 'obsidian';
 import { newPost } from './commands/new-post';
 import { postOf, publish, withdraw } from './commands/publish';
+import { setCategories } from './commands/set-categories';
 import { PublishError } from './core/micropub';
 import { loadSettings, type Settings } from './core/settings';
 import { SettingsTab } from './ui/settings-tab';
@@ -25,6 +26,7 @@ export default class InTheOpen extends Plugin {
 			{ id: 'draft', name: 'Publish note as a draft', icon: 'file-up', published: false, run: (file) => this.send(file, publish(this, file, true)) },
 			{ id: 'withdraw', name: 'Withdraw note', icon: 'archive', published: true, run: (file) => this.send(file, withdraw(this, file, false)) },
 			{ id: 'restore', name: 'Restore note', icon: 'archive-restore', published: true, run: (file) => this.send(file, withdraw(this, file, true)) },
+			{ id: 'set-categories', name: 'Set categories', icon: 'tags', published: false, run: (file) => setCategories(this, file) },
 		];
 		const available = (file: TFile | null, published: boolean): file is TFile =>
 			file?.extension === 'md' && (!published || postOf(this, file) !== null);

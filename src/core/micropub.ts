@@ -175,6 +175,24 @@ export function unknownCategories(wanted: string[], known: string[]): string[] {
 	return [...new Set(wanted.filter((category) => !known.includes(category)))];
 }
 
+/** A category as Set categories offers it: whether the site has it, and whether the note has it now. */
+export interface CategoryChoice {
+	name: string;
+	onSite: boolean;
+	chosen: boolean;
+}
+
+/**
+ * The site's categories, in its order, on for the ones the note has, then the
+ * note's that the site doesn't have, still on, so taking one out is a choice.
+ */
+export function categoryChoices(note: string[], site: string[]): CategoryChoice[] {
+	return [
+		...site.map((name) => ({ name, onSite: true, chosen: note.includes(name) })),
+		...unknownCategories(note, site).map((name) => ({ name, onSite: false, chosen: true })),
+	];
+}
+
 /** Things in a sentence: "a", "a and b", "a, b and c". */
 export function listed(things: string[]): string {
 	return things.length <= 1 ? (things[0] ?? '') : `${things.slice(0, -1).join(', ')} and ${things.at(-1) ?? ''}`;

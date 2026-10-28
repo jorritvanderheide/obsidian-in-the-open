@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, differences, listed, readCategories, readConfig, readSource, secure, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -204,6 +204,15 @@ describe('categories', () => {
 		expect(readCategories('{"categories": ["tech", "notes", 3]}')).toEqual(['tech', 'notes']);
 		expect(readCategories('{}')).toBeNull();
 		expect(readCategories('<html>')).toBeNull();
+	});
+
+	it('offers the site’s, on for the note’s, then the note’s the site doesn’t have', () => {
+		expect(categoryChoices(['notes', 'cooking'], ['tech', 'notes'])).toEqual([
+			{ name: 'tech', onSite: true, chosen: false },
+			{ name: 'notes', onSite: true, chosen: true },
+			{ name: 'cooking', onSite: false, chosen: true },
+		]);
+		expect(categoryChoices([], [])).toEqual([]);
 	});
 
 	it('finds the ones the site doesn’t have, each once', () => {

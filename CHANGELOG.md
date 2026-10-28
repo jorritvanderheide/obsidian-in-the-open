@@ -17,7 +17,8 @@ breaking is in [Compatibility](docs/compatibility.md).
 - Publishing a note without a summary asks for one first, and keeps it in
   the note.
 - A category your site doesn't have is caught before anything is sent, with
-  the ones it does have.
+  the ones it does have. **Set categories** offers your site's categories to
+  pick from.
 - A post's title bar shows where it stands, Draft, Published or Withdrawn,
   and its next step: publish as a draft, then publish. The note keeps it as
   `post-status`.

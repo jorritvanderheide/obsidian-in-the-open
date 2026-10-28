@@ -133,6 +133,8 @@ If you want to work on the plugin, or make your site take its posts:
 
   <!-- SCREENSHOT images/title-bar.png: a draft's title bar, with the Draft pill and the Publish button beside it -->
 
+- **Categories from your site** - **Set categories** offers the categories
+  your site has, so a post is never refused for one it doesn't.
 - **One command** - Publish the note you have open, or any note from its
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
@@ -238,6 +240,8 @@ on its tab.
   asks why, which its page can show. Its address keeps working. A draft is
   discarded instead, and the note forgets its address.
 - `In the Open: Restore note` - Brings a withdrawn post back.
+- `In the Open: Set categories` - Asks your site which categories it has,
+  and lets you switch on the ones the note is in.
 
 <br/>
 
@@ -334,7 +338,9 @@ Only to your site, and only when you run a command:
   properties, in the note you publish, withdraw or restore. The address is
   removed when you discard its draft.
 - **A summary:** the `summary` property, when you publish a note without one
-  and type one in when In the Open asks. Nothing else in your notes.
+  and type one in when In the Open asks.
+- **Categories:** the `categories` property, when you choose them with **Set
+  categories**. Nothing else in your notes.
 - **New posts:** the note **New post** makes, where Obsidian puts new notes.
 - **Template:** `Post.md` in the template folder, when you make a new post
   and there's no file with that name. If the file is there, edited or not,

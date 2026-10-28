@@ -40,7 +40,8 @@ holds.
   title bar says where it stands; one with an address and no status is
   published. They're how the next publish finds the post, and what your own
   searches and Bases may list, so renaming either, or a status, is breaking.
-  And `summary`, when a note has none and you type one in before publishing.
+  And `summary`, when a note has none and you type one in before publishing,
+  and `categories`, when you set them with **Set categories**.
 - **The template:** `Post.md` in the **Template folder**, seeded when it's
   missing and never overwritten. `{{title}}` in it becomes the post's title;
   a new placeholder isn't breaking, and dropping one is.
@@ -53,8 +54,9 @@ holds.
 - **The plugin ID** `in-the-open` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
 - **Command IDs** are `in-the-open:new-post`, `in-the-open:publish`,
-  `in-the-open:draft`, `in-the-open:withdraw` and `in-the-open:restore`.
-  People bind hotkeys to them, so renaming or removing one is breaking. A command's name may change.
+  `in-the-open:draft`, `in-the-open:withdraw`, `in-the-open:restore` and
+  `in-the-open:set-categories`. People bind hotkeys to them, so renaming or
+  removing one is breaking. A command's name may change.
 
 ## Due Credit and Paper Trail
 
