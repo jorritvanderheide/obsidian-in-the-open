@@ -43,9 +43,9 @@ Authorization: Bearer <token>
   publishes a draft at once.
 
 `GET /micropub?q=category` lists the site's categories,
-`{"categories": ["tech", "notes"]}`, so the plugin can check a post's before
-sending it, rather than send one the site will refuse. A site that doesn't
-answer is sent the post unchecked.
+`{"categories": ["tech", "notes"]}`, so the plugin can offer them, and say
+when a post names one the site doesn't have yet. A site that doesn't answer
+is sent the post unchecked.
 
 ## Tokens
 
@@ -83,7 +83,7 @@ Content-Type: application/json
 | `name` | yes | The title. |
 | `content` | yes | The text. To a site that takes the references extension, a plain string of CommonMark, with GFM tables, strikethrough and footnotes. To any other site, HTML, as `{"html": "..."}`, because Micropub reads a plain string as plain text. |
 | `summary` | | One sentence about the post. |
-| `category` | | Its categories. |
+| `category` | | Its categories. A site may make a new one when a post names it, or refuse the post; the plugin asks before sending one the site doesn't list, since a new category is often a typo. |
 | `mp-slug` | | The slug it should have. The site may choose another. |
 | `published` | | When it was published. Without it, the site uses the time it received it. |
 | `post-status` | | `draft` for a draft; see [Drafts](#drafts). Without it, the post is published. |
