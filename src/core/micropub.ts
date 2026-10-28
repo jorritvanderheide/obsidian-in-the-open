@@ -271,6 +271,24 @@ export function failure(response: Response): string {
 	return `the site answered ${response.status}`;
 }
 
+/**
+ * The site's host, from the **Site** setting, checked before anything is
+ * asked or written: an https address, or a sentence saying what to set.
+ */
+export function siteHost(site: string): string {
+	if (site === '') throw new PublishError("Set your site's address in Settings → In the Open first.");
+	let host: string;
+	try {
+		host = new URL(site).host;
+	} catch {
+		host = '';
+	}
+	if (host === '' || !secure(site)) {
+		throw new PublishError(`${site} isn't an address In the Open can publish to. Set your site's address in Settings → In the Open, starting with https://, as https://example.org.`);
+	}
+	return host;
+}
+
 /** An image for the media endpoint, as multipart/form-data with the file in a field called `file`. */
 export function multipart(name: string, type: string, data: Uint8Array, boundary: string): Uint8Array {
 	const encoder = new TextEncoder();

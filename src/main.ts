@@ -11,7 +11,7 @@ export default class InTheOpen extends Plugin {
 	settings!: Settings;
 
 	/** Notes being sent now, by path: their title bar offers no step until they're done. */
-	private readonly sending = new Set<string>();
+	private readonly sending = new Set<TFile>();
 	private unloaded = false;
 
 	async onload() {
@@ -22,10 +22,10 @@ export default class InTheOpen extends Plugin {
 
 		// Publish any note; withdraw or restore only one that has a post.
 		const commands: { id: string; name: string; icon: string; published: boolean; run: (file: TFile) => Promise<void> }[] = [
-			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => this.send(file, publish(this, file, false)) },
-			{ id: 'draft', name: 'Publish note as a draft', icon: 'file-up', published: false, run: (file) => this.send(file, publish(this, file, true)) },
-			{ id: 'withdraw', name: 'Withdraw note', icon: 'archive', published: true, run: (file) => this.send(file, withdraw(this, file, false)) },
-			{ id: 'restore', name: 'Restore note', icon: 'archive-restore', published: true, run: (file) => this.send(file, withdraw(this, file, true)) },
+			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => this.send(file, () => publish(this, file, false)) },
+			{ id: 'draft', name: 'Publish note as a draft', icon: 'file-up', published: false, run: (file) => this.send(file, () => publish(this, file, true)) },
+			{ id: 'withdraw', name: 'Withdraw note', icon: 'archive', published: true, run: (file) => this.send(file, () => withdraw(this, file, false)) },
+			{ id: 'restore', name: 'Restore note', icon: 'archive-restore', published: true, run: (file) => this.send(file, () => withdraw(this, file, true)) },
 			{ id: 'set-categories', name: 'Set categories', icon: 'tags', published: false, run: (file) => setCategories(this, file) },
 		];
 		const available = (file: TFile | null, published: boolean): file is TFile =>
@@ -88,23 +88,31 @@ export default class InTheOpen extends Plugin {
 		() => {
 			if (this.unloaded) return;
 			decorate(this.app, {
-				publish: (file, draft) => this.attempt(this.send(file, publish(this, file, draft))),
-				withdraw: (file, back) => this.attempt(this.send(file, withdraw(this, file, back))),
-				busy: (file) => this.sending.has(file.path),
+				publish: (file, draft) => this.attempt(this.send(file, () => publish(this, file, draft))),
+				withdraw: (file, back) => this.attempt(this.send(file, () => withdraw(this, file, back))),
+				busy: (file) => this.sending.has(file),
 			});
 		},
 		20,
 		true,
 	);
 
-	/** While a note is being sent, its title bar offers nothing to press again. */
-	private async send(file: TFile, done: Promise<void>): Promise<void> {
-		this.sending.add(file.path);
+	/**
+	 * One send at a time for each note, from the title bar, a command or a menu:
+	 * a second publish of a new note would make a second post. Kept by the note
+	 * itself, not its path, so renaming it while it's sent changes nothing.
+	 */
+	private async send(file: TFile, start: () => Promise<void>): Promise<void> {
+		if (this.sending.has(file)) {
+			new Notice(`${file.basename} is being sent already.`, 5000);
+			return;
+		}
+		this.sending.add(file);
 		this.decorate();
 		try {
-			await done;
+			await start();
 		} finally {
-			this.sending.delete(file.path);
+			this.sending.delete(file);
 			this.decorate();
 		}
 	}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -218,5 +218,19 @@ describe('categories', () => {
 	it('finds the ones the site doesn’t have, each once', () => {
 		expect(unknownCategories(['tech', 'cooking', 'Tech', 'cooking'], ['tech', 'notes'])).toEqual(['cooking', 'Tech']);
 		expect(unknownCategories(['tech'], ['tech'])).toEqual([]);
+	});
+});
+
+describe('siteHost', () => {
+	it("is the site's host, for an https address", () => {
+		expect(siteHost('https://bw20.nl')).toBe('bw20.nl');
+		expect(siteHost('https://example.org:8443')).toBe('example.org:8443');
+	});
+
+	it('says what to set, before anything is asked or written', () => {
+		expect(() => siteHost('')).toThrow("Set your site's address in Settings → In the Open first.");
+		for (const site of ['bw20.nl', 'http://bw20.nl', 'not an address']) {
+			expect(() => siteHost(site)).toThrow(`${site} isn't an address In the Open can publish to. Set your site's address in Settings → In the Open, starting with https://, as https://example.org.`);
+		}
 	});
 });

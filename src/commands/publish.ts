@@ -26,12 +26,12 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, ConflictError, createBody, differences, imageType, images, listed, multipart, PublishError, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, differences, imageType, images, listed, multipart, PublishError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
-import { POST_PROPERTY, STATUS_PROPERTY, type PostStatus } from '../core/status';
+import { POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
 /** How long a new post may take to go live before In the Open stops waiting. */
@@ -40,7 +40,7 @@ const WAIT = 5 * 60_000;
 /** The site, with its token from Obsidian's keychain. */
 export async function site(context: Context): Promise<Site> {
 	const { app, settings } = context;
-	if (settings.site === '') throw new PublishError("Set your site's address in Settings → In the Open first.");
+	siteHost(settings.site);
 	// Trimmed, as the receiver trims its own copy: a token pasted with a line
 	// break after it is still the same token.
 	const token = settings.token === '' ? null : (app.secretStorage.getSecret(settings.token)?.trim() ?? null);
@@ -59,6 +59,10 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const { app, settings } = context;
 	const adapter = app.vault.adapter;
 	if (!(adapter instanceof FileSystemAdapter)) throw new PublishError('Publishing needs the desktop app.');
+	// Checked before the summary is asked for and written into the note.
+	const host = siteHost(settings.site);
+	const refused = refusal(draft ? 'draft' : 'publish', statusOf(app.metadataCache.getFileCache(file)?.frontmatter), file.basename);
+	if (refused !== null) throw new PublishError(refused);
 	const vault = adapter.getBasePath();
 	const home = homedir();
 
@@ -89,7 +93,6 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		});
 	}
 
-	const host = new URL(settings.site).host;
 	const existing = postOf(context, file);
 	const progress = new Notice(`Asking ${host} what it takes…`, 0);
 	let target: Site;
@@ -323,10 +326,21 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		new Notice(`${done} The site shows it once it has built it.`, 10000);
 		return;
 	}
+	// The post is on the site from here on: a note that doesn't learn its
+	// address would make a second post the next time it's published.
 	const location = response.headers.location;
-	if (location === undefined) throw new PublishError(`${host} took the post but didn't say where it is.`);
-	const url = new URL(location, target.endpoint).href;
-	await record(context, file, draft ? 'draft' : 'published', url);
+	let url: string;
+	try {
+		url = new URL(location ?? '', target.endpoint).href;
+		if (location === undefined) throw new Error('no Location');
+	} catch {
+		throw new PublishError(`${host} took the post but didn't say where it is, so ${file.basename} doesn't know its address. Find the post on your site and put its address in the note's ${POST_PROPERTY} property before publishing again, or it makes a second post.`);
+	}
+	try {
+		await record(context, file, draft ? 'draft' : 'published', url);
+	} catch (error) {
+		throw new PublishError(`${file.basename} is on your site, at ${url}, but its address couldn't be written into the note: ${error instanceof Error ? error.message : String(error)}. Put it in the note's ${POST_PROPERTY} property before publishing again, or it makes a second post.`);
+	}
 	// Waited for on its own, with its own notices: what's next for the note, such
 	// as publishing its draft, is offered at once rather than after the build.
 	if (response.status === 202) void waitForIt(file.basename, url, draft);
@@ -337,6 +351,8 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 export async function withdraw(context: Context, file: TFile, back: boolean): Promise<void> {
 	const url = postOf(context, file);
 	if (url === null) throw new PublishError(`${file.basename} isn't published: it has no ${POST_PROPERTY}.`);
+	const refused = refusal(back ? 'restore' : 'withdraw', statusOf(context.app.metadataCache.getFileCache(file)?.frontmatter), file.basename);
+	if (refused !== null) throw new PublishError(refused);
 	// Asking the site comes before any dialog, so it says so: it can take a
 	// moment, and a command that shows nothing looks like one that didn't run.
 	const { target, draft } = await showing(`Asking your site about ${file.basename}…`, async () => {

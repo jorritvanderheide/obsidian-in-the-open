@@ -39,7 +39,10 @@ decide nothing.
 
 ## Publishing, from start to finish
 
-1. **Check the settings.** The bibliography and citation style have to exist.
+1. **Check the settings.** The site's address has to be an https one
+   (`siteHost`), and the bibliography and citation style have to exist. The
+   command has to fit where the post stands (`refusal`): a withdrawn post is
+   restored before it's updated. One send at a time for each note.
    A note without a summary is asked for one, which goes in the note.
 2. **Ask the site what it takes.** Its home page names its Micropub endpoint
    (a `Link` header or a `<link rel="micropub">`), followed through redirects

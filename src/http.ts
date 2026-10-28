@@ -19,7 +19,9 @@ export function send(url: string, request: Request = {}): Promise<Response> {
 	const { protocol } = new URL(url);
 	const open = protocol === 'https:' ? httpsRequest : httpRequest;
 	return new Promise((resolve, reject) => {
-		const req = open(url, { method: request.method ?? 'GET', headers: request.headers, timeout: TIMEOUT }, (res) => {
+		// A body goes with its length, not in chunks, which some servers take badly.
+		const headers = request.body === undefined ? request.headers : { ...request.headers, 'Content-Length': String(Buffer.byteLength(request.body)) };
+		const req = open(url, { method: request.method ?? 'GET', headers, timeout: TIMEOUT }, (res) => {
 			const chunks: Buffer[] = [];
 			res.on('data', (chunk: Buffer) => chunks.push(chunk));
 			res.on('end', () => resolve({ status: res.statusCode ?? 0, headers: lowerCase(res.headers), body: Buffer.concat(chunks).toString('utf8') }));

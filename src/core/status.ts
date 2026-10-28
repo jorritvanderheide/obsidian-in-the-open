@@ -13,6 +13,22 @@ export type PostStatus = 'unpublished' | 'draft' | 'published' | 'withdrawn';
 
 const STATUSES: PostStatus[] = ['unpublished', 'draft', 'published', 'withdrawn'];
 
+/** What a command does to a note's post. */
+export type Action = 'publish' | 'draft' | 'withdraw' | 'restore';
+
+/**
+ * Why `action` doesn't fit a post that stands at `status`, as a sentence about
+ * the note called `name`, or null when it does. A withdrawn post is restored
+ * before it is updated, and only a withdrawn one is restored: otherwise the
+ * note would say one thing and the site another.
+ */
+export function refusal(action: Action, status: PostStatus | null, name: string): string | null {
+	if (status === 'withdrawn' && (action === 'publish' || action === 'draft')) return `${name} is withdrawn. Restore it first, then publish it again to update it.`;
+	if (status === 'withdrawn' && action === 'withdraw') return `${name} is withdrawn already.`;
+	if (status !== 'withdrawn' && action === 'restore') return `${name} isn't withdrawn, so there's nothing to restore.`;
+	return null;
+}
+
 /**
  * Where the note's post stands, or null for a note that isn't a post.
  *

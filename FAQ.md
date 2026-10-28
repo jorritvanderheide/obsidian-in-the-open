@@ -28,6 +28,12 @@ curl -H "Authorization: Bearer <your token>" "https://example.org/micropub?q=con
 - **It answers `unauthorized`** too: your site has a different token. Use the
   one it has, or give it this one, as your site's own documentation says.
 
+### "… isn't an address In the Open can publish to. Set your site's address in Settings → In the Open, starting with https://, as https://example.org."
+
+**Site** in the settings isn't a whole web address, or isn't https. Set it to
+your site's home page as a browser shows it, such as `https://example.org`:
+In the Open sends your token only over https.
+
 ### "… answered …, so its Micropub endpoint can't be found there."
 
 Your site's home page, the address in **Site**, answered with an error, so
@@ -71,6 +77,26 @@ it wasn't kept or run. Try again later; if it keeps happening, install pandoc
 from [pandoc.org](https://pandoc.org/installing.html).
 
 ## Publishing
+
+### "… is withdrawn. Restore it first, then publish it again to update it."
+
+A withdrawn post stays withdrawn on your site until it's restored, so
+publishing the note would only change its text there. Run **Restore note**
+first, then publish the note to update it.
+
+### "… took the post but didn't say where it is, so … doesn't know its address. …"
+
+Your site made the post but didn't answer with its address, so the note
+can't keep it, and publishing again would make a second post. Find the post
+on your site, and put its address in the note's `published-url` property
+before you publish it again.
+
+### "… is on your site, at …, but its address couldn't be written into the note: …"
+
+The post was published, but writing its address into the note failed, for
+example because the note was moved or its properties don't parse. Put the
+address the message gives in the note's `published-url` property before you
+publish it again, or it makes a second post.
 
 ### "… takes no drafts: it doesn't say so in its Micropub configuration, and a site that doesn't know drafts publishes one at once."
 

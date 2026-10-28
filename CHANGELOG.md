@@ -8,6 +8,19 @@ breaking is in [Compatibility](docs/compatibility.md).
 - A post changed on your site since you last published it is asked about
   again, with **Replace it** to send the note anyway, as 1.0.0 meant: it
   stopped with "… refused it: …" instead.
+- A note is sent once at a time: publishing it again while it is being sent,
+  from a hotkey, a command or a menu, says so, rather than making a second
+  post.
+- Publishing a withdrawn post asks you to restore it first, and Restore only
+  works on a withdrawn one, so the note and your site agree on where the post
+  stands.
+- A site address that isn't one, or isn't https, is said before anything is
+  asked or written into the note, not as "Invalid URL" afterwards.
+- When your site takes a post but doesn't say where it is, or its address
+  can't be written into the note, the message says the post is there and how
+  to keep the next publish from making a second one.
+- Posts and images go with their length, not in chunks, which some servers
+  take badly.
 
 ## 1.0.0
 

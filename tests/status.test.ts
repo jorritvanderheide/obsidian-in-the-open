@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { statusOf } from '../src/core/status';
+import { refusal, statusOf } from '../src/core/status';
 
 describe('statusOf', () => {
 	it('knows a note that is no post', () => {
@@ -21,5 +21,25 @@ describe('statusOf', () => {
 	it('is unpublished without an address, whatever its status says', () => {
 		expect(statusOf({ 'post-status': 'draft' })).toBe('unpublished');
 		expect(statusOf({ 'post-status': 'published', 'published-url': ' ' })).toBe('unpublished');
+	});
+});
+
+describe('refusal', () => {
+	it('restores a withdrawn post before it is updated, and only a withdrawn one', () => {
+		expect(refusal('publish', 'withdrawn', 'Notes')).toBe('Notes is withdrawn. Restore it first, then publish it again to update it.');
+		expect(refusal('draft', 'withdrawn', 'Notes')).toBe('Notes is withdrawn. Restore it first, then publish it again to update it.');
+		expect(refusal('withdraw', 'withdrawn', 'Notes')).toBe('Notes is withdrawn already.');
+		expect(refusal('restore', 'published', 'Notes')).toBe("Notes isn't withdrawn, so there's nothing to restore.");
+		expect(refusal('restore', 'draft', 'Notes')).toBe("Notes isn't withdrawn, so there's nothing to restore.");
+	});
+
+	it('lets the rest through', () => {
+		for (const status of [null, 'unpublished', 'draft', 'published'] as const) {
+			expect(refusal('publish', status, 'Notes')).toBeNull();
+			expect(refusal('draft', status, 'Notes')).toBeNull();
+		}
+		expect(refusal('withdraw', 'published', 'Notes')).toBeNull();
+		expect(refusal('withdraw', 'draft', 'Notes')).toBeNull();
+		expect(refusal('restore', 'withdrawn', 'Notes')).toBeNull();
 	});
 });
