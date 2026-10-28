@@ -3,6 +3,14 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Publish without pandoc installed: In the Open offers to download pandoc's
+  own built-in version the first time, 17 MB, once, and runs it inside
+  Obsidian. An installed pandoc still comes first. Tested with pandoc 3.13,
+  up from 3.7, whose reference lists differ slightly: a journal article
+  without a journal now has its title in italics.
+
 ## 1.0.0-beta.2
 
 - A category your site doesn't have yet is asked about before anything is

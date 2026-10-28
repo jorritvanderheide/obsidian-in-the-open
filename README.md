@@ -37,8 +37,11 @@ posting to a website, so it works with any site that does.
 
 ## 1 Installation
 
-1. **Install pandoc** from [pandoc.org](https://pandoc.org/installing.html).
-   In the Open is tested with pandoc 3.7.
+1. **Pandoc**, which turns a note into a post. If you have it installed, In
+   the Open uses it; it's tested with pandoc 3.13. If you don't, or can't
+   install it, as on a computer your work manages, In the Open offers to
+   download pandoc's own built-in version the first time you publish:
+   17 MB, once. See [What it sends](#111-what-it-sends) for where from.
 2. **For citations, export a `.bib` file from Zotero** with
    [Better BibTeX](https://retorque.re/zotero-better-bibtex/)'s auto-export
    turned on, so it stays up to date as you add papers. Pin your citation
@@ -273,7 +276,7 @@ file explorer or on its tab.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. |
+| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. Without one, In the Open offers to download pandoc's built-in version, once. |
 
 **Citations**
 
@@ -311,8 +314,9 @@ reads the same on your site as in the file you send your supervisor.
 
 ## 11 Network and file disclosure
 
-In the Open runs on your computer, and connects to one place: the site you set
-in **Site**.
+In the Open runs on your computer, and connects to your site, the one you set
+in **Site**. Once, if you agree, it also downloads the built-in pandoc from
+pandoc's release on GitHub.
 
 ### 11.1 What it sends
 
@@ -330,6 +334,10 @@ Only to your site, and only when you run a command:
 - **Questions:** what the site takes, which categories it has, and, for a
   note you publish again, its post as the site has it, to compare.
 - **Your token**, with every request, so your site knows it's you.
+
+To GitHub, only if you agree to download the built-in pandoc: a request for
+pandoc's own release file, `pandoc-3.13-wasm.zip`, and nothing of yours. What
+comes back is checked against a hash in In the Open before it's kept.
 
 ### 11.2 What it reads
 
@@ -356,6 +364,12 @@ Only to your site, and only when you run a command:
 - **Template:** `Post.md` in the template folder, when you make a new post
   and there's no file with that name. If the file is there, edited or not,
   it's never overwritten.
+- **The built-in pandoc:** when you agree to download it, in your user
+  cache folder, outside the vault: `~/.cache/obsidian-citation-core` on
+  Linux, `~/Library/Caches/obsidian-citation-core` on macOS, and
+  `obsidian-citation-core\Cache` in `%LOCALAPPDATA%` on Windows. Due Credit
+  uses the same file. You can delete it; it's downloaded again, if you agree,
+  the next time it's needed.
 - **Temporary files:** For each publish, pandoc's filters and the note's
   properties go in a temporary folder, which is removed afterwards.
 
@@ -366,7 +380,9 @@ Only to your site, and only when you run a command:
 
 ### 11.5 What it runs
 
-- **Pandoc:** The one you set in **Pandoc**. Nothing else.
+- **Pandoc:** The one you set in **Pandoc**, or, without one, the built-in
+  one, which runs inside Obsidian and sees only your vault, your
+  bibliography and citation style, and its temporary folder. Nothing else.
 
 ### 11.6 How releases are built
 

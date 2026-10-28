@@ -53,7 +53,9 @@ decide nothing.
 5. **Check the images:** each needs alt text, and is a PNG or a JPEG.
 6. **Upload the images** to the media endpoint, and put their addresses in
    the note.
-7. **Run pandoc** with the core's `postArgs`, from a temporary folder, and read
+7. **Run pandoc**, the installed one or the built-in one (the core's
+   `pandocFor`, which asks before downloading it), with the core's `postArgs`,
+   every path as that pandoc sees it (`seen`), from a temporary folder, and read
    the post and, as Markdown, its references.
 8. **Compare, for an update,** with the post as the site has it
    (`differences`): what changed is said, and nothing changed is said too,

@@ -88,7 +88,7 @@ export class SettingsTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Pandoc',
-						desc: "The pandoc program: its name if it's on your PATH, or its full path.",
+						desc: "The pandoc program: its name if it's on your PATH, or its full path. Without one, In the Open offers to download pandoc's built-in version, once.",
 						control: { type: 'text', key: 'pandocPath', placeholder: 'pandoc' },
 					},
 				],

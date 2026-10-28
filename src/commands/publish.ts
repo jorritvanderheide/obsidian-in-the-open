@@ -3,10 +3,12 @@
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { homedir } from 'os';
-import { basename, delimiter, dirname, join } from 'path';
-import { FileSystemAdapter, MarkdownView, Notice, parseYaml, type TFile } from 'obsidian';
+import { basename, dirname, join } from 'path';
+import { FileSystemAdapter, MarkdownView, Notice, parseYaml, requestUrl, type App, type TFile } from 'obsidian';
 import {
 	bibKeys,
+	BUILT_IN,
+	builtInFolder,
 	cslPath,
 	expandHome,
 	ExportError,
@@ -16,7 +18,8 @@ import {
 	postProperties,
 	prepare,
 	readReferences,
-	run,
+	pandocFor,
+	seen,
 	settingPath,
 	withFiles,
 	type Missing,
@@ -179,6 +182,11 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const media = target.config.mediaEndpoint;
 	if (pictures.length > 0 && media === null) throw new PublishError(`${host} takes no images (it has no media endpoint), and this note has some.`);
 
+	// Asked for before anything is uploaded, since the built-in pandoc may
+	// have to be downloaded first, which you may not want.
+	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
+	if (pandoc === null) return;
+
 	const making = new Notice(`Preparing ${file.basename}…`, 0);
 	let body: Post;
 	try {
@@ -198,19 +206,22 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		const { content, references } = await withFiles(prepared.metadata, async (files) => {
 			const output = join(dirname(files.references), `post${format === 'markdown' ? '.md' : '.html'}`);
 			try {
-				await run(
-					settings.pandocPath,
-					postArgs(format, {
-						...files,
-						bibliography,
-						csl,
-						resourcePath: [vault, dirname(adapter.getFullPath(file.path))].join(delimiter),
-						hardLineBreaks: lineBreaks(appConfig),
-						output,
-					}),
+				await pandoc.run(
+					postArgs(
+						format,
+						seen(
+							{
+								...files,
+								bibliography,
+								csl,
+								resourcePath: [vault, dirname(adapter.getFullPath(file.path))].map((dir) => pandoc.see(dir)).join(pandoc.delimiter),
+								hardLineBreaks: lineBreaks(appConfig),
+								output,
+							},
+							(path) => pandoc.see(path),
+						),
+					),
 					markdown,
-					vault,
-					'Settings → In the Open',
 				);
 			} catch (error) {
 				// Already a sentence: the core's own kind of failure, said as In the Open's.
@@ -458,4 +469,41 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 		},
 		'Publish anyway',
 	);
+}
+
+/**
+ * The pandoc the **Pandoc** setting asks for. Without an installed one, the
+ * built-in one, which is asked about and downloaded the first time; null when
+ * that's declined.
+ */
+async function pandocToRun(app: App, setting: string, vault: string) {
+	let downloading: Notice | null = null;
+	try {
+		return await pandocFor(
+			setting,
+			vault,
+			'Settings → In the Open',
+			async () => {
+				const yes = await confirm(
+					app,
+					'Download pandoc?',
+					(el) => {
+						el.createEl('p', { text: "Publishing turns a note into a post with pandoc, and In the Open can't find one installed." });
+						el.createEl('p', {
+							text: `In the Open can download pandoc ${BUILT_IN.version} from pandoc's own release on GitHub (${BUILT_IN.megabytes} MB), once. It's kept in ${builtInFolder()}, outside your vault, and runs inside Obsidian. Or install pandoc, or set its full path in Settings → In the Open, and publish again.`,
+						});
+					},
+					'Download',
+				);
+				if (yes) downloading = new Notice(`Downloading pandoc ${BUILT_IN.version}…`, 0);
+				return yes;
+			},
+			async (url) => (await requestUrl({ url })).arrayBuffer,
+		);
+	} catch (error) {
+		if (error instanceof ExportError) throw new PublishError(error.message);
+		throw new PublishError(`Couldn't download pandoc: ${error instanceof Error ? error.message : String(error)}. Try again, or install pandoc.`);
+	} finally {
+		(downloading as Notice | null)?.hide();
+	}
 }

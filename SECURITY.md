@@ -26,7 +26,7 @@ template **New post** makes. See
 are security problems:
 
 - Sending anything the README doesn't list, or sending to anywhere but your
-  site.
+  site, except the one request for the built-in pandoc to pandoc's release.
 - Your token leaving Obsidian's secret storage for anywhere but your site's
   Micropub and media endpoints: into `data.json`, a log, a notice, or another
   site a request is redirected to.
@@ -37,6 +37,8 @@ are security problems:
   there.
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
+- The built-in pandoc being kept or run without matching its pinned hash, or
+  seeing more of your disk than the vault and the files it needs.
 - Something you wrote for yourself, like a comment, reaching your site.
 
 Problems in your site's Micropub endpoint belong to whoever makes it, and
