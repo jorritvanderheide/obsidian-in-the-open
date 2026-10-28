@@ -3,6 +3,14 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## 1.0.0
+
+The first release, for the plugin directory: everything from the betas, as
+1.0.0-beta.3 left it. Publish a note to your website over Micropub, with its
+citations formatted and its reference list, its images, drafts, updates,
+categories, and withdrawing and restoring a post; and without pandoc
+installed, with pandoc's own built-in version.
+
 ## 1.0.0-beta.3
 
 - Publish without pandoc installed: In the Open offers to download pandoc's

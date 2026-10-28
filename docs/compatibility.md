@@ -10,8 +10,8 @@ In the Open's version is `MAJOR.MINOR.PATCH`. A minor or patch release breaks
 nothing below. A major release may, and the changelog then says what changed
 and what to do.
 
-Nothing is promised before the first release, 1.0.0. From then on, this page
-holds.
+This page holds from the first release, 1.0.0. The betas before it promised
+nothing.
 
 ## Your site
 
