@@ -216,7 +216,7 @@ makes sense inside Obsidian:
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Published, they'd only be their query. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word. |
 | A link to a note you've published | A link to its post. |
-| A link to a note you haven't published | Its words, as Obsidian shows them. In the Open lists these links before it sends, so you can publish anyway, or publish those notes first. |
+| A link to a note you haven't published, or only sent as a draft | Its words, as Obsidian shows them: the alias after the `\|`, or the note's name. In the Open lists these links before it sends, so you can publish anyway, or publish those notes first. |
 | `> [!note] Title` | A quote with the title in bold. |
 | `==highlight==` | Plain text, because a site has no highlight of its own. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |

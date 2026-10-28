@@ -3,6 +3,15 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Before you publish, a link to a note without a post is listed by the words
+  your post will show, which are the link's alias when it has one. The list
+  used to show the note's name, which read as if the post would show that.
+- A link to a note that's only a draft is now plain words in your post, like a
+  link to a note you haven't published. It used to go to the draft's address,
+  which is only meant for people you give it to.
+
 ## 1.0.2
 
 - Messages, settings descriptions and the README use plainer words, with less

@@ -118,6 +118,21 @@ A post can go from draft to published, but never back. To change a
 published post, publish the note again, and that updates it. To take it down,
 withdraw it.
 
+### "A link will be plain text on your site"
+
+Before it sends, In the Open lists the links that will go out as plain words.
+A link to a note you haven't published, or only sent as a draft, shows the
+same words it shows in Obsidian: `[[Raised beds|my post on beds]]` becomes
+"my post on beds", and `[[Raised beds]]` becomes "Raised beds". A draft's
+address is only for the people you give it to, so a post never links to one.
+To get a real link, publish that note first, then publish this one again.
+
+The same list has links to papers your bibliography doesn't have, and links
+to no note at all. Those go out as their names instead of citations. For a
+paper, usually Better BibTeX changed the key, or its auto-export hasn't run
+since you added the paper. You can publish anyway, or cancel and fix the link
+first.
+
 ### "… has no alt text, the words a reader gets when they can't see an image. …"
 
 Every image you publish needs alt text. A reader who can't see the image, or

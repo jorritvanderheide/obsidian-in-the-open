@@ -20,7 +20,7 @@ installed one, or the built-in one, which it downloads, checks and runs
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
 | `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config` and `q=source`, the requests' bodies, an answer's error, images and their upload. Pure, with a test named after it. |
-| `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`. Pure, with a test named after it. |
+| `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`, and which posts another post may link to. Pure, with a test named after it. |
 | `src/core/template.ts` | The post template the plugin ships, and filling in its title. Pure, with a test named after it. |
 | `src/http.ts` | What goes over the wire: Node's `https`, which never follows a redirect with the token. |
 | `src/site.ts` | A site: its endpoint and what it takes, and the requests that carry the token. |

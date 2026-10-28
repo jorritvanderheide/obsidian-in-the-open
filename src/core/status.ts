@@ -30,6 +30,16 @@ export function refusal(action: Action, status: PostStatus | null, name: string)
 }
 
 /**
+ * Whether another post may link to a post that stands at `status`. A draft's
+ * address is only for whoever has it, so a link to a draft goes out as its
+ * words until the draft is published. A withdrawn post's address keeps
+ * working, and links to it still lead there.
+ */
+export function linkable(status: PostStatus | null): boolean {
+	return status === 'published' || status === 'withdrawn';
+}
+
+/**
  * Where the note's post stands, or null for a note that isn't a post.
  *
  * A note is a post when it has either property. Without an address it is

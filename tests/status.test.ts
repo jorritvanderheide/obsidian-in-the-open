@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { refusal, statusOf } from '../src/core/status';
+import { linkable, refusal, statusOf } from '../src/core/status';
 
 describe('statusOf', () => {
 	it('knows a note that is no post', () => {
@@ -41,5 +41,15 @@ describe('refusal', () => {
 		expect(refusal('withdraw', 'published', 'Notes')).toBeNull();
 		expect(refusal('withdraw', 'draft', 'Notes')).toBeNull();
 		expect(refusal('restore', 'withdrawn', 'Notes')).toBeNull();
+	});
+});
+
+describe('linkable', () => {
+	it('lets a post link to a published or withdrawn post, and never to a draft', () => {
+		expect(linkable('published')).toBe(true);
+		expect(linkable('withdrawn')).toBe(true);
+		expect(linkable('draft')).toBe(false);
+		expect(linkable('unpublished')).toBe(false);
+		expect(linkable(null)).toBe(false);
 	});
 });

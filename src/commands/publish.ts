@@ -31,7 +31,7 @@ import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
-import { POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
+import { linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
 /** How long a new post may take to go live before In the Open stops waiting. */
@@ -157,7 +157,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	// without a post here.
 	const linkedPost = (linkpath: string) => {
 		const dest = app.metadataCache.getFirstLinkpathDest(linkpath, file.path);
-		const url = dest ? postOf(context, dest) : null;
+		const url = dest && linkable(statusOf(app.metadataCache.getFileCache(dest)?.frontmatter)) ? postOf(context, dest) : null;
 		return url !== null && url.startsWith(`${settings.site}/`) ? url : null;
 	};
 	const prepared = prepare(text, lookup, {
@@ -474,9 +474,14 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 		count === 1 ? 'A link will be plain text on your site' : `${count} links will be plain text on your site`,
 		(el) => {
 			if (missing.unpublished.length > 0) {
-				el.createEl('p', { text: "These link to notes you haven't published, so they'll show as their words:" });
-				list(el, missing.unpublished);
-				el.createEl('p', { text: 'Publish them first, and their links go to their posts.' });
+				el.createEl('p', { text: "These link to notes you haven't published, or only sent as a draft. Your post will show their words, without a link:" });
+				const ul = el.createEl('ul');
+				for (const { words, note } of missing.unpublished) {
+					const li = ul.createEl('li');
+					li.createEl('code', { text: words });
+					if (words !== note) li.appendText(`, which links to ${note}`);
+				}
+				el.createEl('p', { text: 'Publish those notes first, then publish this one again, and the links go to their posts.' });
 			}
 			if (missing.papers.length > 0) {
 				el.createEl('p', { text: `These link to papers that ${bib} doesn't have, so they'll show as plain names instead of citations:` });
