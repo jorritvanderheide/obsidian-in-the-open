@@ -305,7 +305,9 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	if (location === undefined) throw new PublishError(`${host} took the post but didn't say where it is.`);
 	const url = new URL(location, target.endpoint).href;
 	await record(context, file, draft ? 'draft' : 'published', url);
-	if (response.status === 202) await waitForIt(file.basename, url, draft);
+	// Waited for on its own, with its own notices: what's next for the note, such
+	// as publishing its draft, is offered at once rather than after the build.
+	if (response.status === 202) void waitForIt(file.basename, url, draft);
 	else live(file.basename, url, draft);
 }
 
@@ -389,7 +391,10 @@ async function writeProperties(context: Context, file: TFile, change: (frontmatt
 	await app.fileManager.processFrontMatter(file, change);
 }
 
-/** Ask for the new post until it answers, and say when it's up, or that it isn't yet. */
+/**
+ * Ask for the new post until it answers, and say when it's up, or that it
+ * isn't yet. Never fails: a request that goes wrong is one more try.
+ */
 async function waitForIt(name: string, url: string, draft: boolean): Promise<void> {
 	const waiting = new Notice(`Sent ${name}. Waiting for the site to put it up…`, 0);
 	const until = Date.now() + WAIT;
