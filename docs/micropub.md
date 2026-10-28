@@ -203,6 +203,28 @@ Authorization: Bearer <token>
   `q=source`, or leaves a property out, is sent the update as it would be
   otherwise.
 
+### Changed elsewhere
+
+A post can change on the site after the plugin last sent it, by hand or by
+another tool, and an update replaces that change with the note. A site that
+can tell may refuse the update instead:
+
+```http
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{"error": "conflict", "error_description": "log/nixos-module-system was edited elsewhere since it was last published (commit 3f2a1b9)"}
+```
+
+The plugin then asks whether to replace that change, and if so sends the
+update again, saying so:
+
+```json
+{ "action": "update", "url": "...", "mp-overwrite": true, "replace": { "...": ["..."] } }
+```
+
+A site that doesn't know `mp-overwrite` never sends `409`, so never sees it.
+
 ## Drafts
 
 A draft is a post on the site that only its address leads to, so you can see
