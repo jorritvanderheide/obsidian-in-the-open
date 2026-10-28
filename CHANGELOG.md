@@ -3,6 +3,12 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- A post changed on your site since you last published it is asked about
+  again, with **Replace it** to send the note anyway, as 1.0.0 meant: it
+  stopped with "… refused it: …" instead.
+
 ## 1.0.0
 
 The first release, for the plugin directory: everything from the betas, as

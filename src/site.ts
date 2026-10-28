@@ -15,7 +15,6 @@ export interface Site {
 /** Find the site's endpoint, and ask what it takes. */
 export async function connect(home: string, token: string): Promise<Site> {
 	const { url, response } = await page(`${home}/`);
-	if (response.status === 409) throw new ConflictError(failure(response));
 	if (response.status >= 400) throw new PublishError(`${home} answered ${response.status}, so its Micropub endpoint can't be found there.`);
 	const endpoint = endpointFrom(url, response);
 	if (endpoint === null) {
@@ -38,6 +37,10 @@ export async function call(site: Site, url: string, request: { method: string; t
 		throw new PublishError(`${new URL(url).host} answered with a redirect, which In the Open doesn't follow with your token. Check the site's address in the settings.`);
 	}
 	if (response.status === 401) throw new PublishError(`${new URL(url).host} doesn't take your token. Check the token in Settings → In the Open.`);
+	// The post was changed on the site since it was last sent (docs/micropub.md,
+	// Changed elsewhere): publishing asks before sending it again with
+	// mp-overwrite.
+	if (response.status === 409) throw new ConflictError(failure(response));
 	if (response.status >= 400) throw new PublishError(`${new URL(url).host} refused it: ${failure(response)}`);
 	return response;
 }
