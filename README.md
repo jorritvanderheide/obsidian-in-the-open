@@ -61,9 +61,9 @@ In the Open needs Obsidian 1.13 or later, on desktop.
 3. **Start a post.** Run **New post** and give it a title. In the Open makes
    a note from its template, with a `summary` property to fill in: one
    sentence about the post.
-4. **Publish it as a draft.** Press the pencil in the note's title bar. In the
-   Open sends it, writes the post's address to the note's `published-url`
-   property, and tells you when the draft is up. Only its address leads to
+4. **Publish it as a draft.** Press the upload button in the note's title
+   bar. In the Open sends it, writes the post's address to the note's
+   `published-url` property, and tells you when the draft is up. Only its address leads to
    it, so you can see it as readers will.
 5. **Publish it.** Press the button again. The pill beside it says where the
    post stands, and clicking the pill updates, opens or withdraws it.

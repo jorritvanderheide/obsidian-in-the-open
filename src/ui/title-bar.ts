@@ -19,7 +19,7 @@ export interface Actions {
 }
 
 const PILLS: Record<Exclude<PostStatus, 'unpublished'>, { word: string; icon: string; tip: string }> = {
-	draft: { word: 'Draft', icon: 'pencil', tip: 'A draft: only its address leads to it' },
+	draft: { word: 'Draft', icon: 'eye-off', tip: 'A draft: only its address leads to it' },
 	published: { word: 'Published', icon: 'globe', tip: 'Published on your site' },
 	withdrawn: { word: 'Withdrawn', icon: 'archive', tip: "Withdrawn: off your site's lists, at the same address" },
 };
@@ -69,7 +69,7 @@ function decorateOne(app: App, actions: Actions, view: MarkdownView): void {
 	const next = now === null || actions.busy(now.file) ? null : now.status === 'unpublished' ? 'draft' : now.status === 'draft' ? 'publish' : null;
 	if (next !== null) {
 		step.empty();
-		setIcon(step, next === 'draft' ? 'pencil' : 'send');
+		setIcon(step, next === 'draft' ? 'file-up' : 'send');
 		step.setAttribute('aria-label', next === 'draft' ? 'Publish as a draft' : 'Publish');
 	}
 	step.toggle(next !== null);
@@ -97,7 +97,7 @@ function menu(app: App, actions: Actions, file: TFile, status: PostStatus): Menu
 		if (typeof url === 'string') item(title, 'external-link', () => window.open(url));
 	};
 	if (status === 'draft') {
-		item('Update the draft', 'pencil', () => actions.publish(file, true));
+		item('Update the draft', 'file-up', () => actions.publish(file, true));
 		open('Open the draft');
 		item('Discard the draft', 'trash-2', () => actions.withdraw(file, false));
 	} else if (status === 'published') {
