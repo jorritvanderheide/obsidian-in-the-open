@@ -37,6 +37,7 @@ decide nothing.
 ## Publishing, from start to finish
 
 1. **Check the settings.** The bibliography and citation style have to exist.
+   A note without a summary is asked for one, which goes in the note.
 2. **Ask the site what it takes.** Its home page names its Micropub endpoint
    (a `Link` header or a `<link rel="micropub">`), followed through redirects
    without the token; `q=config` says whether it takes the references

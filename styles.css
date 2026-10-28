@@ -27,3 +27,14 @@
 	width: var(--icon-s);
 	height: var(--icon-s);
 }
+
+/* A question's answer is a sentence, so its field spans the dialog. */
+.in-the-open-ask .setting-item-info {
+	display: none;
+}
+
+.in-the-open-ask .setting-item-control,
+.in-the-open-ask input {
+	flex: 1;
+	width: 100%;
+}

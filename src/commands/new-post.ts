@@ -9,7 +9,7 @@ import type { Context } from '../context';
 
 export async function newPost(context: Context): Promise<void> {
 	const { app } = context;
-	const title = await ask(app, 'New post', 'Its title');
+	const title = await ask(app, { title: 'New post', placeholder: 'Its title', cta: 'Create' });
 	if (title === null) return;
 	const name = noteName(title);
 	if (name === '') throw new PublishError("A post's title needs letters or digits, for its note's name.");

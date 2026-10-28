@@ -40,6 +40,7 @@ holds.
   title bar says where it stands; one with an address and no status is
   published. They're how the next publish finds the post, and what your own
   searches and Bases may list, so renaming either, or a status, is breaking.
+  And `summary`, when a note has none and you type one in before publishing.
 - **The template:** `Post.md` in the **Template folder**, seeded when it's
   missing and never overwritten. `{{title}}` in it becomes the post's title;
   a new placeholder isn't breaking, and dropping one is.

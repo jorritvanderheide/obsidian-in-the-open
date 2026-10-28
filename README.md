@@ -75,8 +75,9 @@ In the Open needs Obsidian 1.13 or later, on desktop.
 In the Open sends one note, and only to the site you set. What you wrote for
 yourself never leaves: comments are stripped, and only the title, summary,
 categories and slug go along from the note's properties. In your vault it
-writes only the post's address and status, in the note you publish, and the
-notes and the template **New post** makes.
+writes only the post's address and status, and a summary you type in when
+it asks, in the note you publish, and the notes and the template **New post**
+makes.
 [Section 11](#11-network-and-file-disclosure) lists exactly what it reads,
 sends and writes.
 
@@ -325,7 +326,9 @@ Only to your site, and only when you run a command:
 
 - **The post's address and status:** the `published-url` and `post-status`
   properties, in the note you publish, withdraw or restore. The address is
-  removed when you discard its draft. Nothing else in your notes.
+  removed when you discard its draft.
+- **A summary:** the `summary` property, when you publish a note without one
+  and type one in when In the Open asks. Nothing else in your notes.
 - **New posts:** the note **New post** makes, where Obsidian puts new notes.
 - **Template:** `Post.md` in the template folder, when you make a new post
   and there's no file with that name. If the file is there, edited or not,

@@ -27,6 +27,7 @@ import { actionBody, createBody, imageType, images, multipart, PublishError, upd
 import { send } from '../http';
 import { connect, isDraft, post, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
+import { ask } from '../ui/prompt';
 import { POST_PROPERTY, STATUS_PROPERTY, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
@@ -65,6 +66,24 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const csl = settings.csl ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
 	if (csl && !existsSync(csl)) {
 		throw new PublishError(`There's no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
+	}
+
+	// Asked for before anything is sent, and kept in the note, so it's asked
+	// once. The metadata cache may not have the new property yet when the post
+	// is put together, so the answer is used as it is.
+	let summary = postProperties(app.metadataCache.getFileCache(file)?.frontmatter).summary;
+	if (summary === null) {
+		summary = await ask(app, {
+			title: `A summary for ${file.basename}`,
+			description: 'One sentence about the post, which your site shows under its title and in its feed. It goes in the note as its summary property.',
+			placeholder: 'What the post is about',
+			cta: 'Save',
+		});
+		if (summary === null) return;
+		const answer = summary;
+		await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+			frontmatter.summary = answer;
+		});
 	}
 
 	const host = new URL(settings.site).host;
@@ -200,7 +219,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		const title = typeof prepared.metadata.title === 'string' ? prepared.metadata.title : file.basename;
 		const body: Post = {
 			title,
-			summary: properties.summary,
+			summary,
 			content: format === 'markdown' ? { markdown: content } : { html: content },
 			categories: properties.categories,
 			slug: properties.slug,
