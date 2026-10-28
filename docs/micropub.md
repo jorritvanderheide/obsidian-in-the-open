@@ -26,7 +26,8 @@ Authorization: Bearer <token>
 ```json
 {
   "media-endpoint": "https://example.org/micropub/media",
-  "references": 1
+  "references": 1,
+  "post-status": ["published", "draft"]
 }
 ```
 
@@ -36,6 +37,10 @@ Authorization: Bearer <token>
   takes it gets `content` as Markdown and the works the post cites. Without
   it, a site gets `content` as HTML, and the citations as
   [References](#references) describes.
+- `post-status` lists the statuses a post can have. With `draft` in it, the
+  plugin can send a draft; see [Drafts](#drafts). Without it, the plugin
+  sends none, because a site that doesn't know Micropub's `post-status`
+  publishes a draft at once.
 
 `GET /micropub?q=category` lists the site's categories,
 `{"categories": ["tech", "notes"]}`, so the plugin can offer them rather than
@@ -80,6 +85,7 @@ Content-Type: application/json
 | `category` | | Its categories. |
 | `mp-slug` | | The slug it should have. The site may choose another. |
 | `published` | | When it was published. Without it, the site uses the time it received it. |
+| `post-status` | | `draft` for a draft; see [Drafts](#drafts). Without it, the post is published. |
 | `references` | | The works it cites; see [References](#references). |
 
 The site answers `201 Created`, or `202 Accepted` when the post appears only
@@ -165,10 +171,54 @@ The slug and `published` never change. `updated` is added to `replace` only
 when you mark the change as one of substance; correcting a typo leaves it
 out. The site answers `204 No Content`.
 
+## Drafts
+
+A draft is a post on the site that only its address leads to, so you can see
+it as readers will before they can. The plugin sends one as a new post with
+`"post-status": ["draft"]`, sends it again as an update while it is one, and
+publishes it with an update that replaces `post-status`:
+
+```json
+{
+  "action": "update",
+  "url": "https://example.org/log/nixos-module-system/",
+  "replace": {
+    "post-status": ["published"],
+    "name": ["..."],
+    "content": ["..."]
+  }
+}
+```
+
+- **A draft is in none of the site's lists**, nor its feed, its sitemap or
+  anything else that announces a post, and its page asks search engines not
+  to index it. Otherwise it looks as the post will. Its address is unlisted,
+  not secret.
+- **A published post links to no draft**, since the link would lead its
+  readers there. A site refuses a post that does.
+- **Its date is when it is published**, not when it was drafted. The update
+  that publishes it has no `updated`.
+- **A published post never becomes a draft again.** A site refuses
+  `"post-status": ["draft"]` for one.
+- **Deleting a draft discards it**: it was never public, so nothing links to
+  it and nobody has cited it. An undelete then finds no post.
+
+To know whether a post is a draft, the plugin asks for its source, as
+Micropub says. A site that takes drafts answers this:
+
+```http
+GET /micropub?q=source&properties[]=post-status&url=https://example.org/log/nixos-module-system/
+Authorization: Bearer <token>
+```
+
+```json
+{ "properties": { "post-status": ["draft"] } }
+```
+
 ## Withdrawing a post
 
-A post is never deleted: other posts link to it, and people may have cited
-it. A delete request withdraws it, and an undelete brings it back:
+A published post is never deleted: other posts link to it, and people may
+have cited it. A delete request withdraws it, and an undelete brings it back:
 
 ```json
 { "action": "delete", "url": "https://example.org/log/nixos-module-system/" }
