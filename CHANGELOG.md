@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.2.0
 
 - Markdown images of files in your vault, like `![A raised bed](bed.png)`,
   are uploaded with the post, as `![[bed.png]]` always was. They used to go
