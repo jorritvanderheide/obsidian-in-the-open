@@ -19,7 +19,7 @@ and [Due Credit](https://community.obsidian.md/plugins/due-credit). See
 [![Checks](https://github.com/jorritvanderheide/obsidian-in-the-open/actions/workflows/ci.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-in-the-open/actions/workflows/ci.yml)
 [![License: EUPL-1.2](https://img.shields.io/badge/license-EUPL--1.2-blue?style=flat-square)](LICENSE)
 
-<!-- SCREENSHOT images/hero.png: a note with citation links in Obsidian, next to the same post on a website, with its citations and reference list -->
+![A note with citation links in Obsidian, next to the same post on its website, with its citations formatted and its reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/hero.png)
 
 You write in Obsidian, and your citations are links: `[[marsh2024]]` opens the
 paper, and the paper's backlinks show everywhere you cited it. But a blog post
@@ -141,7 +141,7 @@ If you want to work on the plugin, or make your site take its posts:
 - **In the title bar** - A post's status as a pill, Draft, Published or
   Withdrawn, and its next step as a button.
 
-  <!-- SCREENSHOT images/title-bar.png: a draft's title bar, with the Draft pill and the Publish button beside it -->
+  ![A draft's title bar, with the Draft pill and the Publish button beside it](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/title-bar.png)
 
 - **Categories from your site** - **Set categories** offers the categories
   your site has, and takes a new one, which your site makes when you
