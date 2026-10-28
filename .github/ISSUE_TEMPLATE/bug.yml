@@ -33,7 +33,7 @@ body:
       id: site
       attributes:
           label: Your site
-          description: What runs its Micropub endpoint, and whether it takes the references extension.
+          description: The software your site takes posts with, and whether it takes the references extension, if you know.
           placeholder: WordPress with the Micropub plugin, my own code, ...
       validations:
           required: true
@@ -66,7 +66,7 @@ body:
       id: pandoc
       attributes:
           label: Pandoc version
-          description: The first line of `pandoc --version`.
+          description: The first line of `pandoc --version`, or "built-in" if In the Open downloaded its own.
       validations:
           required: true
 

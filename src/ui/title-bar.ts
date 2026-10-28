@@ -19,9 +19,9 @@ export interface Actions {
 }
 
 const PILLS: Record<Exclude<PostStatus, 'unpublished'>, { word: string; icon: string; tip: string }> = {
-	draft: { word: 'Draft', icon: 'eye-off', tip: 'A draft: only its address leads to it' },
+	draft: { word: 'Draft', icon: 'eye-off', tip: 'A draft, which only people with its address can find' },
 	published: { word: 'Published', icon: 'globe', tip: 'Published on your site' },
-	withdrawn: { word: 'Withdrawn', icon: 'archive', tip: "Withdrawn: off your site's lists, at the same address" },
+	withdrawn: { word: 'Withdrawn', icon: 'archive', tip: "Withdrawn from your site's lists, and still at the same address" },
 };
 
 /**

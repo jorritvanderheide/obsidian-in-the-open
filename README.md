@@ -2,8 +2,10 @@
 
 **Publish a note to your website over Micropub, with its links turned into real citations.**
 
-Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail)
-and [Due Credit](https://community.obsidian.md/plugins/due-credit). See
+Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
+which turns your Zotero library into a reading queue, with a note for each
+paper, and [Due Credit](https://community.obsidian.md/plugins/due-credit), which
+exports a note to Word, PDF or LaTeX with the same citations. See
 [Works well with](#10-works-well-with).
 
 <br/>
@@ -15,37 +17,41 @@ and [Due Credit](https://community.obsidian.md/plugins/due-credit). See
 
 ![A note with citation links in Obsidian, next to the same post on its website, with its citations formatted and its reference list](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/hero.png)
 
-You write in Obsidian, and your citations are links: `[[marsh2024]]` opens the
-paper, and the paper's backlinks show everywhere you cited it. But a blog post
-needs more than a copy of the note. It needs real citations and a reference
-list, your links to other posts pointing at those posts, and none of the
-comments you left for yourself.
+You write in Obsidian, and your citations are links. `[[marsh2024]]` opens the
+paper, and the paper's backlinks show everywhere you cited it. Then you want to
+put the piece on your blog. Copy it over, and `[[marsh2024]]` is just a word in
+brackets. Your links to other posts lead nowhere, and the comments you left for
+yourself are there for anyone to read.
 
-In the Open sends the note you have open to your website, ready to read. It
-formats your citations in the style you choose, sends the reference list along
-with the post, and leaves out everything that only makes sense in Obsidian. It
-speaks [Micropub](https://www.w3.org/TR/micropub/), the open standard for
-posting to a website, so it works with any site that does.
+In the Open publishes the note for you. Your citations come out in the style
+you choose, with a reference list, and a link to a note you've already
+published points to its post. Everything that only makes sense in Obsidian
+stays behind. It sends the post with
+[Micropub](https://www.w3.org/TR/micropub/), an open standard for posting to a
+website. Any site that supports it can take your posts.
 
 <br/>
 
 ## 1 Installation
 
-1. **Pandoc**, which turns a note into a post. If you have it installed, In
-   the Open uses it; it's tested with pandoc 3.13. If you don't, or can't
-   install it, as on a computer your work manages, In the Open offers to
-   download pandoc's own built-in version the first time you publish:
-   17 MB, once. See [What it sends](#111-what-it-sends) for where from.
+1. **Pandoc.** It's the program that turns a note into a post. If you have it
+   installed, In the Open uses yours, and it's tested with pandoc 3.13. If you
+   don't have it, or can't install programs (say, on a computer your work
+   manages), In the Open offers to download pandoc's own built-in version the
+   first time you publish. That's 17 MB, once.
+   [What it sends](#111-what-it-sends) says where it comes from.
 2. **For citations, export a `.bib` file from Zotero** with
    [Better BibTeX](https://retorque.re/zotero-better-bibtex/)'s auto-export
    turned on, so it stays up to date as you add papers. Pin your citation
-   keys in Better BibTeX: a published post cites a key for good.
-3. **Have a site that takes Micropub.** To have your references show as a
-   reference list, it also needs the references extension; see
-   [Your site](#62-what-your-site-gets).
-4. **Install In the Open** in Obsidian: go to Settings → Community plugins →
-   Browse, search for "In the Open", then install and enable it. You can also
-   open [its page in the plugin directory](https://community.obsidian.md/plugins/in-the-open).
+   keys in Better BibTeX as well. A published post cites each work by its key,
+   and the key should stay the same after that.
+3. **Have a site that takes Micropub.** Any Micropub site gets your post with
+   its citations and a reference list. A site that also takes the references
+   extension gets every work on its own as well, and can show the references
+   its own way. [What your site gets](#62-what-your-site-gets) has the details.
+4. **Install In the Open.** In Obsidian, go to Settings → Community plugins →
+   Browse, search for "In the Open", and install and enable it. You can also
+   find it on [its page in the plugin directory](https://community.obsidian.md/plugins/in-the-open).
 
 In the Open needs Obsidian 1.13 or later, on desktop.
 
@@ -57,49 +63,54 @@ In the Open needs Obsidian 1.13 or later, on desktop.
    site's address, and **Token** to the token your site gave you.
 2. **Point In the Open at your bibliography.** Set **Bibliography** to your
    `.bib` file. The default is `Literature/library.bib` in your vault.
-3. **Start a post.** Run **New post** and give it a title. In the Open makes
-   a note from its template, with a `summary` property to fill in: one
-   sentence about the post. Any note with a `post-status` property is a post,
-   so a template of your own works too, as long as it has
-   `post-status: unpublished`. **Set categories** picks the post's categories
-   from the ones your site has.
+3. **Start a post.** Run **New post** and give it a title. You get a note from
+   the post template, with a `summary` property where you write one sentence
+   about the post. Any note with a `post-status` property counts as a post, so
+   your own template works too, as long as it has `post-status: unpublished`.
+   To pick the post's categories from the ones your site has, run
+   **Set categories**.
 4. **Publish it as a draft.** Press the upload button in the note's title
    bar. If the note has no summary yet, In the Open asks for one. It sends the
-   note, writes the post's address to its `published-url` property, and tells
-   you when the draft is up. Only its address leads to it, so you can see it
-   as readers will.
+   note, saves the post's address in the note's `published-url` property, and
+   tells you when the draft is up. A draft stays out of your site's lists and
+   feed, so only people with its address can find it. You can read it on your
+   site before anyone else does.
 5. **Publish it.** Press the button again. The pill beside it says where the
-   post stands, and clicking the pill updates, opens or withdraws it.
+   post stands. Click the pill to update, open or withdraw the post.
 
 <br/>
 
 ## 3 Safety and quality
 
-In the Open sends one note, and only to the site you set. What you wrote for
-yourself never leaves: comments are stripped, and only the title, summary,
-categories and slug go along from the note's properties. In your vault it
-writes only the post's address and status, a summary you type in when it
-asks, and categories you set, in the note you publish, and the notes and the
-template **New post** makes. Once, if you agree, it downloads the built-in
-pandoc from pandoc's release on GitHub, when you have none installed.
-[Section 11](#11-network-and-file-disclosure) lists exactly what it reads,
-sends and writes.
+In the Open sends the note you publish to the site you set. What you wrote
+for yourself stays in your vault. Comments are left out, and of the note's
+properties only the title, summary, categories and slug go along. The slug is
+the last part of the post's address.
 
-Your token is kept in Obsidian's secret storage, not in the plugin's settings
-file, so it doesn't travel with a vault you sync or commit.
+In your vault, In the Open changes only what publishing needs. In the note you
+publish, that's the post's address and status, and a summary or categories
+when you add them through In the Open. **New post** also makes a note, and the
+template it starts from. When you have no pandoc installed, In the Open offers
+to download pandoc's built-in version, once, from pandoc's release on GitHub.
+It only does that if you agree. [Section 11](#11-network-and-file-disclosure)
+lists exactly what it reads, sends and writes.
 
-The health report in Obsidian's plugin directory warns about two things, and
-both are how publishing works. *Shell Execution* is pandoc: In the Open starts
-an installed one directly, without a shell in between, and starts nothing
-else. *Direct Filesystem Access* is for what the Obsidian API can't reach:
-reading your bibliography and citation style wherever you keep them, and the
-images you publish, checking that the files in your settings exist, putting
-pandoc's filters and the note's properties in a temporary folder, and keeping
-the built-in pandoc in your cache folder.
+Your token is kept in Obsidian's keychain. It isn't in the plugin's settings
+file, so it stays behind when you sync or commit your vault.
 
-Every push is tested, and every release is built in the open with a signed
-attestation, so you can check that the file you installed is the one that was
-built. [Section 11.6](#116-how-releases-are-built) says how.
+The health report in Obsidian's plugin directory warns about two things. Both
+are part of how publishing works. *Shell Execution* means running pandoc. In
+the Open starts an installed pandoc directly, without a shell in between, and
+starts nothing else. *Direct Filesystem Access* is for the files the Obsidian
+API can't reach. In the Open uses it to read your bibliography, your citation
+style and the images you publish, wherever you keep them, and to check that
+the files in your settings exist. It also puts pandoc's filters and the note's
+properties in a temporary folder, and keeps the built-in pandoc in your cache
+folder.
+
+Every change is tested. Every release is built in public on GitHub, and you
+can check that the file you installed is the one GitHub built.
+[Section 11.6](#116-how-releases-are-built) shows how.
 
 <br/>
 
@@ -141,29 +152,30 @@ If you want to work on the plugin, or make your site take its posts:
 
 - **New post** - A note from your post template, with the properties a post
   needs. The template is yours to edit.
-- **In the title bar** - A post's status as a pill, Draft, Published or
-  Withdrawn, and its next step as a button.
+- **In the title bar** - A pill says whether the post is a draft, published
+  or withdrawn, and a button beside it offers the next step.
 
   ![A draft's title bar, with the Draft pill and the Publish button beside it](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/title-bar.png)
 
 - **Categories from your site** - **Set categories** offers the categories
-  your site has, and takes a new one, which your site makes when you
-  publish.
+  your site already has. You can add a new one too, and a site that takes new
+  categories makes it when you publish.
 - **One command** - Publish the note you have open, or any note from its
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
-  same address, and says first what changed. When nothing did, it sends
-  nothing, and when the post was changed on your site, it asks before
-  replacing that.
-- **Drafts first** - See a post on your site before anyone else does: a
-  draft is at its address, but in none of your site's lists or its feed,
-  until you publish it. On a site that takes drafts.
+  same address, and tells you first what changed. If nothing did, it sends
+  nothing. If the post was changed on your site, it asks before replacing
+  that change.
+- **Drafts first** - See a post on your site before anyone else does. A draft
+  has its own address, but it stays out of your site's lists and feed until
+  you publish it. Your site has to take drafts for this.
 - **Knows when it's live** - On a site that builds before it shows a post,
   In the Open waits and tells you when it's up, or that it isn't yet.
 - **Withdraw, and bring back** - Take a post off your site's lists without
   breaking the links to it, say why, and restore it later.
-- **Images included** - Images in the note are uploaded with it. Every image
-  needs alt text, so every reader gets it.
+- **Images included** - PNG and JPEG images in the note are uploaded with it.
+  Each one needs alt text, so a reader who can't see the image still knows
+  what it shows.
 - **Works with any Micropub site** - A site that knows nothing of citations
   still gets a finished post, as HTML, with its reference list.
 
@@ -206,24 +218,25 @@ makes sense inside Obsidian:
 | A link to a note you've published | A link to its post. |
 | A link to a note you haven't published | Its words, as Obsidian shows them. In the Open lists these links before it sends, so you can publish anyway, or publish those notes first. |
 | `> [!note] Title` | A quote with the title in bold. |
-| `==highlight==` | Plain text: a site has no highlight of its own. |
+| `==highlight==` | Plain text, because a site has no highlight of its own. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |
 | Your headings | A level down, under the post's title, which the site shows as the page's heading. |
 
 ### 6.2 What your site gets
 
-A Micropub post: the title, the summary, the text, the categories and the
-slug. In the Open compares the categories with your site's first, when it
-lists them, and asks before sending one it doesn't have yet: a new category
-is often a typo. With the references
-extension, it gets the text as Markdown, every work the post cites,
-formatted, and each citation as a link to its work. Any other
-site gets the text as HTML, ready to show, with the citations as plain text
-and the reference list at the end.
+Your site gets a Micropub post with the title, the summary, the text, the
+categories and the slug, the last part of the post's address. If your site
+lists its categories, In the Open checks the post's against them first. It
+asks before sending one your site doesn't have yet, because a new category is
+often a typo.
+
+A site that takes the references extension gets the text as Markdown, with
+each citation as a link to its work, and every work the post cites, already
+formatted. Any other site gets the text as HTML, ready to show, with the
+citations as plain text and the reference list at the end.
 
 What a site has to do to take these posts, the extension included, is in
 [Micropub](docs/micropub.md).
-
 
 <br/>
 
@@ -234,30 +247,34 @@ In the Open reads citations exactly as Due Credit does, through the same code:
 `[@marsh2024, p. 12]`, and the rest. Every form is in Due Credit's
 [Citations](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/docs/citations.md).
 
-A link to a paper whose key isn't in your bibliography would go out as its
-plain name, so In the Open lists those before it sends, as Due Credit does
-before an export: you can publish anyway, or fix the key first.
+Before it sends anything, In the Open lists every link to a paper whose key
+isn't in your bibliography, since that link would go out as its plain name.
+Due Credit does the same before an export. You can publish anyway, or fix the
+key first.
 
 <br/>
 
 ## 8 Commands
 
-None of the commands has a hotkey, so you can choose your own in Settings →
-Hotkeys. Each one but New post is also on a note's right-click menu, in the
-file explorer or on its tab.
+None of the commands come with a hotkey, so they won't clash with the ones
+you already use. You can set your own in Settings → Hotkeys.
 
 - `In the Open: New post` - Makes a note from your post template, marked as a
   post, so its title bar offers to publish it.
 - `In the Open: Publish note` - Sends the note to your site, or updates its post
   if it's published already. A draft is published, dated today.
 - `In the Open: Publish note as a draft` - Sends the note as a draft, or
-  updates its draft. Only its address leads to it, until you publish it.
+  updates the draft it has. Until you publish it, only people with its
+  address can find it.
 - `In the Open: Withdraw note` - Takes the post off your site's lists, and
-  asks why, which its page can show. Its address keeps working. A draft is
-  discarded instead, and the note forgets its address.
+  asks why, so its page can say. Its address keeps working. A draft is
+  discarded instead, and its address is removed from the note.
 - `In the Open: Restore note` - Brings a withdrawn post back.
 - `In the Open: Set categories` - Asks your site which categories it has,
   and lets you switch on the ones the note is in, or add a new one.
+
+Every command except New post is also on a note's right-click menu, in the
+file explorer or on its tab.
 
 <br/>
 
@@ -267,8 +284,8 @@ file explorer or on its tab.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Site** | None | Your site's address. In the Open finds its Micropub endpoint from there. |
-| **Token** | None | The token your site gave you. Kept in Obsidian's secret storage. |
+| **Site** | None | Your site's address, such as `https://example.org`. In the Open looks on its home page for where to send posts. |
+| **Token** | None | The token your site gave you. Obsidian keeps it in its keychain, apart from this plugin's settings, so it stays behind when you sync or commit your vault. |
 
 **Posts**
 
@@ -280,68 +297,77 @@ file explorer or on its tab.
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Pandoc** | `pandoc` | Its name if it's on your PATH, or its full path. Without one, In the Open offers to download pandoc's built-in version, once. |
+| **Pandoc** | `pandoc` | Leave it as `pandoc` to use an installed pandoc, which In the Open finds by itself, or set the full path to one. If there's none, In the Open offers to download pandoc's built-in version, once. |
 
 **Citations**
 
 | Setting | Default | |
 | --- | --- | --- |
-| **Bibliography** | `Literature/library.bib` | The `.bib` file that decides which links are citations. A path in your vault, or outside it, starting with `/` or `~`. |
-| **Papers folder** | `Literature` | Where your paper notes are. |
-| **Citation key property** | `citekey` | The property that holds a paper note's citation key. |
-| **Citation style** | Chicago author-date | A style Zotero has installed, such as `apa`, or the path to a `.csl` file. |
+| **Bibliography** | `Literature/library.bib` | The `.bib` file Better BibTeX keeps up to date. It can be in your vault, or anywhere else with a path that starts with `/` or `~`. A link to one of its citation keys, like `[[marsh2024]]`, is published as a citation. Leave it empty to publish without citations. |
+| **Papers folder** | `Literature` | Where your paper notes are. Before you publish, In the Open lists any link to a paper that isn't in your bibliography, so a changed key can't quietly turn a citation into plain text. |
+| **Citation key property** | `citekey` | The property that holds a paper note's citation key. A link to a paper note cites its key, whatever the note is called. Paper Trail writes `citekey`. |
+| **Citation style** | Chicago author-date | The name of a style Zotero has installed, such as `apa` or `ieee`, or the path to a `.csl` file. Leave it empty for Chicago author-date. |
 
 <br/>
 
 ## 10 Works well with
 
-These plugins are by the same author. Each does one thing, and In the Open
-doesn't need either of them, but they fit together nicely.
+I made these too. Each one does one thing and works on its own, but they fit
+together nicely.
 
 ### 10.1 Paper Trail
 
 [Paper Trail](https://community.obsidian.md/plugins/paper-trail) turns your
-Zotero library into a reading queue, with a note for each paper. It gives every
-paper note the `citekey` property that keeps your citations working when
-Better BibTeX changes a key, and its **Insert annotation** quotes a passage
-with a citation In the Open reads.
+Zotero library into a reading queue, with a note for each paper. Each paper
+note gets a `citekey` property, which keeps your citations working even when
+Better BibTeX changes a key. Its **Insert annotation** quotes a passage from a
+paper, with a citation that In the Open publishes.
 
 ### 10.2 Due Credit
 
 [Due Credit](https://community.obsidian.md/plugins/due-credit) exports a note
-to Word, PDF or LaTeX, and inserts citations: its **Insert citation** picks a
-paper from your bibliography and writes the link In the Open publishes as a
-citation. It shares In the Open's way of reading a note, so the same note
-reads the same on your site as in the file you send your supervisor.
+to Word, PDF or LaTeX. Its **Insert citation** picks a paper from your
+bibliography and writes the link that In the Open publishes as a citation.
+Both plugins read a note with the same code, so a note reads the same on your
+site as in the file you send your supervisor.
 
 <br/>
 
 ## 11 Network and file disclosure
 
-In the Open runs on your computer, and connects to your site, the one you set
-in **Site**. Once, if you agree, it also downloads the built-in pandoc from
+In the Open runs on your computer. It connects to one site, the one you set
+in **Site**. If you agree, it also downloads the built-in pandoc once, from
 pandoc's release on GitHub.
 
 ### 11.1 What it sends
 
 To your site, and only when you run a command:
 
-- **The post:** the note's text after the steps in
+- **The post:** The note's text after the steps in
   [What happens to your note](#61-what-happens-to-your-note), its title, and
   its `summary`, `categories` and `slug` properties.
-- **References:** every work the note cites, from your bibliography.
-- **Images:** the images in the note.
-- **Whether it's a draft:** with a draft, and when it's published.
-- **Why it's withdrawn:** what you type when you withdraw a post, if anything.
-- **Replacing a change:** that you said to replace a post changed on your
-  site, when it asked.
-- **Questions:** what the site takes, which categories it has, and, for a
-  note you publish again, its post as the site has it, to compare.
-- **Your token**, with every request, so your site knows it's you.
+- **References:** Every work the note cites, from your bibliography. A site
+  with the references extension gets them on their own. Any other site gets
+  them as the reference list at the end of the post.
+- **Images:** The images in the note.
+- **Whether it's a draft:** A draft is sent with `post-status` set to
+  `draft`, and publishing it sends `published`.
+- **Why it's withdrawn:** What you type when you withdraw a post, if anything.
+- **Replacing a change:** When your site says the post was changed there and
+  you choose **Replace it**, the update says so (`mp-overwrite`).
+- **Questions:** Your site's home page, to find its Micropub endpoint, the
+  address it takes posts at. Then what the site takes (`q=config`), which
+  categories it has (`q=category`), and, before an update or a withdrawal,
+  the post as the site has it (`q=source`).
+- **Your token:** With every request to your site's Micropub and media
+  endpoints, the addresses it takes posts and images at, so your site knows
+  it's you. The home page, and the new post while In the Open waits for it to
+  go live, are asked for without it.
 
-To GitHub, only if you agree to download the built-in pandoc: a request for
-pandoc's own release file, `pandoc-3.13-wasm.zip`, and nothing of yours. What
-comes back is checked against a hash in In the Open before it's kept.
+To GitHub, only if you agree to download the built-in pandoc: one request for
+pandoc's own release file, `pandoc-3.13-wasm.zip`, with nothing of yours in
+it. Before In the Open keeps what comes back, it checks it against the hash it
+ships with, a fingerprint of the file pandoc released.
 
 ### 11.2 What it reads
 
@@ -354,84 +380,93 @@ comes back is checked against a hash in In the Open before it's kept.
   `.csl` file you set.
 - **Obsidian's settings:** Whether strict line breaks are on, from the vault's
   `app.json`.
-- **Your PATH:** each folder on it, for a pandoc installed there.
+- **Your PATH:** The folders your computer looks in for programs, to find an
+  installed pandoc.
 - **The built-in pandoc:** `pandoc-3.13.wasm` in your cache folder, when
   there's no pandoc installed, checked against its hash once a session. A
   file that doesn't match is deleted, and downloaded again if you agree.
 
 ### 11.3 What it writes
 
-- **The post's address and status:** the `published-url` and `post-status`
+- **The post's address and status:** The `published-url` and `post-status`
   properties, in the note you publish, withdraw or restore. The address is
   removed when you discard its draft.
-- **A summary:** the `summary` property, when you publish a note without one
+- **A summary:** The `summary` property, when you publish a note without one
   and type one in when In the Open asks.
-- **Categories:** the `categories` property, when you choose them with **Set
+- **Categories:** The `categories` property, when you choose them with **Set
   categories**. Nothing else in your notes.
-- **New posts:** the note **New post** makes, where Obsidian puts new notes.
+- **New posts:** The note **New post** makes, where Obsidian puts new notes.
 - **Template:** `Post.md` in the template folder, when you make a new post
-  and there's no file with that name. If the file is there, edited or not,
-  it's never overwritten.
-- **The built-in pandoc:** when you agree to download it, `pandoc-3.13.wasm`
+  and there's no file with that name. If the file is already there, In the
+  Open never overwrites it, edited or not.
+- **The built-in pandoc:** When you agree to download it, `pandoc-3.13.wasm`
   (62 MB) in your user cache folder, outside the vault:
   `~/.cache/obsidian-citation-core` on Linux (or in `$XDG_CACHE_HOME`),
   `~/Library/Caches/obsidian-citation-core` on macOS, and
   `obsidian-citation-core\Cache` in `%LOCALAPPDATA%` on Windows. Due Credit
-  uses the same file. You can delete it; it's downloaded again, if you agree,
-  the next time it's needed.
+  uses the same file. You can delete it. If you do, In the Open offers to
+  download it again the next time it's needed.
 - **Temporary files:** For each publish, pandoc's filters, its template and
   font, the note's properties and the post pandoc makes go in a temporary
-  folder; with the built-in pandoc, the note's text goes in a second one.
+  folder. With the built-in pandoc, the note's text goes in a second one.
   Both are removed afterwards.
 
 ### 11.4 What it stores
 
 - **Settings:** Its own `data.json` in the plugin folder.
-- **Your token:** In Obsidian's secret storage, never in `data.json`.
+- **Your token:** In Obsidian's keychain, never in `data.json`.
 
 ### 11.5 What it runs
 
-- **Pandoc:** The one you set in **Pandoc**, or, without one, the built-in
-  one, which runs inside Obsidian and sees only your vault, the folders your bibliography and citation style
-  are in, and its temporary folders: never the rest of your disk. An installed
-  pandoc can read and write anything you can. Nothing else.
+- **Pandoc:** The pandoc you set in **Pandoc**. If none is installed, the
+  built-in one, which runs inside Obsidian. The built-in pandoc sees only your
+  vault, the folders your bibliography and citation style are in, and its
+  temporary folders, and none of the rest of your disk. An installed pandoc
+  can read and write anything you can.
+
+In the Open runs nothing besides pandoc.
 
 ### 11.6 How releases are built
 
-Every push is built, linted with [ESLint](https://eslint.org/) and the official
-[Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin), tested
-with [Vitest](https://vitest.dev/), and built with Nix as well. The citation
-tests run through a real, pinned version of pandoc, so its output can't drift
-unnoticed. Releases are built by GitHub Actions from the tagged source, after
-the same checks and a check that the tag is the version in `manifest.json`,
-with every action pinned to an exact version, and come with a signed build
-provenance attestation, so you can check that the file you installed is the one
-that was built:
+Every change I push is built, checked with [ESLint](https://eslint.org/) and
+the official [Obsidian ESLint plugin](https://github.com/obsidianmd/eslint-plugin),
+and tested with [Vitest](https://vitest.dev/). Nix builds it a second time,
+on its own.
+
+Releases are built by GitHub Actions from the tagged code, after the same
+checks. A release only goes out when its tag matches the version in
+`manifest.json`, and every action it uses is pinned to an exact version. Each
+release comes with a signed attestation from GitHub, which records what it
+was built from. To check that the `main.js` you installed is the one GitHub
+built:
 
 ```sh
 gh attestation verify main.js --repo jorritvanderheide/obsidian-in-the-open
 ```
 
+The citation tests also run through a real pandoc, always the same version.
+A change in pandoc's output shows up as a failing test.
+
 <br/>
 
 ## 12 Questions or issues?
 
-Have a look at the [FAQ](FAQ.md) first: it covers the most common surprises,
-like a token your site doesn't take. If something still doesn't work, or you
-have an idea, please
+Have a look at the [FAQ](FAQ.md) first. It covers the things people run into
+most, like a token your site doesn't take. If something still doesn't
+work, or you have an idea, please
 [open an issue](https://github.com/jorritvanderheide/obsidian-in-the-open/issues/new/choose).
-Found a security problem? Please report it privately, as described in the
-[security policy](SECURITY.md).
+Found a security problem? Please report it privately, the way the
+[security policy](SECURITY.md) explains.
 
-The source lives on [Codeberg](https://codeberg.org/BW20/obsidian-in-the-open)
-and is mirrored to [GitHub](https://github.com/jorritvanderheide/obsidian-in-the-open).
+The code lives on [Codeberg](https://codeberg.org/BW20/obsidian-in-the-open),
+with a copy on [GitHub](https://github.com/jorritvanderheide/obsidian-in-the-open).
 
 <br/>
 
 ## 13 Support
 
-In the Open is free. If you find it useful, you can support its development on
-Liberapay:
+In the Open is free. If it's useful to you and you'd like to give something
+back, you can do that on Liberapay:
 
 [![Donate](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/BW20)
 

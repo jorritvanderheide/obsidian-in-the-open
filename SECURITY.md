@@ -13,26 +13,27 @@ through GitHub instead:
 https://github.com/jorritvanderheide/obsidian-in-the-open/security/advisories/new
 
 Include your versions of In the Open, Obsidian and pandoc (or that it's
-the built-in one), your operating system, what runs your site's Micropub
-endpoint, and the steps to reproduce it. Reports are looked at before
-anything about them is made public.
+the built-in one), your operating system, the software your site takes posts
+with (its Micropub endpoint), and the steps to reproduce it. I'll look into
+your report before anything about it is made public.
 
 ## What counts
 
-In the Open sends the note you publish to the site you set, with your token. It
-reads that note, your bibliography and your citation style, and writes only
-the post's address and status, a summary you type in and categories you set
-into that note, besides the notes and the template **New post** makes. Once,
-if you agree, it downloads the built-in pandoc from pandoc's release on GitHub
-into your cache folder, outside the vault. See
-[section 11 of the README](README.md#11-network-and-file-disclosure). These
-are security problems:
+In the Open sends the note you publish to the site you set, with your token.
+It reads that note, your bibliography and your citation style. Into that note
+it writes only the post's address and status, a summary you type in, and
+categories you set. **New post** also makes a note, and the template it starts
+from. Once, if you agree, In the Open downloads the built-in pandoc from
+pandoc's release on GitHub into your cache folder, outside the vault.
+[Section 11 of the README](README.md#11-network-and-file-disclosure) has the
+full list. These are security problems:
 
 - Sending anything the README doesn't list, or sending to anywhere but your
   site, except the one request for the built-in pandoc to pandoc's release.
-- Your token leaving Obsidian's secret storage for anywhere but your site's
-  Micropub and media endpoints: into `data.json`, a log, a notice, or another
-  site a request is redirected to.
+- Your token leaving Obsidian's keychain for anywhere but your site's
+  Micropub and media endpoints, the addresses it takes posts and images at.
+  That includes `data.json`, a log, a notice, or another site a request is
+  redirected to.
 - Writing anywhere in your vault but the `published-url` and `post-status`
   properties of the note you publish, withdraw, restore or discard, its
   `summary` when you type one in, its `categories` when you set them, a
@@ -40,7 +41,8 @@ are security problems:
   there.
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
-- The built-in pandoc being kept or run without matching its pinned hash, or
+- The built-in pandoc being kept or run without matching the hash In the Open
+  ships with, the fingerprint of pandoc's release file. Or the built-in pandoc
   seeing more of your disk than the vault, the folders of the files it needs,
   and its temporary folders.
 - Something you wrote for yourself, like a comment, reaching your site.
@@ -49,5 +51,4 @@ Problems in your site's Micropub endpoint belong to whoever makes it, and
 problems in pandoc itself to [pandoc](https://github.com/jgm/pandoc).
 
 A bug that publishes the wrong text, or leaves something out, is serious too,
-but it isn't secret: please report that as a normal issue, so others can see
-it.
+but it isn't secret. Please report it as a normal issue, so others can see it.

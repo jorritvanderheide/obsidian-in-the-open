@@ -12,7 +12,7 @@ export async function newPost(context: Context): Promise<void> {
 	const title = await ask(app, { title: 'New post', placeholder: 'Its title', cta: 'Create' });
 	if (title === null) return;
 	const name = noteName(title);
-	if (name === '') throw new PublishError("A post's title needs letters or digits, for its note's name.");
+	if (name === '') throw new PublishError("A post's title needs at least one letter or digit, because it becomes the note's name.");
 
 	const folder = app.fileManager.getNewFileParent(app.workspace.getActiveFile()?.path ?? '');
 	const path = normalizePath(`${folder.path}/${name}.md`);

@@ -82,7 +82,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	if (summary === null) {
 		summary = await ask(app, {
 			title: `A summary for ${file.basename}`,
-			description: 'One sentence about the post, which your site shows under its title and in its feed. It goes in the note as its summary property.',
+			description: 'One sentence about the post, for your site to show under its title and in its feed. In the Open saves it in the note, as its summary property.',
 			placeholder: 'What the post is about',
 			cta: 'Save',
 		});
@@ -118,9 +118,9 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			one ? 'A new category' : 'New categories',
 			(el) => {
 				el.createEl('p', {
-					text: `${host} has no ${one ? 'category' : 'categories'} ${listed(unknown)} yet. Publishing ${file.basename} adds ${one ? 'it' : 'them'}, if your site takes new ones.`,
+					text: `${host} has no ${one ? 'category' : 'categories'} ${listed(unknown)} yet. If your site takes new categories, publishing ${file.basename} adds ${one ? 'it' : 'them'}.`,
 				});
-				el.createEl('p', { text: known.length > 0 ? `It has ${listed(known)}.` : 'It has none yet.' });
+				el.createEl('p', { text: known.length > 0 ? `In case it's a typo, these are the ones it has: ${listed(known)}.` : 'It has no categories yet.' });
 			},
 			'Publish',
 		);
@@ -128,7 +128,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	}
 	const wasDraft = target.config.drafts && online?.draft === true;
 	if (draft && !target.config.drafts) {
-		throw new PublishError(`${host} takes no drafts: it doesn't say so in its Micropub configuration, and a site that doesn't know drafts publishes one at once.`);
+		throw new PublishError(`${host} doesn't say that it takes drafts, so In the Open didn't send this one. A site that doesn't know about drafts would publish it straight away. You can publish ${file.basename} instead.`);
 	}
 	if (draft && existing !== null && !wasDraft) {
 		throw new PublishError(`${file.basename} is published already, at ${existing}, so it can't be a draft again. Publish it to update it.`);
@@ -149,7 +149,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			try {
 				return parseYaml(yaml) as unknown;
 			} catch {
-				throw new PublishError(`The properties of ${file.basename} aren't valid YAML, so it can't be published. Fix them in source mode, where Obsidian shows what's wrong.`);
+				throw new PublishError(`The properties of ${file.basename} can't be read, so it can't be published. Open the note in source mode, where Obsidian shows what's wrong with them.`);
 			}
 		},
 	};
@@ -177,13 +177,18 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const blind = pictures.filter((image) => image.alt === '');
 	if (blind.length > 0) {
 		throw new PublishError(
-			`Every image on a website needs alt text, saying what it shows, and ${blind.map((image) => basename(image.path)).join(', ')} has none. Write it after a |, as ![[bed.png|A raised bed in March]].`,
+			`${listed(blind.map((image) => basename(image.path)))} ${blind.length === 1 ? 'has' : 'have'} no alt text, the words a reader gets when they can't see an image. Write a few about what it shows after a |, like ![[bed.png|A raised bed in March]].`,
 		);
 	}
 	const other = pictures.filter((image) => imageType(image.path) === null);
-	if (other.length > 0) throw new PublishError(`A site takes PNG and JPEG images, and ${other.map((image) => basename(image.path)).join(', ')} isn't one.`);
+	if (other.length > 0) {
+		const one = other.length === 1;
+		throw new PublishError(
+			`In the Open can only send PNG and JPEG images, and ${listed(other.map((image) => basename(image.path)))} ${one ? "isn't one" : "aren't"}. Save ${one ? 'it' : 'them'} as PNG or JPEG, then embed ${one ? 'that' : 'those'} in the note instead.`,
+		);
+	}
 	const media = target.config.mediaEndpoint;
-	if (pictures.length > 0 && media === null) throw new PublishError(`${host} takes no images (it has no media endpoint), and this note has some.`);
+	if (pictures.length > 0 && media === null) throw new PublishError(`This note has images, but ${host} doesn't say where to upload them, so In the Open can't send them. Your site needs a Micropub media endpoint for images.`);
 
 	// Asked for before anything is uploaded, since the built-in pandoc may
 	// have to be downloaded first, which you may not want.
@@ -257,7 +262,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const changed = existing !== null && online !== null && !(wasDraft && !draft) ? differences(body, online) : null;
 	if (changed !== null && changed.length === 0) {
 		if (pictures.length === 0) {
-			new Notice(`${file.basename} is up to date: your site has it as the note has it.`, 10000);
+			new Notice(`${file.basename} is up to date. Your site already has it just as it is in the note.`, 10000);
 			return;
 		}
 		const anyway = await confirm(
@@ -265,7 +270,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			`${file.basename} hasn't changed`,
 			(el) =>
 				el.createEl('p', {
-					text: "Your site has it as the note has it, apart from its pictures, which In the Open can't compare. Send it anyway, for a picture you changed?",
+					text: "As far as In the Open can tell, your site already has it just as it is in the note. It can't see whether a picture changed, so if you changed one, send it anyway.",
 				}),
 			'Send anyway',
 		);
@@ -287,9 +292,9 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 								? `It's at ${existing}. Only its pictures may have changed.`
 								: `It's at ${existing}. What changed: ${listed(changed)}.`,
 				});
-				el.createEl('p', { text: "Did it change in substance? Then the post says it was updated. A correction, such as a typo, doesn't." });
+				el.createEl('p', { text: "Is this a real change, or a small correction such as a typo? After a real change, the post says it was updated. After a correction, it doesn't." });
 			},
-			['Just a correction', 'Changed in substance'],
+			['Just a correction', 'A real change'],
 		);
 		if (answer === null) return;
 		if (answer === 1) updated = new Date();
@@ -307,8 +312,8 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			app,
 			`${file.basename} was changed on your site`,
 			(el) => {
-				el.createEl('p', { text: `Since you last published it, it was changed there: ${error.message}.` });
-				el.createEl('p', { text: 'Publishing it again replaces that change with the note. To keep the change, bring it into the note first.' });
+				el.createEl('p', { text: `It was changed on your site since you last published it, by hand or by another tool. Your site says: ${error.message}.` });
+				el.createEl('p', { text: 'Replacing it sends the note as it is, and that change is lost. To keep the change, copy it into the note first, then publish again.' });
 			},
 			'Replace it',
 		);
@@ -320,10 +325,10 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		const done = draft
 			? `Updated the draft of ${file.basename}.`
 			: wasDraft
-				? `Published ${file.basename}: it goes into your site's lists and feed.`
+				? `Published ${file.basename}. It moves into your site's lists and feed.`
 				: `Updated ${file.basename}.`;
 		await record(context, file, draft ? 'draft' : 'published');
-		new Notice(`${done} The site shows it once it has built it.`, 10000);
+		new Notice(`${done} If your site builds its pages first, it may take a moment to show.`, 10000);
 		return;
 	}
 	// The post is on the site from here on: a note that doesn't learn its
@@ -334,12 +339,12 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		url = new URL(location ?? '', target.endpoint).href;
 		if (location === undefined) throw new Error('no Location');
 	} catch {
-		throw new PublishError(`${host} took the post but didn't say where it is, so ${file.basename} doesn't know its address. Find the post on your site and put its address in the note's ${POST_PROPERTY} property before publishing again, or it makes a second post.`);
+		throw new PublishError(`${host} took the post but didn't say where it is, so ${file.basename} doesn't know its address. Find the post on your site and put its address in the note's ${POST_PROPERTY} property. Publishing again without it would make a second post.`);
 	}
 	try {
 		await record(context, file, draft ? 'draft' : 'published', url);
 	} catch (error) {
-		throw new PublishError(`${file.basename} is on your site, at ${url}, but its address couldn't be written into the note: ${error instanceof Error ? error.message : String(error)}. Put it in the note's ${POST_PROPERTY} property before publishing again, or it makes a second post.`);
+		throw new PublishError(`${file.basename} is on your site, at ${url}, but its address couldn't be written into the note: ${error instanceof Error ? error.message : String(error)}. Put the address in the note's ${POST_PROPERTY} property yourself. Publishing again without it would make a second post.`);
 	}
 	// Waited for on its own, with its own notices: what's next for the note, such
 	// as publishing its draft, is offered at once rather than after the build.
@@ -350,7 +355,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 /** Withdraw the note's post, or bring it back. A draft is discarded instead. */
 export async function withdraw(context: Context, file: TFile, back: boolean): Promise<void> {
 	const url = postOf(context, file);
-	if (url === null) throw new PublishError(`${file.basename} isn't published: it has no ${POST_PROPERTY}.`);
+	if (url === null) throw new PublishError(`${file.basename} isn't published. It has no ${POST_PROPERTY} property.`);
 	const refused = refusal(back ? 'restore' : 'withdraw', statusOf(context.app.metadataCache.getFileCache(file)?.frontmatter), file.basename);
 	if (refused !== null) throw new PublishError(refused);
 	// Asking the site comes before any dialog, so it says so: it can take a
@@ -363,7 +368,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		const yes = await confirm(
 			context.app,
 			`Discard the draft of ${file.basename}?`,
-			(el) => el.createEl('p', { text: `It was never published, so your site deletes it, and the note forgets its address, ${url}.` }),
+			(el) => el.createEl('p', { text: `It was never published, so your site deletes it, and In the Open removes its address from the note (${url}).` }),
 			'Discard',
 		);
 		if (!yes) return;
@@ -376,7 +381,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 	if (!back) {
 		const answer = await ask(context.app, {
 			title: `Withdraw ${file.basename}?`,
-			description: `It leaves your site's lists and feed, and its page says it was withdrawn, above its text. Its address, ${url}, keeps working, so links and citations to it still lead there. Say why, and the page says that too.`,
+			description: `It leaves your site's lists and feed, and its page says it was withdrawn. Its address, ${url}, keeps working, so links and citations to it still lead there. If you say why, your site can show that on the page too.`,
 			placeholder: 'Why, for its readers (optional)',
 			cta: 'Withdraw',
 			optional: true,
@@ -390,7 +395,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		post(target, actionBody(back ? 'undelete' : 'delete', url, reason)),
 	);
 	await record(context, file, back ? 'published' : 'withdrawn');
-	new Notice(`${back ? 'Restored' : 'Withdrew'} ${file.basename}. The site shows it once it has built it.`, 10000);
+	new Notice(`${back ? 'Restored' : 'Withdrew'} ${file.basename}. If your site builds its pages first, it may take a moment to show.`, 10000);
 }
 
 /** A notice that stays while the work runs, and goes when it's done or fails. */
@@ -448,12 +453,12 @@ async function waitForIt(name: string, url: string, draft: boolean): Promise<voi
 	} finally {
 		waiting.hide();
 	}
-	new Notice(`${name} isn't up yet after ${WAIT / 60_000} minutes. The site took it, so it may still be building: look at ${url} later.`, 0);
+	new Notice(`${name} still isn't up after ${WAIT / 60_000} minutes. Your site took it, so it's probably still being built. Have a look at ${url} in a while.`, 0);
 }
 
 function live(name: string, url: string, draft: boolean): void {
 	const fragment = createFragment((el) => {
-		el.createDiv({ text: draft ? `The draft of ${name} is up, and only its address leads to it` : `${name} is live` });
+		el.createDiv({ text: draft ? `The draft of ${name} is up. Only people with its address can find it:` : `${name} is live` });
 		el.createEl('a', { text: url, href: url });
 	});
 	new Notice(fragment, 15000);
@@ -466,7 +471,7 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 	};
 	return confirm(
 		context.app,
-		count === 1 ? "A link won't be one on your site" : `${count} links won't be links on your site`,
+		count === 1 ? 'A link will be plain text on your site' : `${count} links will be plain text on your site`,
 		(el) => {
 			if (missing.unpublished.length > 0) {
 				el.createEl('p', { text: "These link to notes you haven't published, so they'll show as their words:" });
@@ -504,9 +509,9 @@ async function pandocToRun(app: App, setting: string, vault: string) {
 					app,
 					'Download pandoc?',
 					(el) => {
-						el.createEl('p', { text: "Publishing turns a note into a post with pandoc, and In the Open can't find one installed." });
+						el.createEl('p', { text: "In the Open turns a note into a post with pandoc, and it can't find pandoc installed on this computer." });
 						el.createEl('p', {
-							text: `In the Open can download pandoc ${BUILT_IN.version} from pandoc's own release on GitHub (${BUILT_IN.megabytes} MB), once. It's kept in ${builtInFolder()}, outside your vault, and runs inside Obsidian. Or install pandoc, or set its full path in Settings → In the Open, and publish again.`,
+							text: `It can download pandoc ${BUILT_IN.version} for you, once, from pandoc's own release on GitHub (${BUILT_IN.megabytes} MB). It's kept in ${builtInFolder()}, outside your vault, and runs inside Obsidian. To use your own pandoc instead, install it, or set its full path in Settings → In the Open, then publish again.`,
 						});
 					},
 					'Download',

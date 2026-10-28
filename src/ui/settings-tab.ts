@@ -31,7 +31,7 @@ export class SettingsTab extends PluginSettingTab {
 		const adapter = this.app.vault.adapter;
 		if (value === '' || !(adapter instanceof FileSystemAdapter)) return '';
 		const path = settingPath(value, adapter.getBasePath(), homedir());
-		return existsSync(path) ? '' : ` ⚠ There's no file at ${path}, so ${stops} until you fix or clear this.`;
+		return existsSync(path) ? '' : ` ⚠ There's no file at ${path}. ${stops} until you fix or clear this.`;
 	}
 
 	private siteStatus(): string {
@@ -55,12 +55,12 @@ export class SettingsTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Site',
-						desc: "Your site's address, such as https://example.org. In the Open finds its Micropub endpoint from there." + this.siteStatus(),
+						desc: "Your site's address, such as https://example.org. In the Open looks on its home page for where to send posts." + this.siteStatus(),
 						control: { type: 'text', key: 'site', placeholder: 'https://example.org' },
 					},
 					{
 						name: 'Token',
-						desc: "The token your site gave you, kept in Obsidian's keychain, not in this plugin's settings, so it doesn't travel with a vault you sync or commit.",
+						desc: "The token your site gave you. Obsidian keeps it in its keychain, apart from this plugin's settings, so it stays behind when you sync or commit your vault.",
 						render: (setting) => {
 							setting.addComponent((el) =>
 								new SecretComponent(this.app, el).setValue(this.plugin.settings.token).onChange((value) => {
@@ -88,7 +88,7 @@ export class SettingsTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Pandoc',
-						desc: "The pandoc program: its name if it's on your PATH, or its full path. Without one, In the Open offers to download pandoc's built-in version, once.",
+						desc: "Leave it as pandoc to use an installed pandoc, which In the Open finds by itself, or set the full path to one. If there's none, In the Open offers to download pandoc's built-in version, once.",
 						control: { type: 'text', key: 'pandocPath', placeholder: 'pandoc' },
 					},
 				],
@@ -100,18 +100,18 @@ export class SettingsTab extends PluginSettingTab {
 					{
 						name: 'Bibliography',
 						desc:
-							'The .bib file Better BibTeX keeps up to date: a path in the vault, or outside it starting with / or ~. A link whose name is one of its keys is published as a citation. Leave it empty to publish without citations.' +
-							this.fileStatus(this.plugin.settings.bibliography, 'publishing stops'),
+							'The .bib file Better BibTeX keeps up to date. It can be in your vault, or anywhere else with a path that starts with / or ~. A link to one of its citation keys, like [[marsh2024]], is published as a citation. Leave it empty to publish without citations.' +
+							this.fileStatus(this.plugin.settings.bibliography, 'Publishing stops'),
 						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
 					{
 						name: 'Papers folder',
-						desc: "Where your paper notes are. Before publishing, links to papers that aren't in the bibliography are listed, so a changed key can't quietly turn a citation into plain text.",
+						desc: "Where your paper notes are. Before you publish, In the Open lists any link to a paper that isn't in your bibliography, so a changed key can't quietly turn a citation into plain text.",
 						control: { type: 'folder', key: 'literatureFolder', placeholder: 'Literature' },
 					},
 					{
 						name: 'Citation key property',
-						desc: 'The property that holds a paper note’s citation key. A link to a note with one cites that key, whatever the note is called. Paper Trail writes citekey.',
+						desc: 'The property that holds a paper note’s citation key. A link to a paper note cites its key, whatever the note is called. Paper Trail writes citekey.',
 						control: { type: 'text', key: 'keyProperty', placeholder: 'citekey' },
 					},
 					{

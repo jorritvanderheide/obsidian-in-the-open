@@ -38,6 +38,6 @@ describe('call', () => {
 		const error = await update().catch((e: unknown) => e);
 		expect(error).toBeInstanceOf(PublishError);
 		expect(error).not.toBeInstanceOf(ConflictError);
-		expect((error as Error).message).toBe('bw20.nl refused it: missing summary');
+		expect((error as Error).message).toBe('bw20.nl turned the request down. It answered: missing summary');
 	});
 });

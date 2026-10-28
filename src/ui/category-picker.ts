@@ -21,7 +21,7 @@ class CategoryPicker extends Modal {
 		this.contentEl.createEl('p', {
 			text: this.listed
 				? 'The categories your site has. Switch on the ones this post is in, or add a new one, which your site makes when you publish.'
-				: "Your site doesn't list its categories. These are the note's: switch them off, or add one.",
+				: "Your site doesn't list its categories, so these are the note's own. Switch off any you don't want, or add one.",
 		});
 		const chosen = new Set(this.choices.filter((choice) => choice.chosen).map((choice) => choice.name));
 		const list = this.contentEl.createDiv();

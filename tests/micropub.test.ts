@@ -33,7 +33,7 @@ describe('readConfig', () => {
 		expect(readConfig('{"media-endpoint": "https://bw20.nl/micropub/media", "references": 1}')).toEqual({ mediaEndpoint: 'https://bw20.nl/micropub/media', references: 1, drafts: false });
 		expect(readConfig('{}')).toEqual({ mediaEndpoint: null, references: null, drafts: false });
 		expect(readConfig('{"post-status": ["published", "draft"]}').drafts).toBe(true);
-		expect(() => readConfig('<html>')).toThrow("didn't answer q=config with JSON");
+		expect(() => readConfig('<html>')).toThrow("can't read it (q=config)");
 	});
 });
 
@@ -89,7 +89,7 @@ describe('the requests', () => {
 		expect(readSource('{"properties": {"post-status": ["draft"]}}').draft).toBe(true);
 		expect(readSource('{"properties": {"post-status": ["published"]}}').draft).toBe(false);
 		expect(readSource('{"properties": {}}')).toEqual({ draft: false });
-		expect(() => readSource('<html>')).toThrow("didn't answer q=source with JSON");
+		expect(() => readSource('<html>')).toThrow("can't read it (q=source)");
 	});
 
 	it('reads the post as the site has it, and only what it gave', () => {
@@ -123,7 +123,7 @@ describe('failure', () => {
 	it('says what the site said, or its status', () => {
 		expect(failure(answer('{"error": "invalid_request", "error_description": "log/quiet: index.md: missing summary"}', {}, 400))).toBe('log/quiet: index.md: missing summary');
 		expect(failure(answer('{"error": "forbidden"}', {}, 403))).toBe('forbidden (403)');
-		expect(failure(answer('<html>', {}, 502))).toBe('the site answered 502');
+		expect(failure(answer('<html>', {}, 502))).toBe('error 502, with no reason given');
 	});
 });
 

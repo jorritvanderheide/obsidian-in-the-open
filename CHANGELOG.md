@@ -3,6 +3,18 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Messages, settings descriptions and the README use plainer words, with less
+  of Micropub's own vocabulary.
+- After an update, a withdrawal or a restore, the notice no longer says your
+  site shows it "once it has built it". Not every site builds its pages, so
+  it now says a site that does may take a moment.
+- The message about an image that isn't PNG or JPEG now says that In the Open
+  only sends those two. It used to say your site only takes them.
+- The README no longer says your site needs the references extension to show
+  a reference list. Every Micropub site gets one.
+
 ## 1.0.1
 
 - A post changed on your site since you last published it is asked about

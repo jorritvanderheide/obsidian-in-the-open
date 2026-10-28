@@ -104,7 +104,7 @@ export default class InTheOpen extends Plugin {
 	 */
 	private async send(file: TFile, start: () => Promise<void>): Promise<void> {
 		if (this.sending.has(file)) {
-			new Notice(`${file.basename} is being sent already.`, 5000);
+			new Notice(`${file.basename} is still being sent. Wait until it's done, then try again.`, 5000);
 			return;
 		}
 		this.sending.add(file);

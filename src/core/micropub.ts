@@ -62,7 +62,7 @@ export function readConfig(body: string): Config {
 		const parsed: unknown = JSON.parse(body);
 		if (parsed !== null && typeof parsed === 'object') config = parsed as Record<string, unknown>;
 	} catch {
-		throw new PublishError("The site's Micropub endpoint didn't answer q=config with JSON.");
+		throw new PublishError("Your site's answer about what it takes isn't JSON, so In the Open can't read it (q=config).");
 	}
 	const media = config['media-endpoint'];
 	const references = config.references;
@@ -94,7 +94,7 @@ export function readSource(body: string): Source {
 		const parsed = JSON.parse(body) as { properties?: unknown };
 		if (parsed.properties !== null && typeof parsed.properties === 'object') props = parsed.properties as Record<string, unknown>;
 	} catch {
-		throw new PublishError("The site's Micropub endpoint didn't answer q=source with JSON.");
+		throw new PublishError("Your site's answer about this post isn't JSON, so In the Open can't read it (q=source).");
 	}
 	const list = (name: string): unknown[] | undefined => (Array.isArray(props[name]) ? (props[name] as unknown[]) : undefined);
 	const text = (name: string): string | undefined => {
@@ -268,7 +268,7 @@ export function failure(response: Response): string {
 	} catch {
 		// Not Micropub's JSON: the status says it.
 	}
-	return `the site answered ${response.status}`;
+	return `error ${response.status}, with no reason given`;
 }
 
 /**
