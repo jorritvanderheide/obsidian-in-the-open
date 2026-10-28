@@ -88,6 +88,15 @@ sends and writes.
 Your token is kept in Obsidian's secret storage, not in the plugin's settings
 file, so it doesn't travel with a vault you sync or commit.
 
+The health report in Obsidian's plugin directory warns about two things, and
+both are how publishing works. *Shell Execution* is pandoc: In the Open starts
+an installed one directly, without a shell in between, and starts nothing
+else. *Direct Filesystem Access* is for what the Obsidian API can't reach:
+reading your bibliography and citation style wherever you keep them, and the
+images you publish, checking that the files in your settings exist, putting
+pandoc's filters and the note's properties in a temporary folder, and keeping
+the built-in pandoc in your cache folder.
+
 Every push is tested, and every release is built in the open with a signed
 attestation, so you can check that the file you installed is the one that was
 built. [Section 11.6](#116-how-releases-are-built) says how.
