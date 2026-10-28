@@ -171,6 +171,37 @@ The slug and `published` never change. `updated` is added to `replace` only
 when you mark the change as one of substance; correcting a typo leaves it
 out. The site answers `204 No Content`.
 
+### What changed
+
+Before it sends an update, the plugin asks for the post as the site has it,
+as Micropub says, so it can say what changed, and send nothing when nothing
+did:
+
+```http
+GET /micropub?q=source&url=https://example.org/log/nixos-module-system/
+Authorization: Bearer <token>
+```
+
+```json
+{
+  "type": ["h-entry"],
+  "properties": {
+    "name": ["..."],
+    "summary": ["..."],
+    "content": ["..."],
+    "category": ["..."],
+    "references": [{ "key": "marsh2020", "text": "...", "url": "..." }],
+    "post-status": ["published"]
+  }
+}
+```
+
+- `content` is the text as the site keeps it. Its images may be at addresses
+  of the site's own, so the plugin compares an image by its alt text only.
+- The plugin compares only what it gets. A site that doesn't answer
+  `q=source`, or leaves a property out, is sent the update as it would be
+  otherwise.
+
 ## Drafts
 
 A draft is a post on the site that only its address leads to, so you can see
