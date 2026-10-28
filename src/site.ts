@@ -1,7 +1,7 @@
 // A site, as In the Open talks to it: its endpoint, found from its home page,
 // what it takes, and the requests that carry the token.
 import { randomBytes } from 'crypto';
-import { ConflictError, endpointFrom, failure, PublishError, readCategories, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
+import { ConflictError, endpointFrom, failure, PublishError, readCategories, RefusedError, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
 import { page, send } from './http';
 
 export interface Site {
@@ -34,14 +34,19 @@ export async function call(site: Site, url: string, request: { method: string; t
 	if (request.type !== undefined) headers['Content-Type'] = request.type;
 	const response = await send(url, { method: request.method, headers, body: request.body });
 	if (response.status >= 300 && response.status < 400) {
-		throw new PublishError(`${new URL(url).host} answered with a redirect, which In the Open doesn't follow with your token. Check the site's address in the settings.`);
+		throw new RefusedError(`${new URL(url).host} answered with a redirect, which In the Open doesn't follow with your token. Check the site's address in the settings.`);
 	}
-	if (response.status === 401) throw new PublishError(`${new URL(url).host} doesn't take your token. Check the token in Settings → In the Open.`);
+	if (response.status === 401) throw new RefusedError(`${new URL(url).host} doesn't take your token. Check the token in Settings → In the Open.`);
 	// The post was changed on the site since it was last sent (docs/micropub.md,
 	// Changed elsewhere): publishing asks before sending it again with
 	// mp-overwrite.
 	if (response.status === 409) throw new ConflictError(failure(response));
-	if (response.status >= 400) throw new PublishError(`${new URL(url).host} turned the request down. It answered: ${failure(response)}`);
+	// A server's own error (`5xx`) may come after it made the post, so it isn't
+	// taken as a refusal.
+	if (response.status >= 400) {
+		const message = `${new URL(url).host} turned the request down. It answered: ${failure(response)}`;
+		throw response.status < 500 ? new RefusedError(message) : new PublishError(message);
+	}
 	return response;
 }
 

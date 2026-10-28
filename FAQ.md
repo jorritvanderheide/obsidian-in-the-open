@@ -90,6 +90,18 @@ A withdrawn post stays withdrawn on your site until it's restored, so
 publishing the note would only change its text there. Run **Restore note**
 first, then publish the note to update it.
 
+### "Is … on your site already?"
+
+The last time you published this note, its address didn't make it back into
+the note. Obsidian may have closed while it was sending, the connection may
+have dropped, or the note couldn't be written. Your site may have the post
+anyway.
+
+Open your site and look for it. If it's there, choose **Give its address** and
+paste the post's address. In the Open checks that the page is there, writes
+the address into the note, and the next publish updates that post. If it
+isn't there, choose **Publish it as new**.
+
 ### "… took the post but didn't say where it is, so … doesn't know its address. …"
 
 Your site made the post, but didn't send back its address. The note keeps

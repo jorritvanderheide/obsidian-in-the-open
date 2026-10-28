@@ -3,6 +3,15 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- If a new post's address never made it into the note, because Obsidian
+  closed while it was sending, the connection dropped or the note couldn't
+  be written, the next publish of that note asks whether the post is on your
+  site already. You can give its address, which In the Open checks, or
+  publish it as new. It used to make a second post, or your site turned it
+  down.
+
 ## 1.1.0
 
 - When you publish a note for the first time, In the Open finds your

@@ -365,8 +365,9 @@ that link to a note you just published:
   the post as the site has it (`q=source`).
 - **Your token:** With every request to your site's Micropub and media
   endpoints, the addresses it takes posts and images at, so your site knows
-  it's you. The home page, and the new post while In the Open waits for it to
-  go live, are asked for without it.
+  it's you. The home page, the new post while In the Open waits for it to go
+  live, and a post's page when you give its address, are asked for without
+  it.
 
 To GitHub, only if you agree to download the built-in pandoc: one request for
 pandoc's own release file, `pandoc-3.13-wasm.zip`, with nothing of yours in
@@ -419,6 +420,11 @@ ships with, a fingerprint of the file pandoc released.
 ### 11.4 What it stores
 
 - **Settings:** Its own `data.json` in the plugin folder.
+- **Posts it didn't hear back about:** When a new post is sent, the note's
+  path and the time, in Obsidian's local storage for this vault, on this
+  device. It's removed once the note has the post's address. If it's still
+  there at the next publish, In the Open asks whether the post is on your
+  site already.
 - **Your token:** In Obsidian's keychain, never in `data.json`.
 
 ### 11.5 What it runs

@@ -1,6 +1,6 @@
 import { debounce, Notice, Plugin, TFile } from 'obsidian';
 import { newPost } from './commands/new-post';
-import { linkingToUpdate, postOf, publish, withdraw } from './commands/publish';
+import { linkingToUpdate, noteDeleted, noteMoved, postOf, publish, withdraw } from './commands/publish';
 import { setCategories } from './commands/set-categories';
 import { PublishError } from './core/micropub';
 import { loadSettings, type Settings } from './core/settings';
@@ -59,6 +59,11 @@ export default class InTheOpen extends Plugin {
 				}
 			}),
 		);
+
+		// A new post sent without hearing back is remembered by its note's path,
+		// which follows the note.
+		this.registerEvent(this.app.vault.on('rename', (file, old) => noteMoved(this.app, old, file.path)));
+		this.registerEvent(this.app.vault.on('delete', (file) => noteDeleted(this.app, file.path)));
 
 		// The title bar follows the note: a view rebuilds its actions when it
 		// switches between editing and reading, and a post's status changes in

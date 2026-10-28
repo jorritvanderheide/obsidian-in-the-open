@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ConflictError, PublishError, type Response } from '../src/core/micropub';
+import { ConflictError, PublishError, RefusedError, type Response } from '../src/core/micropub';
 import { send } from '../src/http';
 import { call, type Site } from '../src/site';
 
@@ -39,5 +39,18 @@ describe('call', () => {
 		expect(error).toBeInstanceOf(PublishError);
 		expect(error).not.toBeInstanceOf(ConflictError);
 		expect((error as Error).message).toBe('bw20.nl turned the request down. It answered: missing summary');
+	});
+
+	// A refused request made nothing, so no post can have been lost. A server's
+	// own error may come after the post was made.
+	it("tells a request turned down from a server's own error", async () => {
+		for (const status of [302, 400, 401, 409]) {
+			vi.mocked(send).mockResolvedValue(answer(status, '', { location: 'https://elsewhere.example/' }));
+			expect(await update().catch((e: unknown) => e)).toBeInstanceOf(RefusedError);
+		}
+		vi.mocked(send).mockResolvedValue(answer(502));
+		const error = await update().catch((e: unknown) => e);
+		expect(error).toBeInstanceOf(PublishError);
+		expect(error).not.toBeInstanceOf(RefusedError);
 	});
 });

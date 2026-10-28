@@ -5,8 +5,11 @@
 /** A failure already written as a sentence for the person reading it. */
 export class PublishError extends Error {}
 
+/** A site's answer that turned a request down, so it made nothing: a redirect, or an error of the request's own (`4xx`). */
+export class RefusedError extends PublishError {}
+
 /** A site's `409`: the post was changed there since it was last sent. The message is the site's own words. */
-export class ConflictError extends PublishError {}
+export class ConflictError extends RefusedError {}
 
 /** An answer, with its headers' names in lower case. */
 export interface Response {

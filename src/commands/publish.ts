@@ -26,12 +26,13 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, PublishError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, PublishError, RefusedError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
 import { linkingPosts } from '../core/links';
+import { forgotten, moved, readSending, sent, type Sending } from '../core/sending';
 import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, sentStatus, updatedNotice, updateSummary, whenUnchanged, type Send } from '../core/steps';
 import { goesPublic, linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
@@ -68,6 +69,26 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const host = siteHost(settings.site);
 	const refused = refusal(draft ? 'draft' : 'publish', statusOf(app.metadataCache.getFileCache(file)?.frontmatter), file.basename);
 	if (refused !== null) throw new PublishError(refused);
+	// A new post sent before, whose address never came back into the note, may
+	// be on the site already, so it's asked about before a second one is made.
+	if (postOf(context, file) !== null) forget(app, file.path);
+	else if (sendingOf(app)[file.path] !== undefined) {
+		const answer = await choose(
+			app,
+			`Is ${file.basename} on your site already?`,
+			(el) => {
+				el.createEl('p', { text: `The last time you published ${file.basename}, its address didn't make it back into the note. The post may be on your site already.` });
+				el.createEl('p', { text: "If it is, give its address, and the note knows its post again. Publishing it as new could make a second post, or your site may turn it down." });
+			},
+			['Publish it as new', 'Give its address'],
+		);
+		if (answer === null) return false;
+		if (answer === 1) {
+			await relink(context, file, host);
+			return false;
+		}
+		forget(app, file.path);
+	}
 	const vault = adapter.getBasePath();
 	const home = homedir();
 
@@ -285,10 +306,15 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 
 	const sendingText = draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`;
 	const send = (overwrite: boolean) => showing(sendingText, () => post(target, existing === null ? createBody(body) : updateBody(existing, body, updated, overwrite)));
+	// Until the note has its new post's address: if that never happens, the
+	// next publish asks before it makes a second post.
+	if (existing === null) remember(app, file.path);
 	let response;
 	try {
 		response = await send(false);
 	} catch (error) {
+		// Turned down, so there is no post to lose track of.
+		if (existing === null && error instanceof RefusedError) forget(app, file.path);
 		// Changed on the site since it was last sent: replacing that is asked.
 		if (!(error instanceof ConflictError) || existing === null) throw error;
 		const replace = await confirm(
@@ -321,6 +347,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	}
 	try {
 		await record(context, file, draft ? 'draft' : 'published', url);
+		forget(app, file.path);
 	} catch (error) {
 		throw new PublishError(`${file.basename} is on your site, at ${url}, but its address couldn't be written into the note: ${error instanceof Error ? error.message : String(error)}. Put the address in the note's ${POST_PROPERTY} property yourself. Publishing again without it would make a second post.`);
 	}
@@ -445,6 +472,61 @@ function settled(app: App, file: TFile): Promise<void> {
 		});
 		const timer = window.setTimeout(done, 5000);
 	});
+}
+
+/**
+ * Link the note to a post it lost track of, at the address you give, once that
+ * address shows a page on your site. Its status is asked of the site, since a
+ * draft has a page too.
+ */
+async function relink(context: Context, file: TFile, host: string): Promise<void> {
+	const { app, settings } = context;
+	const answer = await ask(app, {
+		title: `Where is ${file.basename}?`,
+		description: "Find the post on your site, and paste its address here. In the Open checks that it's there before it writes it into the note.",
+		placeholder: `${settings.site}/…`,
+		cta: 'Link it',
+	});
+	if (answer === null) return;
+	const url = answer.trim();
+	if (!url.startsWith(`${settings.site}/`)) throw new PublishError(`${url} isn't an address on ${host}. Paste the address of the post on your site, starting with ${settings.site}/.`);
+	const page = await showing(`Looking for ${file.basename} on ${host}…`, () => send(url).catch(() => null));
+	if (page?.status !== 200) throw new PublishError(`There's no post at ${url}, or ${host} didn't show it. Open the address in a browser to check it, then try again.`);
+	const draft = await isDraft(await site(context), url);
+	await record(context, file, draft ? 'draft' : 'published', url);
+	forget(app, file.path);
+	new Notice(`${file.basename} knows its post again, at ${url}. Publish it again to update the post with what's in the note.`, 10000);
+}
+
+/** Where the new posts sent without hearing back are kept: this vault's local storage, on this device. */
+const SENDING = 'in-the-open-sending';
+
+function sendingOf(app: App): Sending {
+	return readSending(app.loadLocalStorage(SENDING));
+}
+
+function keep(app: App, sending: Sending): void {
+	app.saveLocalStorage(SENDING, Object.keys(sending).length > 0 ? sending : null);
+}
+
+function remember(app: App, path: string): void {
+	keep(app, sent(sendingOf(app), path, new Date()));
+}
+
+function forget(app: App, path: string): void {
+	const sending = sendingOf(app);
+	if (sending[path] !== undefined) keep(app, forgotten(sending, path));
+}
+
+/** A note renamed or moved keeps what was remembered about its send. */
+export function noteMoved(app: App, from: string, to: string): void {
+	const sending = sendingOf(app);
+	if (sending[from] !== undefined) keep(app, moved(sending, from, to));
+}
+
+/** A note deleted takes what was remembered about its send with it. */
+export function noteDeleted(app: App, path: string): void {
+	forget(app, path);
 }
 
 function record(context: Context, file: TFile, status: PostStatus, url?: string | null): Promise<void> {
