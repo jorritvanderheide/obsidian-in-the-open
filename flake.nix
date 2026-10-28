@@ -39,7 +39,7 @@
             chmod -R u+w obsidian-citation-core
           '';
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-Ctb1BqV5vVj3ELNYdqHNErIgR+/AYC1FYnShPa0RnVQ=";
+          npmDepsHash = "sha256-pber3OA+/+Rgi4yhSXMdvvAtKgAOJX40VwfIOWKaGMs=";
           nodejs = pkgs.nodejs_24;
           installPhase = ''
             mkdir -p $out

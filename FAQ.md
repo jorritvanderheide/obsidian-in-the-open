@@ -4,6 +4,7 @@ Can't find your answer here? Please
 [open an issue](https://github.com/jorritvanderheide/obsidian-in-the-open/issues/new/choose).
 
 - [Connecting to your site](#connecting-to-your-site)
+- [Pandoc](#pandoc)
 - [Publishing](#publishing)
 
 ## Connecting to your site
@@ -26,6 +27,29 @@ curl -H "Authorization: Bearer <your token>" "https://example.org/micropub?q=con
   secret again in Settings → In the Open → **Token**, and paste it.
 - **It answers `unauthorized`** too: your site has a different token. Use the
   one it has, or give it this one, as your site's own documentation says.
+
+## Pandoc
+
+### "Download pandoc?"
+
+In the Open can't find pandoc installed, so it offers pandoc's own built-in
+version: 17 MB from pandoc's release on GitHub, once, kept outside your vault
+and shared with Due Credit. If pandoc is installed but not found, Obsidian may
+not see the same PATH as your terminal: set **Pandoc** in the settings to its
+full path instead. Run `which pandoc` (macOS, Linux) or `where pandoc`
+(Windows) in a terminal to find it.
+
+### "Couldn't find pandoc at …"
+
+**Pandoc** in the settings names a pandoc that isn't there. Fix the path, or
+set it back to `pandoc`: then In the Open uses the one on your PATH, or offers
+its built-in one.
+
+### "Couldn't download pandoc: …"
+
+The download from GitHub failed, or what came back isn't the pandoc In the
+Open was tested with, so it wasn't kept. Try again later, or install pandoc
+from [pandoc.org](https://pandoc.org/installing.html).
 
 ## Publishing
 

@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.0.0-beta.3
 
 - Publish without pandoc installed: In the Open offers to download pandoc's
   own built-in version the first time, 17 MB, once, and runs it inside
