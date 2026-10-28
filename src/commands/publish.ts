@@ -253,8 +253,13 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 export async function withdraw(context: Context, file: TFile, back: boolean): Promise<void> {
 	const url = postOf(context, file);
 	if (url === null) throw new PublishError(`${file.basename} isn't published: it has no ${POST_PROPERTY}.`);
-	const target = await site(context);
-	if (!back && (await isDraft(target, url))) {
+	// Asking the site comes before any dialog, so it says so: it can take a
+	// moment, and a command that shows nothing looks like one that didn't run.
+	const { target, draft } = await showing(`Asking your site about ${file.basename}…`, async () => {
+		const target = await site(context);
+		return { target, draft: !back && (await isDraft(target, url)) };
+	});
+	if (draft) {
 		const yes = await confirm(
 			context.app,
 			`Discard the draft of ${file.basename}?`,
@@ -262,7 +267,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 			'Discard',
 		);
 		if (!yes) return;
-		await post(target, actionBody('delete', url));
+		await showing(`Discarding the draft of ${file.basename}…`, () => post(target, actionBody('delete', url)));
 		await record(context, file, 'unpublished', null);
 		new Notice(`Discarded the draft of ${file.basename}.`, 10000);
 		return;
@@ -279,9 +284,23 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		if (answer === null) return;
 		reason = answer;
 	}
-	await post(target, actionBody(back ? 'undelete' : 'delete', url, reason));
+	// The site checks, commits and pushes before it answers, which takes a few
+	// seconds.
+	await showing(back ? `Restoring ${file.basename}…` : `Withdrawing ${file.basename}…`, () =>
+		post(target, actionBody(back ? 'undelete' : 'delete', url, reason)),
+	);
 	await record(context, file, back ? 'published' : 'withdrawn');
-	new Notice(back ? `Restored ${file.basename}.` : `Withdrew ${file.basename}.`, 10000);
+	new Notice(`${back ? 'Restored' : 'Withdrew'} ${file.basename}. The site shows it once it has built it.`, 10000);
+}
+
+/** A notice that stays while the work runs, and goes when it's done or fails. */
+async function showing<T>(text: string, work: () => Promise<T>): Promise<T> {
+	const notice = new Notice(text, 0);
+	try {
+		return await work();
+	} finally {
+		notice.hide();
+	}
 }
 
 /** Write where the note's post stands, and its address: a new one, or null to forget it. */
