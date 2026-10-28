@@ -30,7 +30,7 @@
 		"globals": "^17.6.0",
 		"jiti": "^2.6.1",
 		"obsidian": "~1.13.1",
-		"obsidian-citation-core": "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#af64531f5542848590ab198043f5975eeba61fe4",
+		"obsidian-citation-core": "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#81050a22a6b56cfeea0285c3d593fc644cc0755a",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1",
 		"vitest": "^3.2.7"
