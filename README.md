@@ -58,13 +58,15 @@ In the Open needs Obsidian 1.13 or later, on desktop.
    site's address, and **Token** to the token your site gave you.
 2. **Point In the Open at your bibliography.** Set **Bibliography** to your
    `.bib` file. The default is `Literature/library.bib` in your vault.
-3. **Give the note a summary.** Add a `summary` property: one sentence about
-   the post.
-4. **Publish it.** Run **Publish note**, or right-click the note and choose it
-   from the menu. In the Open sends it, writes the post's address to the
-   note's `published-url` property, and tells you when the post is live.
-   Publishing the note again updates the post. To see it on your site
-   first, run **Publish note as a draft**.
+3. **Start a post.** Run **New post** and give it a title. In the Open makes
+   a note from its template, with a `summary` property to fill in: one
+   sentence about the post.
+4. **Publish it as a draft.** Press the pencil in the note's title bar. In the
+   Open sends it, writes the post's address to the note's `published-url`
+   property, and tells you when the draft is up. Only its address leads to
+   it, so you can see it as readers will.
+5. **Publish it.** Press the button again. The pill beside it says where the
+   post stands, and clicking the pill updates, opens or withdraws it.
 
 <br/>
 
@@ -72,8 +74,9 @@ In the Open needs Obsidian 1.13 or later, on desktop.
 
 In the Open sends one note, and only to the site you set. What you wrote for
 yourself never leaves: comments are stripped, and only the title, summary,
-categories and slug go along from the note's properties. The only thing it
-writes in your vault is the post's address, in the note you published.
+categories and slug go along from the note's properties. In your vault it
+writes only the post's address and status, in the note you publish, and the
+notes and the template **New post** makes.
 [Section 11](#11-network-and-file-disclosure) lists exactly what it reads,
 sends and writes.
 
@@ -121,6 +124,13 @@ If you want to work on the plugin, or make your site take its posts:
 ## 5 Features
 
 ### 5.1 Publishing
+
+- **New post** - A note from your post template, with the properties a post
+  needs. The template is yours to edit.
+- **In the title bar** - A post's status as a pill, Draft, Published or
+  Withdrawn, and its next step as a button.
+
+  <!-- SCREENSHOT images/title-bar.png: a draft's title bar, with the Draft pill and the Publish button beside it -->
 
 - **One command** - Publish the note you have open, or any note from its
   right-click menu.
@@ -214,6 +224,8 @@ None of the commands has a hotkey, so you can choose your own in Settings →
 Hotkeys. Each one is also on a note's right-click menu, in the file explorer or
 on its tab.
 
+- `In the Open: New post` - Makes a note from your post template, marked as a
+  post, so its title bar offers to publish it.
 - `In the Open: Publish note` - Sends the note to your site, or updates its post
   if it's published already. A draft is published, dated today.
 - `In the Open: Publish note as a draft` - Sends the note as a draft, or
@@ -233,6 +245,12 @@ on its tab.
 | --- | --- | --- |
 | **Site** | None | Your site's address. In the Open finds its Micropub endpoint from there. |
 | **Token** | None | The token your site gave you. Kept in Obsidian's secret storage. |
+
+**Posts**
+
+| Setting | Default | |
+| --- | --- | --- |
+| **Template folder** | `Templates/In the Open` | Where `Post.md` is, the template **New post** makes a note from. In the Open puts it there the first time, and after that it's yours to edit. |
 
 **Pandoc**
 
@@ -294,7 +312,9 @@ Only to your site, and only when you run a command:
 ### 11.2 What it reads
 
 - **Notes:** The note you publish, and the citation keys and `published-url`
-  of the notes it links to.
+  of the notes it links to. The `published-url` and `post-status` of the
+  notes you have open, for their title bar.
+- **Template:** `Post.md` in the template folder, when you make a new post.
 - **Bibliography:** The `.bib` file you set in **Bibliography**.
 - **Citation style:** From Zotero's styles folder (`~/Zotero/styles`), or the
   `.csl` file you set.
@@ -303,9 +323,13 @@ Only to your site, and only when you run a command:
 
 ### 11.3 What it writes
 
-- **The post's address:** the `published-url` property, in the note you
-  published, and removed from it when you discard its draft. Nothing else in
-  your notes, and nothing anywhere else in your vault.
+- **The post's address and status:** the `published-url` and `post-status`
+  properties, in the note you publish, withdraw or restore. The address is
+  removed when you discard its draft. Nothing else in your notes.
+- **New posts:** the note **New post** makes, where Obsidian puts new notes.
+- **Template:** `Post.md` in the template folder, when you make a new post
+  and there's no file with that name. If the file is there, edited or not,
+  it's never overwritten.
 - **Temporary files:** For each publish, pandoc's filters and the note's
   properties go in a temporary folder, which is removed afterwards.
 

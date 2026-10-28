@@ -37,6 +37,8 @@ export interface Settings {
 	 * a `.csl` file. Empty is pandoc's built-in Chicago author-date.
 	 */
 	csl: string;
+	/** Where the post template, `Post.md`, is kept, and seeded to when it is missing. */
+	templateFolder: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -48,6 +50,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	literatureFolder: 'Literature',
 	keyProperty: 'citekey',
 	csl: '',
+	templateFolder: 'Templates/In the Open',
 };
 
 function text(value: unknown): string | undefined {
@@ -66,7 +69,7 @@ function text(value: unknown): string | undefined {
  */
 export function loadSettings(data: unknown): Settings {
 	const saved = (data ?? {}) as Record<string, unknown>;
-	const address = (key: 'pandocPath' | 'literatureFolder' | 'keyProperty') => text(saved[key]) || DEFAULT_SETTINGS[key];
+	const address = (key: 'pandocPath' | 'literatureFolder' | 'keyProperty' | 'templateFolder') => text(saved[key]) || DEFAULT_SETTINGS[key];
 	const optional = (key: 'site' | 'token' | 'bibliography' | 'csl') => text(saved[key]) ?? DEFAULT_SETTINGS[key];
 
 	return {
@@ -78,5 +81,6 @@ export function loadSettings(data: unknown): Settings {
 		literatureFolder: address('literatureFolder'),
 		keyProperty: address('keyProperty'),
 		csl: optional('csl'),
+		templateFolder: address('templateFolder'),
 	};
 }

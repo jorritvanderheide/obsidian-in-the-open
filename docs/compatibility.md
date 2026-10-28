@@ -35,8 +35,14 @@ holds.
   reading one of these, or reading it differently, is breaking. Reading
   something new isn't.
 - **What's written in a note:** only `published-url`, after the first publish,
-  and removed when its draft is discarded. It's how the next publish finds
-  the post, so renaming it is breaking.
+  and removed when its draft is discarded, and `post-status`: `unpublished`,
+  `draft`, `published` or `withdrawn`. A note with either is a post, and its
+  title bar says where it stands; one with an address and no status is
+  published. They're how the next publish finds the post, and what your own
+  searches and Bases may list, so renaming either, or a status, is breaking.
+- **The template:** `Post.md` in the **Template folder**, seeded when it's
+  missing and never overwritten. `{{title}}` in it becomes the post's title;
+  a new placeholder isn't breaking, and dropping one is.
 - **What stays behind:** `%%comments%%`, `<!-- comments -->` and every property
   not listed above never leave. Letting more of a note out is breaking,
   because people write things there for themselves.
@@ -45,8 +51,8 @@ holds.
 
 - **The plugin ID** `in-the-open` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
-- **Command IDs** are `in-the-open:publish`, `in-the-open:draft`,
-  `in-the-open:withdraw` and `in-the-open:restore`. People bind hotkeys to them, so renaming or removing
+- **Command IDs** are `in-the-open:new-post`, `in-the-open:publish`,
+  `in-the-open:draft`, `in-the-open:withdraw` and `in-the-open:restore`. People bind hotkeys to them, so renaming or removing
   one is breaking. A command's name may change.
 
 ## Paper Trail

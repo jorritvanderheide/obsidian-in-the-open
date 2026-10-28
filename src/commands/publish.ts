@@ -27,10 +27,8 @@ import { actionBody, createBody, imageType, images, multipart, PublishError, upd
 import { send } from '../http';
 import { connect, isDraft, post, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
+import { POST_PROPERTY, STATUS_PROPERTY, type PostStatus } from '../core/status';
 import type { Context } from '../context';
-
-/** The property that holds a published note's post, its address. */
-export const POST_PROPERTY = 'published-url';
 
 /** How long a new post may take to go live before In the Open stops waiting. */
 const WAIT = 5 * 60_000;
@@ -220,15 +218,14 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			: wasDraft
 				? `Published ${file.basename}: it goes into your site's lists and feed.`
 				: `Updated ${file.basename}.`;
+		await record(context, file, draft ? 'draft' : 'published');
 		new Notice(`${done} The site shows it once it has built it.`, 10000);
 		return;
 	}
 	const location = response.headers.location;
 	if (location === undefined) throw new PublishError(`${host} took the post but didn't say where it is.`);
 	const url = new URL(location, target.endpoint).href;
-	await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
-		frontmatter[POST_PROPERTY] = url;
-	});
+	await record(context, file, draft ? 'draft' : 'published', url);
 	if (response.status === 202) await waitForIt(file.basename, url, draft);
 	else live(file.basename, url, draft);
 }
@@ -247,9 +244,7 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		);
 		if (!yes) return;
 		await post(target, actionBody('delete', url));
-		await context.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
-			delete frontmatter[POST_PROPERTY];
-		});
+		await record(context, file, 'unpublished', null);
 		new Notice(`Discarded the draft of ${file.basename}.`, 10000);
 		return;
 	}
@@ -263,7 +258,17 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		if (!yes) return;
 	}
 	await post(target, actionBody(back ? 'undelete' : 'delete', url));
+	await record(context, file, back ? 'published' : 'withdrawn');
 	new Notice(back ? `Restored ${file.basename}.` : `Withdrew ${file.basename}.`, 10000);
+}
+
+/** Write where the note's post stands, and its address: a new one, or null to forget it. */
+function record(context: Context, file: TFile, status: PostStatus, url?: string | null): Promise<void> {
+	return context.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+		if (url === null) delete frontmatter[POST_PROPERTY];
+		else if (url !== undefined) frontmatter[POST_PROPERTY] = url;
+		frontmatter[STATUS_PROPERTY] = status;
+	});
 }
 
 /** Ask for the new post until it answers, and say when it's up, or that it isn't yet. */

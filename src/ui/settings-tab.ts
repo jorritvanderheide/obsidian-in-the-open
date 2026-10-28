@@ -73,6 +73,17 @@ export class SettingsTab extends PluginSettingTab {
 			},
 			{
 				type: 'group',
+				heading: 'Posts',
+				items: [
+					{
+						name: 'Template folder',
+						desc: 'Where Post.md is, the template New post makes a note from. In the Open puts it there the first time, and after that it’s yours to edit.',
+						control: { type: 'folder', key: 'templateFolder', placeholder: 'Templates/In the Open' },
+					},
+				],
+			},
+			{
+				type: 'group',
 				heading: 'Pandoc',
 				items: [
 					{

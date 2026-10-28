@@ -43,7 +43,7 @@
           nodejs = pkgs.nodejs_24;
           installPhase = ''
             mkdir -p $out
-            cp main.js manifest.json $out/
+            cp main.js manifest.json styles.css $out/
           '';
         };
 

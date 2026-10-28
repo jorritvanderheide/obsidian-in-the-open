@@ -1,0 +1,29 @@
+/* A post's status in its note's title bar: a word with its mark, as Paper
+ * Trail shows a paper's reading status, so the two read alike. */
+.view-action.in-the-open-status {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	border-radius: var(--radius-s);
+	background-color: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	white-space: nowrap;
+}
+
+/* The square a theme gives the bar's buttons, taken back for a word. */
+.workspace-leaf .view-header .view-actions .view-action.in-the-open-status {
+	width: auto;
+	padding: 0 var(--size-4-2);
+}
+
+/* The mark keeps a glyph's size while the word sets its own. */
+.in-the-open-status-icon {
+	display: flex;
+	align-items: center;
+}
+
+.in-the-open-status-icon svg {
+	width: var(--icon-s);
+	height: var(--icon-s);
+}

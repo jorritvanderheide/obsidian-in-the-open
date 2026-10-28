@@ -20,7 +20,8 @@ Reports are looked at before anything about them is made public.
 
 In the Open sends the note you publish to the site you set, with your token. It
 reads that note, your bibliography and your citation style, and writes only
-the post's address into that note. See
+the post's address and status into that note, besides the notes and the
+template **New post** makes. See
 [section 11 of the README](README.md#11-network-and-file-disclosure). These
 are security problems:
 
@@ -29,8 +30,10 @@ are security problems:
 - Your token leaving Obsidian's secret storage for anywhere but your site's
   Micropub and media endpoints: into `data.json`, a log, a notice, or another
   site a request is redirected to.
-- Writing anywhere in your vault but the `published-url` property of the note
-  you published or whose draft you discarded.
+- Writing anywhere in your vault but the `published-url` and `post-status`
+  properties of the note you publish, withdraw, restore or discard, a note
+  **New post** makes, and `Post.md` in the template folder when it isn't
+  there.
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
 - Something you wrote for yourself, like a comment, reaching your site.
