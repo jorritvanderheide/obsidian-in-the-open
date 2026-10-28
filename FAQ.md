@@ -37,3 +37,11 @@ Before it makes the post, In the Open asks your site which categories it has
 The message lists the ones the site has. Change the note's `categories` to
 one of those, or add the category to your site first, the way your site does
 that.
+
+### "… was changed on your site"
+
+Your site says the post was changed there since you last published it from
+this note: by hand, or by another tool. Publishing the note again would
+replace that change, so In the Open asks first. **Replace it** sends the note
+as it is. To keep the change, copy it into the note first, then publish. Only
+a site that keeps track of this asks; any other is simply updated.

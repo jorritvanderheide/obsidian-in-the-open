@@ -23,7 +23,7 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, createBody, differences, imageType, images, listed, multipart, PublishError, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, differences, imageType, images, listed, multipart, PublishError, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
@@ -270,12 +270,25 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		if (answer === 1) updated = new Date();
 	}
 
-	const sending = new Notice(draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`, 0);
+	const sendingText = draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`;
+	const send = (overwrite: boolean) => showing(sendingText, () => post(target, existing === null ? createBody(body) : updateBody(existing, body, updated, overwrite)));
 	let response;
 	try {
-		response = await post(target, existing === null ? createBody(body) : updateBody(existing, body, updated));
-	} finally {
-		sending.hide();
+		response = await send(false);
+	} catch (error) {
+		// Changed on the site since it was last sent: replacing that is asked.
+		if (!(error instanceof ConflictError) || existing === null) throw error;
+		const replace = await confirm(
+			app,
+			`${file.basename} was changed on your site`,
+			(el) => {
+				el.createEl('p', { text: `Since you last published it, it was changed there: ${error.message}.` });
+				el.createEl('p', { text: 'Publishing it again replaces that change with the note. To keep the change, bring it into the note first.' });
+			},
+			'Replace it',
+		);
+		if (!replace) return;
+		response = await send(true);
 	}
 
 	if (existing !== null) {

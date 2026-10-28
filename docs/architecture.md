@@ -60,7 +60,9 @@ decide nothing.
    For a published post, ask whether the change is one of substance: only then
    does the post say it was updated.
 9. **Send it**, as a create or an update, with `post-status` for a draft or
-   a draft being published. A new post's address goes into the
-   note's `published-url`, and when the site answers `202`, In the Open asks
-   for that address every five seconds, for five minutes at most, and says
-   when the post is live.
+   a draft being published. A site's `409`, for a post changed there since,
+   is asked about, and with your yes the update goes again with
+   `mp-overwrite`. A new post's address goes into the note's
+   `published-url`, and when the site answers `202`, In the Open asks for
+   that address every five seconds, for five minutes at most, and says when
+   the post is live.

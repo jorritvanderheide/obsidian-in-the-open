@@ -1,7 +1,7 @@
 // A site, as In the Open talks to it: its endpoint, found from its home page,
 // what it takes, and the requests that carry the token.
 import { randomBytes } from 'crypto';
-import { endpointFrom, failure, PublishError, readCategories, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
+import { ConflictError, endpointFrom, failure, PublishError, readCategories, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
 import { page, send } from './http';
 
 export interface Site {
@@ -15,6 +15,7 @@ export interface Site {
 /** Find the site's endpoint, and ask what it takes. */
 export async function connect(home: string, token: string): Promise<Site> {
 	const { url, response } = await page(`${home}/`);
+	if (response.status === 409) throw new ConflictError(failure(response));
 	if (response.status >= 400) throw new PublishError(`${home} answered ${response.status}, so its Micropub endpoint can't be found there.`);
 	const endpoint = endpointFrom(url, response);
 	if (endpoint === null) {

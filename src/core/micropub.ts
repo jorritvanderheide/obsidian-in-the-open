@@ -5,6 +5,9 @@
 /** A failure already written as a sentence for the person reading it. */
 export class PublishError extends Error {}
 
+/** A site's `409`: the post was changed there since it was last sent. The message is the site's own words. */
+export class ConflictError extends PublishError {}
+
 /** An answer, with its headers' names in lower case. */
 export interface Response {
 	status: number;
@@ -221,12 +224,13 @@ export function createBody(post: Post): string {
 /**
  * A post sent again, as an update that replaces everything In the Open sends.
  * `updated` only when the change is one of substance: a correction leaves it
- * out.
+ * out. `overwrite` when the site refused it for a change made there, and
+ * you said to replace that change.
  */
-export function updateBody(url: string, post: Post, updated: Date | null): string {
+export function updateBody(url: string, post: Post, updated: Date | null, overwrite = false): string {
 	const replace = properties(post);
 	if (updated !== null) replace.updated = [updated.toISOString().replace(/\.\d{3}Z$/, 'Z')];
-	return JSON.stringify({ action: 'update', url, replace });
+	return JSON.stringify(overwrite ? { action: 'update', url, 'mp-overwrite': true, replace } : { action: 'update', url, replace });
 }
 
 /** Withdrawing a post (delete), with why when it's said, or bringing it back (undelete). */

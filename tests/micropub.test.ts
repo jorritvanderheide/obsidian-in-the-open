@@ -107,6 +107,11 @@ describe('the requests', () => {
 		expect(source).toEqual({ draft: false, title: 'Quiet', content: '<p>x</p>', categories: ['tech'], references: [{ key: 'a', text: 'A.', url: null }] });
 	});
 
+	it('says to replace a change made on the site only when asked', () => {
+		expect((JSON.parse(updateBody('u', post, null, true)) as Record<string, unknown>)['mp-overwrite']).toBe(true);
+		expect((JSON.parse(updateBody('u', post, null)) as Record<string, unknown>)['mp-overwrite']).toBeUndefined();
+	});
+
 	it('withdraws and restores by the post\'s address', () => {
 		expect(JSON.parse(actionBody('delete', 'https://bw20.nl/log/quiet/'))).toEqual({ action: 'delete', url: 'https://bw20.nl/log/quiet/' });
 		expect(JSON.parse(actionBody('delete', 'u', ' The figures are wrong. '))).toEqual({ action: 'delete', url: 'u', reason: 'The figures are wrong.' });

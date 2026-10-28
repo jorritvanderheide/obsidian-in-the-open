@@ -137,7 +137,8 @@ If you want to work on the plugin, or make your site take its posts:
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
   same address, and says first what changed. When nothing did, it sends
-  nothing.
+  nothing, and when the post was changed on your site, it asks before
+  replacing that.
 - **Drafts first** - See a post on your site before anyone else does: a
   draft is at its address, but in none of your site's lists or its feed,
   until you publish it. On a site that takes drafts.
