@@ -18,12 +18,12 @@ Open's own: its settings, Micropub, and wiring the core to Obsidian.
 | Path | What it holds |
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
-| `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config`, the requests' bodies, an answer's error, images and their upload. Pure, with a test named after it. |
+| `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config` and `q=source`, the requests' bodies, an answer's error, images and their upload. Pure, with a test named after it. |
 | `src/http.ts` | What goes over the wire: Node's `https`, which never follows a redirect with the token. |
 | `src/site.ts` | A site: its endpoint and what it takes, and the requests that carry the token. |
-| `src/commands/publish.ts` | Publishing, updating, withdrawing and restoring a note. |
+| `src/commands/publish.ts` | Publishing a note, as a draft or not, updating it, withdrawing and restoring it, and discarding a draft. |
 | `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, and the dialogs. |
-| `src/main.ts` | Registers the three commands and the file menu items. |
+| `src/main.ts` | Registers the four commands and the file menu items. |
 | `src/modules.d.ts` | What esbuild bundles from the core: its filters as text and its font as bytes. |
 
 **Every decision belongs in the core**, or, for Micropub, in pure code here
@@ -36,21 +36,23 @@ decide nothing.
 2. **Ask the site what it takes.** Its home page names its Micropub endpoint
    (a `Link` header or a `<link rel="micropub">`), followed through redirects
    without the token; `q=config` says whether it takes the references
-   extension, and so whether the post goes as Markdown or as HTML, and where
-   images go. The token comes from Obsidian's keychain, and goes only over
-   https, never through a redirect.
+   extension, and so whether the post goes as Markdown or as HTML, where
+   images go, and whether it takes drafts. For a note with a post, `q=source`
+   says whether that post is a draft. The token comes from Obsidian's
+   keychain, and goes only over https, never through a redirect.
 3. **Read the note**, from the editor when it's open, and **prepare** it with
    the core: a link to a note with a post on this site goes to the post.
 4. **Confirm** the links that won't be links: to notes without a post, and to
    papers the bibliography lacks.
 5. **Check the images:** each needs alt text, and is a PNG or a JPEG.
-6. **Ask, for an update**, whether the change is one of substance: only then
-   does the post say it was updated.
+6. **Ask, for an update** of a published post, whether the change is one of
+   substance: only then does the post say it was updated.
 7. **Upload the images** to the media endpoint, and put their addresses in
    the note.
 8. **Run pandoc** with the core's `postArgs`, from a temporary folder, and read
    the post and, as Markdown, its references.
-9. **Send it**, as a create or an update. A new post's address goes into the
+9. **Send it**, as a create or an update, with `post-status` for a draft or
+   a draft being published. A new post's address goes into the
    note's `published-url`, and when the site answers `202`, In the Open asks
    for that address every five seconds, for five minutes at most, and says
    when the post is live.

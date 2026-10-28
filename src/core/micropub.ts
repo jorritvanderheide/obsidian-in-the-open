@@ -49,6 +49,8 @@ export interface Config {
 	mediaEndpoint: string | null;
 	/** The version of the references extension it takes, or null for none. */
 	references: number | null;
+	/** Whether it takes drafts: `draft` in its `post-status`. A site that doesn't would publish one at once. */
+	drafts: boolean;
 }
 
 export function readConfig(body: string): Config {
@@ -61,10 +63,23 @@ export function readConfig(body: string): Config {
 	}
 	const media = config['media-endpoint'];
 	const references = config.references;
+	const statuses = config['post-status'];
 	return {
 		mediaEndpoint: typeof media === 'string' && media !== '' ? media : null,
 		references: typeof references === 'number' && references >= 1 ? references : null,
+		drafts: Array.isArray(statuses) && statuses.includes('draft'),
 	};
+}
+
+/** Whether a post is a draft, from `q=source`. Anything else is a published post. */
+export function readDraft(body: string): boolean {
+	try {
+		const parsed = JSON.parse(body) as { properties?: Record<string, unknown> };
+		const status = parsed.properties?.['post-status'];
+		return Array.isArray(status) && status[0] === 'draft';
+	} catch {
+		throw new PublishError("The site's Micropub endpoint didn't answer q=source with JSON.");
+	}
 }
 
 /** A work a post cites, as the references extension sends it. */
@@ -84,6 +99,8 @@ export interface Post {
 	slug: string | null;
 	/** The works it cites, for a site that takes the extension. */
 	references: Reference[] | null;
+	/** Its `post-status`: a draft, a draft being published, or null to send none, as for any other post. */
+	status: 'draft' | 'published' | null;
 }
 
 /** Micropub's properties of a post: each a list. */
@@ -93,6 +110,7 @@ function properties(post: Post): Record<string, unknown[]> {
 		content: ['markdown' in post.content ? post.content.markdown : { html: post.content.html }],
 		category: post.categories,
 	};
+	if (post.status !== null) props['post-status'] = [post.status];
 	if (post.summary !== null) props.summary = [post.summary];
 	if (post.references !== null) props.references = post.references.map(({ key, text, url }) => (url === null ? { key, text } : { key, text, url }));
 	return props;

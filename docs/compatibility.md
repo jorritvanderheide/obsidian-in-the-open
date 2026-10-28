@@ -22,6 +22,8 @@ holds.
 - **The references extension's version** is read from the site's
   configuration. A new version of the extension is sent only to a site that
   says it takes it.
+- **Drafts** go only to a site whose configuration lists `draft` under
+  `post-status`, since any other would publish one at once.
 
 ## Your notes
 
@@ -32,8 +34,9 @@ holds.
   and the **Citation key property** of the notes it links to. No longer
   reading one of these, or reading it differently, is breaking. Reading
   something new isn't.
-- **What's written in a note:** only `published-url`, after the first publish.
-  It's how the next publish finds the post, so renaming it is breaking.
+- **What's written in a note:** only `published-url`, after the first publish,
+  and removed when its draft is discarded. It's how the next publish finds
+  the post, so renaming it is breaking.
 - **What stays behind:** `%%comments%%`, `<!-- comments -->` and every property
   not listed above never leave. Letting more of a note out is breaking,
   because people write things there for themselves.
@@ -42,8 +45,8 @@ holds.
 
 - **The plugin ID** `in-the-open` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
-- **Command IDs** are `in-the-open:publish`, `in-the-open:withdraw` and
-  `in-the-open:restore`. People bind hotkeys to them, so renaming or removing
+- **Command IDs** are `in-the-open:publish`, `in-the-open:draft`,
+  `in-the-open:withdraw` and `in-the-open:restore`. People bind hotkeys to them, so renaming or removing
   one is breaking. A command's name may change.
 
 ## Paper Trail

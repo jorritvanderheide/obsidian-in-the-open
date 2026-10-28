@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, readConfig, secure, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, readConfig, readDraft, secure, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -30,8 +30,9 @@ describe('secure', () => {
 
 describe('readConfig', () => {
 	it('reads the media endpoint and the references extension', () => {
-		expect(readConfig('{"media-endpoint": "https://bw20.nl/micropub/media", "references": 1}')).toEqual({ mediaEndpoint: 'https://bw20.nl/micropub/media', references: 1 });
-		expect(readConfig('{}')).toEqual({ mediaEndpoint: null, references: null });
+		expect(readConfig('{"media-endpoint": "https://bw20.nl/micropub/media", "references": 1}')).toEqual({ mediaEndpoint: 'https://bw20.nl/micropub/media', references: 1, drafts: false });
+		expect(readConfig('{}')).toEqual({ mediaEndpoint: null, references: null, drafts: false });
+		expect(readConfig('{"post-status": ["published", "draft"]}').drafts).toBe(true);
 		expect(() => readConfig('<html>')).toThrow("didn't answer q=config with JSON");
 	});
 });
@@ -46,6 +47,7 @@ const post: Post = {
 		{ key: 'a', text: 'A, Ann. 2024. *First*.', url: 'https://doi.org/10.1/x' },
 		{ key: 'b', text: 'B.', url: null },
 	],
+	status: null,
 };
 
 describe('the requests', () => {
@@ -75,6 +77,19 @@ describe('the requests', () => {
 		expect(update.replace.updated).toEqual(['2026-11-01T08:00:00Z']);
 		expect(update.replace['mp-slug']).toBeUndefined();
 		expect((JSON.parse(updateBody('u', post, null)) as { replace: Record<string, unknown> }).replace.updated).toBeUndefined();
+	});
+
+	it('sends post-status only for a draft, or a draft being published', () => {
+		expect((JSON.parse(createBody({ ...post, status: 'draft' })) as { properties: Record<string, unknown> }).properties['post-status']).toEqual(['draft']);
+		expect((JSON.parse(updateBody('u', { ...post, status: 'published' }, null)) as { replace: Record<string, unknown> }).replace['post-status']).toEqual(['published']);
+		expect((JSON.parse(createBody(post)) as { properties: Record<string, unknown> }).properties['post-status']).toBeUndefined();
+	});
+
+	it('reads whether a post is a draft from its source', () => {
+		expect(readDraft('{"properties": {"post-status": ["draft"]}}')).toBe(true);
+		expect(readDraft('{"properties": {"post-status": ["published"]}}')).toBe(false);
+		expect(readDraft('{"properties": {}}')).toBe(false);
+		expect(() => readDraft('<html>')).toThrow("didn't answer q=source with JSON");
 	});
 
 	it('withdraws and restores by the post\'s address', () => {

@@ -1,7 +1,7 @@
 // A site, as In the Open talks to it: its endpoint, found from its home page,
 // what it takes, and the requests that carry the token.
 import { randomBytes } from 'crypto';
-import { endpointFrom, failure, PublishError, readConfig, secure, type Config, type Response } from './core/micropub';
+import { endpointFrom, failure, PublishError, readConfig, readDraft, secure, type Config, type Response } from './core/micropub';
 import { page, send } from './http';
 
 export interface Site {
@@ -21,8 +21,8 @@ export async function connect(home: string, token: string): Promise<Site> {
 		throw new PublishError(`${home} doesn't say where its Micropub endpoint is: In the Open looks for a Link header or a <link> with rel="micropub" on its home page.`);
 	}
 	if (!secure(endpoint)) throw new PublishError(`${home}'s Micropub endpoint, ${endpoint}, isn't https, so In the Open doesn't send it your token.`);
-	const site = { home, endpoint, token, config: { mediaEndpoint: null, references: null } as Config };
-	const answer = await call(site, `${endpoint}${endpoint.includes('?') ? '&' : '?'}q=config`, { method: 'GET' });
+	const site = { home, endpoint, token, config: { mediaEndpoint: null, references: null, drafts: false } as Config };
+	const answer = await call(site, query(site, 'q=config'), { method: 'GET' });
 	site.config = readConfig(answer.body);
 	if (site.config.mediaEndpoint !== null && !secure(site.config.mediaEndpoint)) site.config.mediaEndpoint = null;
 	return site;
@@ -39,6 +39,18 @@ export async function call(site: Site, url: string, request: { method: string; t
 	if (response.status === 401) throw new PublishError(`${new URL(url).host} doesn't take your token. Check the token in Settings → In the Open.`);
 	if (response.status >= 400) throw new PublishError(`${new URL(url).host} refused it: ${failure(response)}`);
 	return response;
+}
+
+/** The endpoint, asked something. */
+function query(site: Site, what: string): string {
+	return `${site.endpoint}${site.endpoint.includes('?') ? '&' : '?'}${what}`;
+}
+
+/** Whether the post at `url` is a draft. Only a site that takes drafts is asked: on any other, it's published. */
+export async function isDraft(site: Site, url: string): Promise<boolean> {
+	if (!site.config.drafts) return false;
+	const answer = await call(site, query(site, `q=source&properties[]=post-status&url=${encodeURIComponent(url)}`), { method: 'GET' });
+	return readDraft(answer.body);
 }
 
 /** Send JSON to the endpoint. */

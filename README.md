@@ -63,7 +63,8 @@ In the Open needs Obsidian 1.13 or later, on desktop.
 4. **Publish it.** Run **Publish note**, or right-click the note and choose it
    from the menu. In the Open sends it, writes the post's address to the
    note's `published-url` property, and tells you when the post is live.
-   Publishing the note again updates the post.
+   Publishing the note again updates the post. To see it on your site
+   first, run **Publish note as a draft**.
 
 <br/>
 
@@ -125,6 +126,9 @@ If you want to work on the plugin, or make your site take its posts:
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
   same address.
+- **Drafts first** - See a post on your site before anyone else does: a
+  draft is at its address, but in none of your site's lists or its feed,
+  until you publish it. On a site that takes drafts.
 - **Knows when it's live** - On a site that builds before it shows a post,
   In the Open waits and tells you when it's up, or that it isn't yet.
 - **Withdraw, and bring back** - Take a post off your site's lists without
@@ -211,9 +215,12 @@ Hotkeys. Each one is also on a note's right-click menu, in the file explorer or
 on its tab.
 
 - `In the Open: Publish note` - Sends the note to your site, or updates its post
-  if it's published already.
+  if it's published already. A draft is published, dated today.
+- `In the Open: Publish note as a draft` - Sends the note as a draft, or
+  updates its draft. Only its address leads to it, until you publish it.
 - `In the Open: Withdraw note` - Takes the post off your site's lists. Its
-  address keeps working.
+  address keeps working. A draft is discarded instead, and the note forgets
+  its address.
 - `In the Open: Restore note` - Brings a withdrawn post back.
 
 <br/>
@@ -279,6 +286,9 @@ Only to your site, and only when you run a command:
   its `summary`, `categories` and `slug` properties.
 - **References:** every work the note cites, from your bibliography.
 - **Images:** the images in the note.
+- **Whether it's a draft:** with a draft, and when it's published.
+- **Questions:** what the site takes, and whether a published note's post is
+  a draft.
 - **Your token**, with every request, so your site knows it's you.
 
 ### 11.2 What it reads
@@ -294,8 +304,8 @@ Only to your site, and only when you run a command:
 ### 11.3 What it writes
 
 - **The post's address:** the `published-url` property, in the note you
-  published. Nothing else in your notes, and nothing anywhere else in your
-  vault.
+  published, and removed from it when you discard its draft. Nothing else in
+  your notes, and nothing anywhere else in your vault.
 - **Temporary files:** For each publish, pandoc's filters and the note's
   properties go in a temporary folder, which is removed afterwards.
 

@@ -13,7 +13,8 @@ export default class InTheOpen extends Plugin {
 
 		// Publish any note; withdraw or restore only one that has a post.
 		const commands: { id: string; name: string; icon: string; published: boolean; run: (file: TFile) => Promise<void> }[] = [
-			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => publish(this, file) },
+			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => publish(this, file, false) },
+			{ id: 'draft', name: 'Publish note as a draft', icon: 'pencil', published: false, run: (file) => publish(this, file, true) },
 			{ id: 'withdraw', name: 'Withdraw note', icon: 'archive', published: true, run: (file) => withdraw(this, file, false) },
 			{ id: 'restore', name: 'Restore note', icon: 'archive-restore', published: true, run: (file) => withdraw(this, file, true) },
 		];

@@ -30,7 +30,7 @@ are security problems:
   Micropub and media endpoints: into `data.json`, a log, a notice, or another
   site a request is redirected to.
 - Writing anywhere in your vault but the `published-url` property of the note
-  you published.
+  you published or whose draft you discarded.
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
 - Something you wrote for yourself, like a comment, reaching your site.

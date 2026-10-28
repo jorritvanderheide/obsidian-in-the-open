@@ -25,7 +25,7 @@ import {
 } from 'obsidian-citation-core';
 import { actionBody, createBody, imageType, images, multipart, PublishError, updateBody, withAddresses, type Post } from '../core/micropub';
 import { send } from '../http';
-import { connect, post, upload, type Site } from '../site';
+import { connect, isDraft, post, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import type { Context } from '../context';
 
@@ -52,7 +52,8 @@ export function postOf(context: Context, file: TFile): string | null {
 	return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
 }
 
-export async function publish(context: Context, file: TFile): Promise<void> {
+/** Publish a note, or send it as a draft, which only its address leads to until it's published. */
+export async function publish(context: Context, file: TFile, draft: boolean): Promise<void> {
 	const { app, settings } = context;
 	const adapter = app.vault.adapter;
 	if (!(adapter instanceof FileSystemAdapter)) throw new PublishError('Publishing needs the desktop app.');
@@ -68,12 +69,22 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 		throw new PublishError(`There's no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
 	}
 
-	const progress = new Notice(`Asking ${new URL(settings.site).host} what it takes…`, 0);
+	const host = new URL(settings.site).host;
+	const existing = postOf(context, file);
+	const progress = new Notice(`Asking ${host} what it takes…`, 0);
 	let target: Site;
+	let wasDraft: boolean;
 	try {
 		target = await site(context);
+		wasDraft = existing !== null && (await isDraft(target, existing));
 	} finally {
 		progress.hide();
+	}
+	if (draft && !target.config.drafts) {
+		throw new PublishError(`${host} takes no drafts: it doesn't say so in its Micropub configuration, and a site that doesn't know drafts publishes one at once.`);
+	}
+	if (draft && existing !== null && !wasDraft) {
+		throw new PublishError(`${file.basename} is published already, at ${existing}, so it can't be a draft again. Publish it to update it.`);
 	}
 	const format: Format = target.config.references !== null ? 'markdown' : 'html';
 
@@ -125,11 +136,11 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 	const other = pictures.filter((image) => imageType(image.path) === null);
 	if (other.length > 0) throw new PublishError(`A site takes PNG and JPEG images, and ${other.map((image) => basename(image.path)).join(', ')} isn't one.`);
 	const media = target.config.mediaEndpoint;
-	if (pictures.length > 0 && media === null) throw new PublishError(`${new URL(settings.site).host} takes no images (it has no media endpoint), and this note has some.`);
+	if (pictures.length > 0 && media === null) throw new PublishError(`${host} takes no images (it has no media endpoint), and this note has some.`);
 
-	const existing = postOf(context, file);
+	// A draft has nothing to say it was updated: only a published post does.
 	let updated: Date | null = null;
-	if (existing !== null) {
+	if (existing !== null && !wasDraft) {
 		const answer = await choose(
 			app,
 			`Update ${file.basename}?`,
@@ -143,7 +154,7 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 		if (answer === 1) updated = new Date();
 	}
 
-	const sending = new Notice(`Publishing ${file.basename}…`, 0);
+	const sending = new Notice(draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`, 0);
 	let response;
 	try {
 		const addresses = new Map<string, string>();
@@ -196,6 +207,7 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 			categories: properties.categories,
 			slug: properties.slug,
 			references,
+			status: draft ? 'draft' : wasDraft ? 'published' : null,
 		};
 		response = await post(target, existing === null ? createBody(body) : updateBody(existing, body, updated));
 	} finally {
@@ -203,23 +215,44 @@ export async function publish(context: Context, file: TFile): Promise<void> {
 	}
 
 	if (existing !== null) {
-		new Notice(`Updated ${file.basename}. The site shows it once it has built it.`, 10000);
+		const done = draft
+			? `Updated the draft of ${file.basename}.`
+			: wasDraft
+				? `Published ${file.basename}: it goes into your site's lists and feed.`
+				: `Updated ${file.basename}.`;
+		new Notice(`${done} The site shows it once it has built it.`, 10000);
 		return;
 	}
 	const location = response.headers.location;
-	if (location === undefined) throw new PublishError(`${new URL(settings.site).host} took the post but didn't say where it is.`);
+	if (location === undefined) throw new PublishError(`${host} took the post but didn't say where it is.`);
 	const url = new URL(location, target.endpoint).href;
 	await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
 		frontmatter[POST_PROPERTY] = url;
 	});
-	if (response.status === 202) await waitForIt(file.basename, url);
-	else live(file.basename, url);
+	if (response.status === 202) await waitForIt(file.basename, url, draft);
+	else live(file.basename, url, draft);
 }
 
-/** Withdraw the note's post, or bring it back. */
+/** Withdraw the note's post, or bring it back. A draft is discarded instead. */
 export async function withdraw(context: Context, file: TFile, back: boolean): Promise<void> {
 	const url = postOf(context, file);
 	if (url === null) throw new PublishError(`${file.basename} isn't published: it has no ${POST_PROPERTY}.`);
+	const target = await site(context);
+	if (!back && (await isDraft(target, url))) {
+		const yes = await confirm(
+			context.app,
+			`Discard the draft of ${file.basename}?`,
+			(el) => el.createEl('p', { text: `It was never published, so your site deletes it, and the note forgets its address, ${url}.` }),
+			'Discard',
+		);
+		if (!yes) return;
+		await post(target, actionBody('delete', url));
+		await context.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+			delete frontmatter[POST_PROPERTY];
+		});
+		new Notice(`Discarded the draft of ${file.basename}.`, 10000);
+		return;
+	}
 	if (!back) {
 		const yes = await confirm(
 			context.app,
@@ -229,13 +262,12 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		);
 		if (!yes) return;
 	}
-	const target = await site(context);
 	await post(target, actionBody(back ? 'undelete' : 'delete', url));
 	new Notice(back ? `Restored ${file.basename}.` : `Withdrew ${file.basename}.`, 10000);
 }
 
 /** Ask for the new post until it answers, and say when it's up, or that it isn't yet. */
-async function waitForIt(name: string, url: string): Promise<void> {
+async function waitForIt(name: string, url: string, draft: boolean): Promise<void> {
 	const waiting = new Notice(`Sent ${name}. Waiting for the site to put it up…`, 0);
 	const until = Date.now() + WAIT;
 	try {
@@ -243,7 +275,7 @@ async function waitForIt(name: string, url: string): Promise<void> {
 			await new Promise((resolve) => window.setTimeout(resolve, 5000));
 			const answer = await send(url).catch(() => null);
 			if (answer?.status === 200) {
-				live(name, url);
+				live(name, url, draft);
 				return;
 			}
 		}
@@ -253,9 +285,9 @@ async function waitForIt(name: string, url: string): Promise<void> {
 	new Notice(`${name} isn't up yet after ${WAIT / 60_000} minutes. The site took it, so it may still be building: look at ${url} later.`, 0);
 }
 
-function live(name: string, url: string): void {
+function live(name: string, url: string, draft: boolean): void {
 	const fragment = createFragment((el) => {
-		el.createDiv({ text: `${name} is live` });
+		el.createDiv({ text: draft ? `The draft of ${name} is up, and only its address leads to it` : `${name} is live` });
 		el.createEl('a', { text: url, href: url });
 	});
 	new Notice(fragment, 15000);
