@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.1.0
 
 - When you publish a note for the first time, In the Open finds your
   published posts that link to it, and offers to update them. Their links
