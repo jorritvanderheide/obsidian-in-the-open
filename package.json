@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-in-the-open",
-	"version": "0.1.0",
+	"version": "1.0.0-beta.1",
 	"description": "Publish a note to your website over Micropub, with its links turned into real citations.",
 	"main": "main.js",
 	"type": "module",

@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.0.0-beta.1
 
 - Publish a note to your website over Micropub, with its citations, its
   reference list and its images, and update it by publishing it again. An

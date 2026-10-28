@@ -7,8 +7,10 @@ and [Due Credit](https://community.obsidian.md/plugins/due-credit). See
 [Works well with](#10-works-well-with).
 
 > [!NOTE]
-> In the Open isn't released yet. This README describes what the first release
-> will do, and fills in as it's built.
+> In the Open is in beta. It isn't in the plugin directory yet: to try it, add
+> `jorritvanderheide/obsidian-in-the-open` to
+> [BRAT](https://github.com/TfTHacker/obsidian42-brat), which installs betas
+> from GitHub. This README describes the first release, 1.0.0.
 
 <br/>
 
