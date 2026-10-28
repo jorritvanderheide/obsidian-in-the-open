@@ -5,6 +5,9 @@ breaking is in [Compatibility](docs/compatibility.md).
 
 ## Unreleased
 
+- Markdown images of files in your vault, like `![A raised bed](bed.png)`,
+  are uploaded with the post, as `![[bed.png]]` always was. They used to go
+  out with a path no site has.
 - If a new post's address never made it into the note, because Obsidian
   closed while it was sending, the connection dropped or the note couldn't
   be written, the next publish of that note asks whether the post is on your

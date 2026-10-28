@@ -312,13 +312,13 @@ export function imageType(path: string): string | null {
 	return ext === 'png' ? 'image/png' : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : null;
 }
 
-/** An image in the note as the core writes it, `![alt](<path>)`, on disk. */
+/** An image in the note as the core writes it, `![alt](<path>)` with a title or not, on disk. */
 export interface Image {
 	alt: string;
 	path: string;
 }
 
-const IMAGE = /!\[((?:[^\]\\]|\\.)*)\]\(<([^>]+)>\)/g;
+const IMAGE = /!\[((?:[^\]\\]|\\.)*)\]\(<([^>]+)>(\s+"[^"\n]*")?\)/g;
 
 /** The images in the note, each once, as the core resolved them to files. */
 export function images(markdown: string): Image[] {
@@ -332,8 +332,8 @@ export function images(markdown: string): Image[] {
 
 /** The note with each image's file swapped for the address the media endpoint gave it. */
 export function withAddresses(markdown: string, addresses: Map<string, string>): string {
-	return markdown.replace(IMAGE, (image: string, alt: string, path: string) => {
+	return markdown.replace(IMAGE, (image: string, alt: string, path: string, title?: string) => {
 		const address = addresses.get(path);
-		return address === undefined ? image : `![${alt}](<${address}>)`;
+		return address === undefined ? image : `![${alt}](<${address}>${title ?? ''})`;
 	});
 }

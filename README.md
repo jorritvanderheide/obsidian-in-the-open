@@ -214,7 +214,7 @@ makes sense inside Obsidian:
 | `^abc123` block IDs | Left out. |
 | An H1 on the first line | The post's title. Without one, the `title` property, then the file name. |
 | Properties | Only `summary`, `categories` and `slug` go along. |
-| `![[figure.png\|alt text]]` | The image, uploaded to your site, with its alt text. |
+| `![[figure.png\|alt text]]` or `![alt text](figure.png)` | The image, uploaded to your site, with its alt text. An image from the web stays where it is, and your post shows it from there. |
 | An embedded note, PDF or canvas | Left out. |
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Published, they'd only be their query. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word. |

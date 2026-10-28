@@ -143,6 +143,12 @@ describe('images', () => {
 		);
 	});
 
+	it('keeps an image\'s title', () => {
+		const titled = '![A bed](</v/bed.png> "In March")';
+		expect(images(titled)).toEqual([{ alt: 'A bed', path: '/v/bed.png' }]);
+		expect(withAddresses(titled, new Map([['/v/bed.png', 'https://bw20.nl/media/b.png']]))).toBe('![A bed](<https://bw20.nl/media/b.png> "In March")');
+	});
+
 	it('knows which images a site takes', () => {
 		expect(imageType('a.PNG')).toBe('image/png');
 		expect(imageType('a.jpeg')).toBe('image/jpeg');
