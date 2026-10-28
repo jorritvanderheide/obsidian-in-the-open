@@ -81,7 +81,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		});
 		if (summary === null) return;
 		const answer = summary;
-		await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+		await writeProperties(context, file, (frontmatter) => {
 			frontmatter.summary = answer;
 		});
 	}
@@ -340,11 +340,28 @@ async function showing<T>(text: string, work: () => Promise<T>): Promise<T> {
 
 /** Write where the note's post stands, and its address: a new one, or null to forget it. */
 function record(context: Context, file: TFile, status: PostStatus, url?: string | null): Promise<void> {
-	return context.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+	return writeProperties(context, file, (frontmatter) => {
 		if (url === null) delete frontmatter[POST_PROPERTY];
 		else if (url !== undefined) frontmatter[POST_PROPERTY] = url;
 		frontmatter[STATUS_PROPERTY] = status;
 	});
+}
+
+/**
+ * Change the note's properties, after saving every editor that has it open.
+ *
+ * An editor with typing it hasn't saved yet, or that another plugin is
+ * rewriting on save, holds a different note from the file. Writing the file
+ * under it makes Obsidian merge the two, and a merge of two edited
+ * properties blocks once left a note with two of them. Saved first, the
+ * editor and the file agree, and there is nothing to merge.
+ */
+async function writeProperties(context: Context, file: TFile, change: (frontmatter: Record<string, unknown>) => void): Promise<void> {
+	const { app } = context;
+	for (const leaf of app.workspace.getLeavesOfType('markdown')) {
+		if (leaf.view instanceof MarkdownView && leaf.view.file === file) await leaf.view.save();
+	}
+	await app.fileManager.processFrontMatter(file, change);
 }
 
 /** Ask for the new post until it answers, and say when it's up, or that it isn't yet. */
