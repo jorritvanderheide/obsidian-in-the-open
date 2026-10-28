@@ -8,6 +8,8 @@ export interface Question {
 	placeholder: string;
 	/** The button that takes the answer. */
 	cta: string;
+	/** Whether no answer is an answer too: then it's the empty string. */
+	optional?: boolean;
 }
 
 class Ask extends Modal {
@@ -26,7 +28,7 @@ class Ask extends Modal {
 		this.setTitle(this.question.title);
 		if (this.question.description !== undefined) this.contentEl.createEl('p', { text: this.question.description });
 		const submit = () => {
-			if (this.answer.trim() === '') return;
+			if (this.answer.trim() === '' && this.question.optional !== true) return;
 			this.answered = true;
 			this.done(this.answer.trim());
 			this.close();

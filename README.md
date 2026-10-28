@@ -143,7 +143,7 @@ If you want to work on the plugin, or make your site take its posts:
 - **Knows when it's live** - On a site that builds before it shows a post,
   In the Open waits and tells you when it's up, or that it isn't yet.
 - **Withdraw, and bring back** - Take a post off your site's lists without
-  breaking the links to it, and restore it later.
+  breaking the links to it, say why, and restore it later.
 - **Images included** - Images in the note are uploaded with it. Every image
   needs alt text, so every reader gets it.
 - **Works with any Micropub site** - A site that knows nothing of citations
@@ -231,9 +231,9 @@ on its tab.
   if it's published already. A draft is published, dated today.
 - `In the Open: Publish note as a draft` - Sends the note as a draft, or
   updates its draft. Only its address leads to it, until you publish it.
-- `In the Open: Withdraw note` - Takes the post off your site's lists. Its
-  address keeps working. A draft is discarded instead, and the note forgets
-  its address.
+- `In the Open: Withdraw note` - Takes the post off your site's lists, and
+  asks why, which its page can show. Its address keeps working. A draft is
+  discarded instead, and the note forgets its address.
 - `In the Open: Restore note` - Brings a withdrawn post back.
 
 <br/>
@@ -306,6 +306,7 @@ Only to your site, and only when you run a command:
 - **References:** every work the note cites, from your bibliography.
 - **Images:** the images in the note.
 - **Whether it's a draft:** with a draft, and when it's published.
+- **Why it's withdrawn:** what you type when you withdraw a post, if anything.
 - **Questions:** what the site takes, and whether a published note's post is
   a draft.
 - **Your token**, with every request, so your site knows it's you.

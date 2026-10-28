@@ -7,7 +7,8 @@ breaking is in [Compatibility](docs/compatibility.md).
 
 - Publish a note to your website over Micropub, with its citations, its
   reference list and its images, and update it by publishing it again.
-- Withdraw a post, and restore it, without breaking the links to it.
+- Withdraw a post, and restore it, without breaking the links to it. Say
+  why, and a site that takes it shows the reason on the post's page.
 - Publish a note as a draft first, to see it on your site before anyone
   else does, on a site that takes drafts. Withdrawing a draft discards it.
 - New post makes a note from a post template, which is yours to edit.

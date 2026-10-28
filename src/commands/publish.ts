@@ -267,16 +267,19 @@ export async function withdraw(context: Context, file: TFile, back: boolean): Pr
 		new Notice(`Discarded the draft of ${file.basename}.`, 10000);
 		return;
 	}
+	let reason = '';
 	if (!back) {
-		const yes = await confirm(
-			context.app,
-			`Withdraw ${file.basename}?`,
-			(el) => el.createEl('p', { text: `It leaves your site's lists and feed. Its address, ${url}, keeps working, so links and citations to it still lead somewhere.` }),
-			'Withdraw',
-		);
-		if (!yes) return;
+		const answer = await ask(context.app, {
+			title: `Withdraw ${file.basename}?`,
+			description: `It leaves your site's lists and feed, and its page says it was withdrawn, above its text. Its address, ${url}, keeps working, so links and citations to it still lead there. Say why, and the page says that too.`,
+			placeholder: 'Why, for its readers (optional)',
+			cta: 'Withdraw',
+			optional: true,
+		});
+		if (answer === null) return;
+		reason = answer;
 	}
-	await post(target, actionBody(back ? 'undelete' : 'delete', url));
+	await post(target, actionBody(back ? 'undelete' : 'delete', url, reason));
 	await record(context, file, back ? 'published' : 'withdrawn');
 	new Notice(back ? `Restored ${file.basename}.` : `Withdrew ${file.basename}.`, 10000);
 }

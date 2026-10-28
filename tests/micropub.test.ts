@@ -94,6 +94,8 @@ describe('the requests', () => {
 
 	it('withdraws and restores by the post\'s address', () => {
 		expect(JSON.parse(actionBody('delete', 'https://bw20.nl/log/quiet/'))).toEqual({ action: 'delete', url: 'https://bw20.nl/log/quiet/' });
+		expect(JSON.parse(actionBody('delete', 'u', ' The figures are wrong. '))).toEqual({ action: 'delete', url: 'u', reason: 'The figures are wrong.' });
+		expect(JSON.parse(actionBody('undelete', 'u', 'ignored'))).toEqual({ action: 'undelete', url: 'u' });
 	});
 });
 

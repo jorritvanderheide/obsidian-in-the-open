@@ -134,9 +134,10 @@ export function updateBody(url: string, post: Post, updated: Date | null): strin
 	return JSON.stringify({ action: 'update', url, replace });
 }
 
-/** Withdrawing a post (delete) or bringing it back (undelete). */
-export function actionBody(action: 'delete' | 'undelete', url: string): string {
-	return JSON.stringify({ action, url });
+/** Withdrawing a post (delete), with why when it's said, or bringing it back (undelete). */
+export function actionBody(action: 'delete' | 'undelete', url: string, reason = ''): string {
+	const why = reason.trim();
+	return JSON.stringify(action === 'delete' && why !== '' ? { action, url, reason: why } : { action, url });
 }
 
 /** What went wrong, from an answer that isn't a success: the site's own words when it gives them. */
