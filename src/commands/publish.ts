@@ -26,12 +26,13 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, ConflictError, createBody, differences, imageType, images, listed, multipart, PublishError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, PublishError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
 import { linkingPosts } from '../core/links';
+import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, sentStatus, updatedNotice, updateSummary, whenUnchanged, type Send } from '../core/steps';
 import { goesPublic, linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
@@ -130,13 +131,10 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		);
 		if (!yes) return false;
 	}
-	const wasDraft = target.config.drafts && online?.draft === true;
-	if (draft && !target.config.drafts) {
-		throw new PublishError(`${host} doesn't say that it takes drafts, so In the Open didn't send this one. A site that doesn't know about drafts would publish it straight away. You can publish ${file.basename} instead.`);
-	}
-	if (draft && existing !== null && !wasDraft) {
-		throw new PublishError(`${file.basename} is published already, at ${existing}, so it can't be a draft again. Publish it to update it.`);
-	}
+	const sending: Send = { name: file.basename, host, draft, existing, wasDraft: draftOnSite(target.config.drafts, online) };
+	const { wasDraft } = sending;
+	const refusedDraft = draftRefusal(sending, target.config.drafts);
+	if (refusedDraft !== null) throw new PublishError(refusedDraft);
 	const format: Format = target.config.references !== null ? 'markdown' : 'html';
 
 	// The editor rather than the file when the note is open, since the file
@@ -178,21 +176,9 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	if (lost > 0 && !(await confirmMissing(context, missing, lost, bibliography ? basename(bibliography) : 'your bibliography'))) return false;
 
 	const pictures = images(prepared.markdown);
-	const blind = pictures.filter((image) => image.alt === '');
-	if (blind.length > 0) {
-		throw new PublishError(
-			`${listed(blind.map((image) => basename(image.path)))} ${blind.length === 1 ? 'has' : 'have'} no alt text, the words a reader gets when they can't see an image. Write a few about what it shows after a |, like ![[bed.png|A raised bed in March]].`,
-		);
-	}
-	const other = pictures.filter((image) => imageType(image.path) === null);
-	if (other.length > 0) {
-		const one = other.length === 1;
-		throw new PublishError(
-			`In the Open can only send PNG and JPEG images, and ${listed(other.map((image) => basename(image.path)))} ${one ? "isn't one" : "aren't"}. Save ${one ? 'it' : 'them'} as PNG or JPEG, then embed ${one ? 'that' : 'those'} in the note instead.`,
-		);
-	}
 	const media = target.config.mediaEndpoint;
-	if (pictures.length > 0 && media === null) throw new PublishError(`This note has images, but ${host} doesn't say where to upload them, so In the Open can't send them. Your site needs a Micropub media endpoint for images.`);
+	const refusedImages = imageRefusal(pictures, host, media);
+	if (refusedImages !== null) throw new PublishError(refusedImages);
 
 	// Asked for before anything is uploaded, since the built-in pandoc may
 	// have to be downloaded first, which you may not want.
@@ -255,17 +241,16 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			categories: properties.categories,
 			slug: properties.slug,
 			references,
-			status: draft ? 'draft' : wasDraft ? 'published' : null,
+			status: sentStatus(sending),
 		};
 	} finally {
 		making.hide();
 	}
 
-	// An update is compared with the post as the site has it, except a draft
-	// being published, whose status is the change.
-	const changed = existing !== null && online !== null && !(wasDraft && !draft) ? differences(body, online) : null;
-	if (changed !== null && changed.length === 0) {
-		if (pictures.length === 0) {
+	const changed = changes(sending, body, online);
+	const unchanged = whenUnchanged(changed, pictures.length);
+	if (unchanged !== 'send') {
+		if (unchanged === 'up to date') {
 			new Notice(`${file.basename} is up to date. Your site already has it just as it is in the note.`, 10000);
 			return false;
 		}
@@ -281,20 +266,14 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		if (!anyway) return false;
 	}
 
-	// A draft has nothing to say it was updated: only a published post does.
 	let updated: Date | null = null;
-	if (existing !== null && !wasDraft) {
+	if (existing !== null && asksWhatKind(sending)) {
 		const answer = await choose(
 			app,
 			`Update ${file.basename}?`,
 			(el) => {
 				el.createEl('p', {
-					text:
-						changed === null
-							? `It's at ${existing}, and publishing it again replaces it there.`
-							: changed.length === 0
-								? `It's at ${existing}. Only its pictures may have changed.`
-								: `It's at ${existing}. What changed: ${listed(changed)}.`,
+					text: updateSummary(existing, changed),
 				});
 				el.createEl('p', { text: "Is this a real change, or a small correction such as a typo? After a real change, the post says it was updated. After a correction, it doesn't." });
 			},
@@ -326,13 +305,8 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	}
 
 	if (existing !== null) {
-		const done = draft
-			? `Updated the draft of ${file.basename}.`
-			: wasDraft
-				? `Published ${file.basename}. It moves into your site's lists and feed.`
-				: `Updated ${file.basename}.`;
 		await record(context, file, draft ? 'draft' : 'published');
-		new Notice(`${done} If your site builds its pages first, it may take a moment to show.`, 10000);
+		new Notice(updatedNotice(sending), 10000);
 		return goesPublic(true, wasDraft, draft);
 	}
 	// The post is on the site from here on: a note that doesn't learn its
