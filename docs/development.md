@@ -48,10 +48,25 @@ nix flake update citation-core
 
 Then build and test here, with the core checked out at the same commit.
 
-## Releases
+## Releasing
 
-A tag that is the version in `manifest.json` builds a draft GitHub release,
-after the CI checks, with `main.js` attested and the version's part of
-`CHANGELOG.md` as its notes (`.github/workflows/release.yml`).
-`npm version <version>` sets the version in `manifest.json` and adds its line
-to `versions.json`, which the release workflow checks.
+1. **Write the notes.** Rename `## Unreleased` in `CHANGELOG.md` to the new
+   version.
+2. **Bump the version:** `npm version <x.y.z> --no-git-tag-version` updates
+   `manifest.json` and `versions.json`, and leaves the commit and the tag to
+   jj. A version like `1.2.0-beta.1` becomes a pre-release, for beta testers.
+   The version in `package-lock.json` changes `npmDepsHash`, so run
+   `nix flake check` and put the hash it gives in `flake.nix`.
+3. **Push** the commit, then tag it, named for the version without a `v`:
+   `jj tag set <x.y.z> -r <commit>`, and `git push codeberg <x.y.z>`, since jj
+   doesn't push tags. Codeberg is the only remote: GitHub mirrors it. The
+   core's commit that `flake.lock` pins has to be on Codeberg first, since CI
+   clones it from there.
+4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
+   checks, makes sure the tag is the version in `manifest.json`,
+   `package.json` and `versions.json`, builds it, attests `main.js` and
+   `styles.css`, and creates a **draft** GitHub release named like "In the
+   Open 1.0.0", with the version's part of `CHANGELOG.md` as its notes.
+5. **Publish the draft.** Obsidian's community directory installs from GitHub
+   releases, and a tag alone is not one. The first release is also submitted
+   to the directory, in obsidianmd/obsidian-releases.

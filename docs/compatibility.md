@@ -29,8 +29,8 @@ holds.
 
 - **What's read from a note:** the title (its leading H1, then the `title`
   property, then the file name), the `summary`, `categories` and `slug`
-  properties, `published-url`, every citation form in Due Credit's
-  [Citations](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/docs/citations.md#what-becomes-a-citation),
+  properties, `published-url` and `post-status`, every citation form in Due
+  Credit's [Citations](https://github.com/jorritvanderheide/obsidian-due-credit/blob/main/docs/citations.md#what-becomes-a-citation),
   and the **Citation key property** of the notes it links to. No longer
   reading one of these, or reading it differently, is breaking. Reading
   something new isn't.

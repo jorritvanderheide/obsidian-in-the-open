@@ -60,11 +60,15 @@ In the Open needs Obsidian 1.13 or later, on desktop.
    `.bib` file. The default is `Literature/library.bib` in your vault.
 3. **Start a post.** Run **New post** and give it a title. In the Open makes
    a note from its template, with a `summary` property to fill in: one
-   sentence about the post.
+   sentence about the post. Any note with a `post-status` property is a post,
+   so a template of your own works too, as long as it has
+   `post-status: unpublished`. **Set categories** picks the post's categories
+   from the ones your site has.
 4. **Publish it as a draft.** Press the upload button in the note's title
-   bar. In the Open sends it, writes the post's address to the note's
-   `published-url` property, and tells you when the draft is up. Only its address leads to
-   it, so you can see it as readers will.
+   bar. If the note has no summary yet, In the Open asks for one. It sends the
+   note, writes the post's address to its `published-url` property, and tells
+   you when the draft is up. Only its address leads to it, so you can see it
+   as readers will.
 5. **Publish it.** Press the button again. The pill beside it says where the
    post stands, and clicking the pill updates, opens or withdraws it.
 
@@ -75,9 +79,9 @@ In the Open needs Obsidian 1.13 or later, on desktop.
 In the Open sends one note, and only to the site you set. What you wrote for
 yourself never leaves: comments are stripped, and only the title, summary,
 categories and slug go along from the note's properties. In your vault it
-writes only the post's address and status, and a summary you type in when
-it asks, in the note you publish, and the notes and the template **New post**
-makes.
+writes only the post's address and status, a summary you type in when it
+asks, and categories you set, in the note you publish, and the notes and the
+template **New post** makes.
 [Section 11](#11-network-and-file-disclosure) lists exactly what it reads,
 sends and writes.
 
@@ -200,8 +204,9 @@ makes sense inside Obsidian:
 
 A Micropub post: the title, the summary, the text, the categories and the
 slug. In the Open checks the categories with your site first, when it lists
-them, so a post isn't refused for one it doesn't have. With the references extension, it gets the text as Markdown, every work
-the post cites, formatted, and each citation as a link to its work. Any other
+them, so a post isn't refused for one it doesn't have. With the references
+extension, it gets the text as Markdown, every work the post cites,
+formatted, and each citation as a link to its work. Any other
 site gets the text as HTML, ready to show, with the citations as plain text
 and the reference list at the end.
 
@@ -227,8 +232,8 @@ before an export: you can publish anyway, or fix the key first.
 ## 8 Commands
 
 None of the commands has a hotkey, so you can choose your own in Settings →
-Hotkeys. Each one is also on a note's right-click menu, in the file explorer or
-on its tab.
+Hotkeys. Each one but New post is also on a note's right-click menu, in the
+file explorer or on its tab.
 
 - `In the Open: New post` - Makes a note from your post template, marked as a
   post, so its title bar offers to publish it.
@@ -316,8 +321,10 @@ Only to your site, and only when you run a command:
 - **Images:** the images in the note.
 - **Whether it's a draft:** with a draft, and when it's published.
 - **Why it's withdrawn:** what you type when you withdraw a post, if anything.
-- **Questions:** what the site takes, and, for a note you publish again,
-  its post as the site has it, to compare.
+- **Replacing a change:** that you said to replace a post changed on your
+  site, when it asked.
+- **Questions:** what the site takes, which categories it has, and, for a
+  note you publish again, its post as the site has it, to compare.
 - **Your token**, with every request, so your site knows it's you.
 
 ### 11.2 What it reads
@@ -377,8 +384,9 @@ gh attestation verify main.js --repo jorritvanderheide/obsidian-in-the-open
 
 ## 12 Questions or issues?
 
-Have a look at the [FAQ](FAQ.md) first. If something still doesn't work, or
-you have an idea, please
+Have a look at the [FAQ](FAQ.md) first: it covers the most common surprises,
+like a token your site doesn't take. If something still doesn't work, or you
+have an idea, please
 [open an issue](https://github.com/jorritvanderheide/obsidian-in-the-open/issues/new/choose).
 Found a security problem? Please report it privately, as described in the
 [security policy](SECURITY.md).
