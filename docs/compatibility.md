@@ -1,9 +1,9 @@
 # Compatibility
 
 In the Open's settings live in other people's vaults, people bind hotkeys to its
-commands, Paper Trail writes the citations it reads, and other people's sites
-take its posts. This page says what a release may and may not change, so all
-of that keeps working across updates. Changes are listed in
+commands, Due Credit and Paper Trail write the citations it reads, and other
+people's sites take its posts. This page says what a release may and may not
+change, so all of that keeps working across updates. Changes are listed in
 [CHANGELOG.md](../CHANGELOG.md).
 
 In the Open's version is `MAJOR.MINOR.PATCH`. A minor or patch release breaks
@@ -53,14 +53,15 @@ holds.
 - **The plugin ID** `in-the-open` never changes. It's the plugin's folder, where
   `data.json` lives, and the start of every command ID.
 - **Command IDs** are `in-the-open:new-post`, `in-the-open:publish`,
-  `in-the-open:draft`, `in-the-open:withdraw` and `in-the-open:restore`. People bind hotkeys to them, so renaming or removing
-  one is breaking. A command's name may change.
+  `in-the-open:draft`, `in-the-open:withdraw` and `in-the-open:restore`.
+  People bind hotkeys to them, so renaming or removing one is breaking. A command's name may change.
 
-## Paper Trail
+## Due Credit and Paper Trail
 
-The citation forms are Due Credit's agreement with Paper Trail, and
-In the Open reads them through the same core. Every form Paper Trail writes is
-read; no longer reading one is breaking for all three plugins.
+The citation forms are Due Credit's, which writes them with **Insert
+citation**, and In the Open reads them through the same core, as it does the
+one form Paper Trail's **Insert annotation** writes. No longer reading one is
+breaking for all three plugins.
 
 ## Obsidian and pandoc
 

@@ -278,16 +278,18 @@ doesn't need either of them, but they fit together nicely.
 ### 10.1 Paper Trail
 
 [Paper Trail](https://community.obsidian.md/plugins/paper-trail) turns your
-Zotero library into a reading queue, and writes citations as links. Everything
-it writes, In the Open reads, and it gives every paper note the `citekey`
-property that keeps your citations working when Better BibTeX changes a key.
+Zotero library into a reading queue, with a note for each paper. It gives every
+paper note the `citekey` property that keeps your citations working when
+Better BibTeX changes a key, and its **Insert annotation** quotes a passage
+with a citation In the Open reads.
 
 ### 10.2 Due Credit
 
 [Due Credit](https://community.obsidian.md/plugins/due-credit) exports a note
-to Word, PDF or LaTeX. It shares In the Open's way of reading a note, so the
-same note reads the same on your site as in the file you send your
-supervisor.
+to Word, PDF or LaTeX, and inserts citations: its **Insert citation** picks a
+paper from your bibliography and writes the link In the Open publishes as a
+citation. It shares In the Open's way of reading a note, so the same note
+reads the same on your site as in the file you send your supervisor.
 
 <br/>
 
