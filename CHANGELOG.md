@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.0.3
 
 - Before you publish, a link to a note without a post is listed by the words
   your post will show, which are the link's alias when it has one. The list
