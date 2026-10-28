@@ -221,10 +221,22 @@ A published post is never deleted: other posts link to it, and people may
 have cited it. A delete request withdraws it, and an undelete brings it back:
 
 ```json
-{ "action": "delete", "url": "https://example.org/log/nixos-module-system/" }
+{
+  "action": "delete",
+  "url": "https://example.org/log/nixos-module-system/",
+  "reason": "The figures in section 2 are wrong."
+}
 ```
 
-What withdrawn looks like is the site's choice. Both answer `204 No Content`.
+- `reason` is optional: why it was withdrawn, a sentence of plain text for
+  the post's readers. It isn't part of Micropub, so a site that doesn't know
+  it ignores it. An undelete has none, and the reason goes with the
+  withdrawal.
+- **What withdrawn looks like is the site's choice.** As journals do with a
+  retracted article, it should stay readable at its address, say clearly
+  that it was withdrawn, when, and why, and leave the site's lists and feed.
+
+Both answer `204 No Content`.
 
 ## Errors
 
