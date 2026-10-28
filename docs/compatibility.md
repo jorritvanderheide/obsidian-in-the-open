@@ -77,7 +77,9 @@ breaking for all three plugins.
   CI pins, which is the built-in pandoc's too. Needing a newer pandoc for
   something that already worked is breaking. An installed pandoc on the PATH,
   or the one the setting names, keeps coming first: running the built-in one
-  instead, when one is installed, is breaking.
+  instead, when one is installed, is breaking. So is moving the built-in
+  pandoc's file, `pandoc-3.13.wasm` in the cache folder Due Credit shares,
+  since it would be downloaded again.
 
 ## Not covered
 

@@ -19,7 +19,7 @@ export interface Settings {
 	 * committed vault takes along.
 	 */
 	token: string;
-	/** The pandoc executable: a name found on the PATH, or a full path. */
+	/** The pandoc executable: a name found on the PATH, or a full path. The default, `pandoc`, falls back to the built-in one when there's none (the core's `choosePandoc`). */
 	pandocPath: string;
 	/**
 	 * The `.bib` file that decides which wikilinks are citations, kept current

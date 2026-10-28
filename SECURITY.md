@@ -12,16 +12,19 @@ through GitHub instead:
 
 https://github.com/jorritvanderheide/obsidian-in-the-open/security/advisories/new
 
-Include your versions of In the Open, Obsidian and pandoc, your operating
-system, what runs your site's Micropub endpoint, and the steps to reproduce it.
-Reports are looked at before anything about them is made public.
+Include your versions of In the Open, Obsidian and pandoc (or that it's
+the built-in one), your operating system, what runs your site's Micropub
+endpoint, and the steps to reproduce it. Reports are looked at before
+anything about them is made public.
 
 ## What counts
 
 In the Open sends the note you publish to the site you set, with your token. It
 reads that note, your bibliography and your citation style, and writes only
-the post's address and status into that note, besides the notes and the
-template **New post** makes. See
+the post's address and status, a summary you type in and categories you set
+into that note, besides the notes and the template **New post** makes. Once,
+if you agree, it downloads the built-in pandoc from pandoc's release on GitHub
+into your cache folder, outside the vault. See
 [section 11 of the README](README.md#11-network-and-file-disclosure). These
 are security problems:
 
@@ -38,7 +41,8 @@ are security problems:
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
 - The built-in pandoc being kept or run without matching its pinned hash, or
-  seeing more of your disk than the vault and the files it needs.
+  seeing more of your disk than the vault, the folders of the files it needs,
+  and its temporary folders.
 - Something you wrote for yourself, like a comment, reaching your site.
 
 Problems in your site's Micropub endpoint belong to whoever makes it, and

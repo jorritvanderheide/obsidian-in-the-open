@@ -86,7 +86,8 @@ yourself never leaves: comments are stripped, and only the title, summary,
 categories and slug go along from the note's properties. In your vault it
 writes only the post's address and status, a summary you type in when it
 asks, and categories you set, in the note you publish, and the notes and the
-template **New post** makes.
+template **New post** makes. Once, if you agree, it downloads the built-in
+pandoc from pandoc's release on GitHub, when you have none installed.
 [Section 11](#11-network-and-file-disclosure) lists exactly what it reads,
 sends and writes.
 
@@ -320,7 +321,7 @@ pandoc's release on GitHub.
 
 ### 11.1 What it sends
 
-Only to your site, and only when you run a command:
+To your site, and only when you run a command:
 
 - **The post:** the note's text after the steps in
   [What happens to your note](#61-what-happens-to-your-note), its title, and
@@ -350,6 +351,10 @@ comes back is checked against a hash in In the Open before it's kept.
   `.csl` file you set.
 - **Obsidian's settings:** Whether strict line breaks are on, from the vault's
   `app.json`.
+- **Your PATH:** each folder on it, for a pandoc installed there.
+- **The built-in pandoc:** `pandoc-3.13.wasm` in your cache folder, when
+  there's no pandoc installed, checked against its hash once a session. A
+  file that doesn't match is deleted, and downloaded again if you agree.
 
 ### 11.3 What it writes
 
@@ -364,14 +369,17 @@ comes back is checked against a hash in In the Open before it's kept.
 - **Template:** `Post.md` in the template folder, when you make a new post
   and there's no file with that name. If the file is there, edited or not,
   it's never overwritten.
-- **The built-in pandoc:** when you agree to download it, in your user
-  cache folder, outside the vault: `~/.cache/obsidian-citation-core` on
-  Linux, `~/Library/Caches/obsidian-citation-core` on macOS, and
+- **The built-in pandoc:** when you agree to download it, `pandoc-3.13.wasm`
+  (62 MB) in your user cache folder, outside the vault:
+  `~/.cache/obsidian-citation-core` on Linux (or in `$XDG_CACHE_HOME`),
+  `~/Library/Caches/obsidian-citation-core` on macOS, and
   `obsidian-citation-core\Cache` in `%LOCALAPPDATA%` on Windows. Due Credit
   uses the same file. You can delete it; it's downloaded again, if you agree,
   the next time it's needed.
-- **Temporary files:** For each publish, pandoc's filters and the note's
-  properties go in a temporary folder, which is removed afterwards.
+- **Temporary files:** For each publish, pandoc's filters, its template and
+  font, the note's properties and the post pandoc makes go in a temporary
+  folder; with the built-in pandoc, the note's text goes in a second one.
+  Both are removed afterwards.
 
 ### 11.4 What it stores
 
@@ -381,8 +389,9 @@ comes back is checked against a hash in In the Open before it's kept.
 ### 11.5 What it runs
 
 - **Pandoc:** The one you set in **Pandoc**, or, without one, the built-in
-  one, which runs inside Obsidian and sees only your vault, your
-  bibliography and citation style, and its temporary folder. Nothing else.
+  one, which runs inside Obsidian and sees only your vault, the folders your bibliography and citation style
+  are in, and its temporary folders: never the rest of your disk. An installed
+  pandoc can read and write anything you can. Nothing else.
 
 ### 11.6 How releases are built
 

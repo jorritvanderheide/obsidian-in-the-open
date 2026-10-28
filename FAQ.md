@@ -39,7 +39,7 @@ not see the same PATH as your terminal: set **Pandoc** in the settings to its
 full path instead. Run `which pandoc` (macOS, Linux) or `where pandoc`
 (Windows) in a terminal to find it.
 
-### "Couldn't find pandoc at …"
+### "Couldn't find pandoc at "…". Install it, or set its full path in Settings → In the Open."
 
 **Pandoc** in the settings names a pandoc that isn't there. Fix the path, or
 set it back to `pandoc`: then In the Open uses the one on your PATH, or offers
@@ -47,8 +47,14 @@ its built-in one.
 
 ### "Couldn't download pandoc: …"
 
-The download from GitHub failed, or what came back isn't the pandoc In the
-Open was tested with, so it wasn't kept. Try again later, or install pandoc
+The download from GitHub failed, or the built-in pandoc couldn't be kept in
+your cache folder; the rest of the message says which. Try again later, or
+install pandoc from [pandoc.org](https://pandoc.org/installing.html).
+
+### "The built-in pandoc from … isn't the one this plugin was tested with, so it wasn't kept. Try again later, or install pandoc."
+
+What came back from GitHub doesn't match the hash In the Open has for it, so
+it wasn't kept or run. Try again later; if it keeps happening, install pandoc
 from [pandoc.org](https://pandoc.org/installing.html).
 
 ## Publishing
