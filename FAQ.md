@@ -29,14 +29,15 @@ curl -H "Authorization: Bearer <your token>" "https://example.org/micropub?q=con
 
 ## Publishing
 
-### "… has no category …, which … has under categories."
+### "A new category": "… has no category … yet."
 
-The note's `categories` property names a category your site doesn't have.
+The note's `categories` property names a category your site doesn't have yet.
 Before it makes the post, In the Open asks your site which categories it has
-(`q=category`), and stops here rather than send a post the site would refuse.
-The message lists the ones the site has. Change the note's `categories` to
-one of those, or add the category to your site first, the way your site does
-that.
+(`q=category`), and asks you before sending a new one, since a new category is
+often a typo of one that's there: the question lists the ones your site has.
+**Publish** sends it, and a site that takes new categories makes it. A site
+that doesn't says so, and the post isn't published. To change it, **Cancel**
+and run **Set categories**.
 
 ### "… was changed on your site"
 
@@ -45,10 +46,3 @@ this note: by hand, or by another tool. Publishing the note again would
 replace that change, so In the Open asks first. **Replace it** sends the note
 as it is. To keep the change, copy it into the note first, then publish. Only
 a site that keeps track of this asks; any other is simply updated.
-
-### "… doesn't list its categories, so In the Open can't offer them."
-
-**Set categories** asks your site which categories it has (`q=category`), and
-your site didn't answer with a list. Not every site does: Micropub leaves it
-to the site. Write the categories in the note's `categories` property
-yourself, the way your site names them.

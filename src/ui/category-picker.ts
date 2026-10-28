@@ -1,5 +1,5 @@
-// The categories a post can be in, as switches, on for the ones it has.
-// Dismissing it is null: nothing changes.
+// The categories a post can be in, as switches, on for the ones it has, and a
+// field for a new one. Dismissing it is null: nothing changes.
 import { Modal, Setting, type App } from 'obsidian';
 import type { CategoryChoice } from '../core/micropub';
 
@@ -10,6 +10,7 @@ class CategoryPicker extends Modal {
 		app: App,
 		private readonly name: string,
 		private readonly choices: CategoryChoice[],
+		private readonly listed: boolean,
 		private readonly done: (chosen: string[] | null) => void,
 	) {
 		super(app);
@@ -17,17 +18,50 @@ class CategoryPicker extends Modal {
 
 	onOpen(): void {
 		this.setTitle(`Categories of ${this.name}`);
-		this.contentEl.createEl('p', { text: 'The categories your site has. Switch on the ones this post is in.' });
+		this.contentEl.createEl('p', {
+			text: this.listed
+				? 'The categories your site has. Switch on the ones this post is in, or add a new one, which your site makes when you publish.'
+				: "Your site doesn't list its categories. These are the note's: switch them off, or add one.",
+		});
 		const chosen = new Set(this.choices.filter((choice) => choice.chosen).map((choice) => choice.name));
-		for (const choice of this.choices) {
-			const setting = new Setting(this.contentEl).setName(choice.name).addToggle((toggle) =>
-				toggle.setValue(choice.chosen).onChange((on) => {
+		const list = this.contentEl.createDiv();
+		const show = (choice: CategoryChoice) => {
+			const setting = new Setting(list).setName(choice.name).addToggle((toggle) =>
+				toggle.setValue(chosen.has(choice.name)).onChange((on) => {
 					if (on) chosen.add(choice.name);
 					else chosen.delete(choice.name);
 				}),
 			);
-			if (!choice.onSite) setting.setDesc("Not on your site, which would refuse the post. Switch it off, or add it to your site.");
-		}
+			if (!choice.onSite && this.listed) setting.setDesc('New: your site makes it when you publish.');
+		};
+		this.choices.forEach(show);
+
+		let typed = '';
+		const add = () => {
+			const name = typed.trim();
+			if (name === '' || this.choices.some((choice) => choice.name === name)) return;
+			const choice = { name, onSite: false, chosen: true };
+			this.choices.push(choice);
+			chosen.add(name);
+			show(choice);
+		};
+		new Setting(this.contentEl)
+			.setName('New category')
+			.addText((text) => {
+				text.setPlaceholder('Its name, such as open-science').onChange((value) => (typed = value));
+				text.inputEl.addEventListener('keydown', (event) => {
+					if (event.key !== 'Enter') return;
+					add();
+					text.setValue('');
+					typed = '';
+				});
+			})
+			.addButton((button) =>
+				button.setButtonText('Add').onClick(() => {
+					add();
+				}),
+			);
+
 		new Setting(this.contentEl)
 			.addButton((button) => button.setButtonText('Cancel').onClick(() => this.close()))
 			.addButton((button) =>
@@ -48,7 +82,7 @@ class CategoryPicker extends Modal {
 	}
 }
 
-/** The categories chosen, or null when the picker was dismissed. */
-export function pickCategories(app: App, name: string, choices: CategoryChoice[]): Promise<string[] | null> {
-	return new Promise((resolve) => new CategoryPicker(app, name, choices, resolve).open());
+/** The categories chosen, or null when the picker was dismissed. `listed` is whether the site gave its own. */
+export function pickCategories(app: App, name: string, choices: CategoryChoice[], listed: boolean): Promise<string[] | null> {
+	return new Promise((resolve) => new CategoryPicker(app, name, choices, listed, resolve).open());
 }

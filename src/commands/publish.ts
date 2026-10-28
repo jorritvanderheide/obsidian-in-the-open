@@ -103,11 +103,22 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		progress.hide();
 	}
 	const unknown = known === null ? [] : unknownCategories(categories, known);
+	// A new category is often a typo of one the site has, so it's asked about,
+	// with the ones it has to compare.
 	if (known !== null && unknown.length > 0) {
-		const has = known.length > 0 ? `It has ${listed(known)}.` : 'It has none yet.';
-		throw new PublishError(
-			`${host} has no ${unknown.length === 1 ? 'category' : 'categories'} ${listed(unknown)}, which ${file.basename} has under categories. ${has} Change the note's categories, or add the category to your site first.`,
+		const one = unknown.length === 1;
+		const yes = await confirm(
+			app,
+			one ? 'A new category' : 'New categories',
+			(el) => {
+				el.createEl('p', {
+					text: `${host} has no ${one ? 'category' : 'categories'} ${listed(unknown)} yet. Publishing ${file.basename} adds ${one ? 'it' : 'them'}, if your site takes new ones.`,
+				});
+				el.createEl('p', { text: known.length > 0 ? `It has ${listed(known)}.` : 'It has none yet.' });
+			},
+			'Publish',
 		);
+		if (!yes) return;
 	}
 	const wasDraft = target.config.drafts && online?.draft === true;
 	if (draft && !target.config.drafts) {

@@ -140,7 +140,8 @@ If you want to work on the plugin, or make your site take its posts:
   <!-- SCREENSHOT images/title-bar.png: a draft's title bar, with the Draft pill and the Publish button beside it -->
 
 - **Categories from your site** - **Set categories** offers the categories
-  your site has, so a post is never refused for one it doesn't.
+  your site has, and takes a new one, which your site makes when you
+  publish.
 - **One command** - Publish the note you have open, or any note from its
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
@@ -205,8 +206,9 @@ makes sense inside Obsidian:
 ### 6.2 What your site gets
 
 A Micropub post: the title, the summary, the text, the categories and the
-slug. In the Open checks the categories with your site first, when it lists
-them, so a post isn't refused for one it doesn't have. With the references
+slug. In the Open compares the categories with your site's first, when it
+lists them, and asks before sending one it doesn't have yet: a new category
+is often a typo. With the references
 extension, it gets the text as Markdown, every work the post cites,
 formatted, and each citation as a link to its work. Any other
 site gets the text as HTML, ready to show, with the citations as plain text
@@ -248,7 +250,7 @@ file explorer or on its tab.
   discarded instead, and the note forgets its address.
 - `In the Open: Restore note` - Brings a withdrawn post back.
 - `In the Open: Set categories` - Asks your site which categories it has,
-  and lets you switch on the ones the note is in.
+  and lets you switch on the ones the note is in, or add a new one.
 
 <br/>
 
