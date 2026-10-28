@@ -196,7 +196,8 @@ makes sense inside Obsidian:
 ### 6.2 What your site gets
 
 A Micropub post: the title, the summary, the text, the categories and the
-slug. With the references extension, it gets the text as Markdown, every work
+slug. In the Open checks the categories with your site first, when it lists
+them, so a post isn't refused for one it doesn't have. With the references extension, it gets the text as Markdown, every work
 the post cites, formatted, and each citation as a link to its work. Any other
 site gets the text as HTML, ready to show, with the citations as plain text
 and the reference list at the end.

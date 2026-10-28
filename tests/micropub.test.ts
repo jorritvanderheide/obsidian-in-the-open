@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, differences, listed, readConfig, readSource, secure, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, differences, listed, readCategories, readConfig, readSource, secure, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -191,5 +191,18 @@ describe('listed', () => {
 		expect(listed(['the text'])).toBe('the text');
 		expect(listed(['the title', 'the text'])).toBe('the title and the text');
 		expect(listed(['the title', 'the text', 'the summary'])).toBe('the title, the text and the summary');
+	});
+});
+
+describe('categories', () => {
+	it('reads the site’s categories, or nothing to check against', () => {
+		expect(readCategories('{"categories": ["tech", "notes", 3]}')).toEqual(['tech', 'notes']);
+		expect(readCategories('{}')).toBeNull();
+		expect(readCategories('<html>')).toBeNull();
+	});
+
+	it('finds the ones the site doesn’t have, each once', () => {
+		expect(unknownCategories(['tech', 'cooking', 'Tech', 'cooking'], ['tech', 'notes'])).toEqual(['cooking', 'Tech']);
+		expect(unknownCategories(['tech'], ['tech'])).toEqual([]);
 	});
 });

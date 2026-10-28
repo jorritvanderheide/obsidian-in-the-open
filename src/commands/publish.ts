@@ -23,9 +23,9 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, createBody, differences, imageType, images, listed, multipart, PublishError, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, createBody, differences, imageType, images, listed, multipart, PublishError, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
-import { connect, isDraft, post, sourceOf, upload, type Site } from '../site';
+import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
 import { POST_PROPERTY, STATUS_PROPERTY, type PostStatus } from '../core/status';
@@ -91,11 +91,23 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const progress = new Notice(`Asking ${host} what it takes…`, 0);
 	let target: Site;
 	let online: Source | null;
+	// Checked against the site before anything is made or sent: a category it
+	// doesn't have would be refused only after the images and pandoc.
+	const categories = postProperties(app.metadataCache.getFileCache(file)?.frontmatter).categories;
+	let known: string[] | null = null;
 	try {
 		target = await site(context);
 		online = existing === null ? null : await sourceOf(target, existing);
+		if (categories.length > 0) known = await categoriesOf(target);
 	} finally {
 		progress.hide();
+	}
+	const unknown = known === null ? [] : unknownCategories(categories, known);
+	if (known !== null && unknown.length > 0) {
+		const has = known.length > 0 ? `It has ${listed(known)}.` : 'It has none yet.';
+		throw new PublishError(
+			`${host} has no ${unknown.length === 1 ? 'category' : 'categories'} ${listed(unknown)}, which ${file.basename} has under categories. ${has} Change the note's categories, or add the category to your site first.`,
+		);
 	}
 	const wasDraft = target.config.drafts && online?.draft === true;
 	if (draft && !target.config.drafts) {

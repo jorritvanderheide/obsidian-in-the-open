@@ -4,6 +4,7 @@ Can't find your answer here? Please
 [open an issue](https://github.com/jorritvanderheide/obsidian-in-the-open/issues/new/choose).
 
 - [Connecting to your site](#connecting-to-your-site)
+- [Publishing](#publishing)
 
 ## Connecting to your site
 
@@ -25,3 +26,14 @@ curl -H "Authorization: Bearer <your token>" "https://example.org/micropub?q=con
   secret again in Settings → In the Open → **Token**, and paste it.
 - **It answers `unauthorized`** too: your site has a different token. Use the
   one it has, or give it this one, as your site's own documentation says.
+
+## Publishing
+
+### "… has no category …, which … has under categories."
+
+The note's `categories` property names a category your site doesn't have.
+Before it makes the post, In the Open asks your site which categories it has
+(`q=category`), and stops here rather than send a post the site would refuse.
+The message lists the ones the site has. Change the note's `categories` to
+one of those, or add the category to your site first, the way your site does
+that.

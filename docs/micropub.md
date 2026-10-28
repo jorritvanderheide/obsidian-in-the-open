@@ -43,8 +43,9 @@ Authorization: Bearer <token>
   publishes a draft at once.
 
 `GET /micropub?q=category` lists the site's categories,
-`{"categories": ["tech", "notes"]}`, so the plugin can offer them rather than
-let you type one the site will refuse.
+`{"categories": ["tech", "notes"]}`, so the plugin can check a post's before
+sending it, rather than send one the site will refuse. A site that doesn't
+answer is sent the post unchecked.
 
 ## Tokens
 

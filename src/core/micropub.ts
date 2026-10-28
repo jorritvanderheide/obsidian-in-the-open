@@ -157,6 +157,21 @@ export function differences(post: Post, online: Source): string[] {
 	return changed;
 }
 
+/** The site's categories, from `q=category`, or null when it gives none to check against. */
+export function readCategories(body: string): string[] | null {
+	try {
+		const parsed = JSON.parse(body) as { categories?: unknown };
+		return Array.isArray(parsed.categories) ? parsed.categories.filter((each): each is string => typeof each === 'string') : null;
+	} catch {
+		return null;
+	}
+}
+
+/** The categories the site doesn't have, each once, in the note's order. */
+export function unknownCategories(wanted: string[], known: string[]): string[] {
+	return [...new Set(wanted.filter((category) => !known.includes(category)))];
+}
+
 /** Things in a sentence: "a", "a and b", "a, b and c". */
 export function listed(things: string[]): string {
 	return things.length <= 1 ? (things[0] ?? '') : `${things.slice(0, -1).join(', ')} and ${things.at(-1) ?? ''}`;

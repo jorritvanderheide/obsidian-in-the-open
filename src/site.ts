@@ -1,7 +1,7 @@
 // A site, as In the Open talks to it: its endpoint, found from its home page,
 // what it takes, and the requests that carry the token.
 import { randomBytes } from 'crypto';
-import { endpointFrom, failure, PublishError, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
+import { endpointFrom, failure, PublishError, readCategories, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
 import { page, send } from './http';
 
 export interface Site {
@@ -65,6 +65,19 @@ export async function sourceOf(site: Site, url: string): Promise<Source | null> 
 		return readSource(answer.body);
 	} catch (error) {
 		if (site.config.drafts) throw error;
+		return null;
+	}
+}
+
+/**
+ * The site's categories, or null when it doesn't list them. Then there's
+ * nothing to check a post's against, and the site says itself what it refuses.
+ */
+export async function categoriesOf(site: Site): Promise<string[] | null> {
+	try {
+		const answer = await call(site, query(site, 'q=category'), { method: 'GET' });
+		return readCategories(answer.body);
+	} catch {
 		return null;
 	}
 }
