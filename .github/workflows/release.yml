@@ -46,15 +46,6 @@ jobs:
                   node-version: 24
                   cache: 'npm'
 
-            # The core, where `file:../obsidian-citation-core` in package.json
-            # looks, at the commit flake.lock pins.
-            - name: Check out the core
-              run: |
-                  url=$(jq -r '.nodes."citation-core".locked.url' flake.lock)
-                  rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
-                  git clone --quiet "$url" ../obsidian-citation-core
-                  git -C ../obsidian-citation-core checkout --quiet "$rev"
-
             - name: Build plugin
               run: |
                   npm ci

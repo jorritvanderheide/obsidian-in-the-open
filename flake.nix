@@ -4,10 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    # The core, which npm takes from the checkout next to this one
-    # (`file:../obsidian-citation-core`). This pins the commit a release is
-    # built from; CI checks out the same one. Update with:
-    # nix flake update citation-core
+    # The core, for its own checks at the commit this plugin is built with.
+    # npm takes the same commit from its GitHub mirror (package.json), and
+    # checks.core-pin holds the two together. Update both with:
+    # nix flake update citation-core, then
+    # npm install git+https://github.com/jorritvanderheide/obsidian-citation-core.git#<rev>
     # With its own nixpkgs, not this one's, so its tests run with the pandoc
     # they were written against.
     citation-core.url = "git+https://codeberg.org/BW20/obsidian-citation-core";
@@ -26,6 +27,12 @@
       let
         pkgs = import nixpkgs { inherit system; };
         package = builtins.fromJSON (builtins.readFile ./package.json);
+        inherit (pkgs) lib;
+        # The core's commit as npm has it: the part of its address after `#`.
+        lock = builtins.fromJSON (builtins.readFile ./package-lock.json);
+        npmCore = lib.last (
+          lib.splitString "#" lock.packages."node_modules/obsidian-citation-core".resolved
+        );
       in
       {
         packages.default = pkgs.buildNpmPackage {
@@ -33,14 +40,11 @@
           pname = package.name;
           inherit (package) version;
           src = ./.;
-          # Where `file:../obsidian-citation-core` looks, next to the source.
-          postUnpack = ''
-            cp -r ${citation-core} obsidian-citation-core
-            chmod -R u+w obsidian-citation-core
-          '';
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-BRnW4014TxmVPvHdz9gTJQr5mmpEyVaWhGwviYlgtNs=";
+          npmDepsHash = "sha256-3ekUolNRK3WyZpP7DQOpPtRldH3UuMLzmUafjGnYCSM=";
           nodejs = pkgs.nodejs_24;
+          # npm writes to its cache while it installs the core, a git dependency.
+          makeCacheWritable = true;
           installPhase = ''
             mkdir -p $out
             cp main.js manifest.json styles.css $out/
@@ -54,6 +58,13 @@
         checks = {
           default = self.packages.${system}.default;
           core = citation-core.checks.${system}.default;
+          # npm's core and the flake's are one commit, or the core's checks would
+          # pass for code the plugin doesn't bundle.
+          core-pin =
+            if npmCore == citation-core.rev then
+              pkgs.emptyFile
+            else
+              throw "package-lock.json has the core at ${npmCore}, flake.lock at ${citation-core.rev}: move both to one commit.";
         };
 
         devShells.default = pkgs.mkShell {

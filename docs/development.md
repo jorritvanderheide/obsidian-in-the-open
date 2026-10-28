@@ -4,18 +4,19 @@
 
 In the Open's core is a library of its own,
 [obsidian-citation-core](https://codeberg.org/BW20/obsidian-citation-core),
-which npm takes from the folder next to this one. Check it out there first:
+which npm takes from its GitHub mirror, at the commit `package.json` pins, so
+a checkout of this repository builds on its own:
 
 ```sh
-git clone https://codeberg.org/BW20/obsidian-citation-core ../obsidian-citation-core
 nix develop     # or any Node.js 20+
 npm install
 npm run dev     # rebuild on change
 ```
 
-A change in the core shows up in the next build here, with nothing to link or
-publish. Its own checks, and what to run before a change there is done, are in
-its README.
+To try a change in the core before it is pushed, with it checked out next to
+this folder: `npm install --no-save ../obsidian-citation-core`. `npm ci` goes
+back to the pinned one. The core's own checks, and what to run before a change
+there is done, are in its README.
 
 To try it in a vault, copy or link `main.js` and `manifest.json` into
 `<vault>/.obsidian/plugins/in-the-open/` and reload Obsidian, or turn the plugin
@@ -37,16 +38,19 @@ checks: after a change to `package-lock.json`, update `npmDepsHash` in
 
 ## The core's version
 
-npm builds against whatever is checked out next to this folder. A release is
-built against the commit `flake.lock` pins: CI checks that commit out before
-`npm ci`, and Nix copies it next to the source before building. To move to a
-newer core:
+The core is pinned twice, at one commit: in `package.json`, which npm builds
+with, and in `flake.lock`, which `nix flake check` runs the core's own checks
+at. `checks.core-pin` fails when the two disagree. To move to a newer core,
+once its commit is on Codeberg and the GitHub mirror:
 
 ```sh
 nix flake update citation-core
+rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+npm install "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#$rev"
+nix run nixpkgs#prefetch-npm-deps -- package-lock.json   # the new npmDepsHash
 ```
 
-Then build and test here, with the core checked out at the same commit.
+Then build and test here.
 
 ## Releasing
 
@@ -60,8 +64,8 @@ Then build and test here, with the core checked out at the same commit.
 3. **Push** the commit, then tag it, named for the version without a `v`:
    `jj tag set <x.y.z> -r <commit>`, and `git push codeberg <x.y.z>`, since jj
    doesn't push tags. Codeberg is the only remote: GitHub mirrors it. The
-   core's commit that `flake.lock` pins has to be on Codeberg first, since CI
-   clones it from there.
+   core's commit has to be on Codeberg and its GitHub mirror first, since npm
+   takes it from the mirror and Nix from Codeberg.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
    checks, makes sure the tag is the version in `manifest.json`,
    `package.json` and `versions.json`, builds it, attests `main.js` and

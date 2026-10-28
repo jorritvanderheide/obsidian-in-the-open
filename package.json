@@ -20,7 +20,6 @@
 	"author": "Jorrit van der Heide",
 	"license": "EUPL-1.2",
 	"devDependencies": {
-		"obsidian-citation-core": "file:../obsidian-citation-core",
 		"@codemirror/state": "6.5.0",
 		"@codemirror/view": "6.38.6",
 		"@eslint/js": "^9.39.4",
@@ -31,6 +30,7 @@
 		"globals": "^17.6.0",
 		"jiti": "^2.6.1",
 		"obsidian": "~1.13.1",
+		"obsidian-citation-core": "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#ff91a615797086ba81fd46a65e77b1fad5d140ea",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1",
 		"vitest": "^3.2.7"
