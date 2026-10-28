@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, readConfig, readDraft, secure, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, differences, listed, readConfig, readSource, secure, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -86,10 +86,25 @@ describe('the requests', () => {
 	});
 
 	it('reads whether a post is a draft from its source', () => {
-		expect(readDraft('{"properties": {"post-status": ["draft"]}}')).toBe(true);
-		expect(readDraft('{"properties": {"post-status": ["published"]}}')).toBe(false);
-		expect(readDraft('{"properties": {}}')).toBe(false);
-		expect(() => readDraft('<html>')).toThrow("didn't answer q=source with JSON");
+		expect(readSource('{"properties": {"post-status": ["draft"]}}').draft).toBe(true);
+		expect(readSource('{"properties": {"post-status": ["published"]}}').draft).toBe(false);
+		expect(readSource('{"properties": {}}')).toEqual({ draft: false });
+		expect(() => readSource('<html>')).toThrow("didn't answer q=source with JSON");
+	});
+
+	it('reads the post as the site has it, and only what it gave', () => {
+		const source = readSource(
+			JSON.stringify({
+				type: ['h-entry'],
+				properties: {
+					name: ['Quiet'],
+					content: [{ html: '<p>x</p>', value: 'x' }],
+					category: ['tech', 3],
+					references: [{ key: 'a', text: 'A.', url: '' }, { key: 'b' }],
+				},
+			}),
+		);
+		expect(source).toEqual({ draft: false, title: 'Quiet', content: '<p>x</p>', categories: ['tech'], references: [{ key: 'a', text: 'A.', url: null }] });
 	});
 
 	it('withdraws and restores by the post\'s address', () => {
@@ -132,5 +147,49 @@ describe('images', () => {
 	it('wraps an image as multipart/form-data', () => {
 		const body = new TextDecoder().decode(multipart('bed "1".png', 'image/png', new Uint8Array([104, 105]), 'XYZ'));
 		expect(body).toBe('--XYZ\r\nContent-Disposition: form-data; name="file"; filename="bed _1_.png"\r\nContent-Type: image/png\r\n\r\nhi\r\n--XYZ--\r\n');
+	});
+});
+
+describe('differences', () => {
+	const online = {
+		draft: false,
+		title: 'Quiet',
+		summary: 'Why.',
+		content: 'As [A 2024](#ref-a).\n\n![A bed](abcdef123456.png)\n',
+		categories: ['tech'],
+		references: [
+			{ key: 'a', text: 'A, Ann. 2024. *First*.', url: 'https://doi.org/10.1/x' },
+			{ key: 'b', text: 'B.', url: null },
+		],
+	};
+	const note = { ...post, content: { markdown: 'As [A 2024](#ref-a).  \r\n\r\n![A bed](<https://bw20.nl/micropub/media/0123.png>)' } };
+
+	it('finds nothing when only line endings, spaces and image addresses differ', () => {
+		expect(differences(note, online)).toEqual([]);
+	});
+
+	it('names what changed', () => {
+		const changed = { ...note, title: 'Loud', content: { markdown: 'As [A 2024](#ref-a), again.' }, categories: ['garden'], references: [] };
+		expect(differences(changed, online)).toEqual(['the title', 'the text', 'the categories', 'the references']);
+		expect(differences({ ...note, summary: null }, online)).toEqual(['the summary']);
+		expect(differences({ ...note, content: { markdown: 'As [A 2024](#ref-a).\n\n![Another bed](x.png)' } }, online)).toEqual(['the text']);
+	});
+
+	it('compares only what the site gave', () => {
+		expect(differences({ ...note, title: 'Loud' }, { draft: false })).toEqual([]);
+	});
+
+	it('compares HTML images by their alt text too', () => {
+		const html = { ...note, content: { html: '<p><img src="https://bw20.nl/micropub/media/0123.png" alt="A bed"></p>' } };
+		expect(differences(html, { draft: false, content: '<p><img alt="Another bed" src="/log/quiet/abc.png"></p>' })).toEqual(['the text']);
+		expect(differences(html, { draft: false, content: '<p><img src="/log/quiet/abc.png" alt="A bed"></p>' })).toEqual([]);
+	});
+});
+
+describe('listed', () => {
+	it('puts things in a sentence', () => {
+		expect(listed(['the text'])).toBe('the text');
+		expect(listed(['the title', 'the text'])).toBe('the title and the text');
+		expect(listed(['the title', 'the text', 'the summary'])).toBe('the title, the text and the summary');
 	});
 });

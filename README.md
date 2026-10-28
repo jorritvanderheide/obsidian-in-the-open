@@ -136,7 +136,8 @@ If you want to work on the plugin, or make your site take its posts:
 - **One command** - Publish the note you have open, or any note from its
   right-click menu.
 - **Updates in place** - Publishing a note again updates its post, at the
-  same address.
+  same address, and says first what changed. When nothing did, it sends
+  nothing.
 - **Drafts first** - See a post on your site before anyone else does: a
   draft is at its address, but in none of your site's lists or its feed,
   until you publish it. On a site that takes drafts.
@@ -309,8 +310,8 @@ Only to your site, and only when you run a command:
 - **Images:** the images in the note.
 - **Whether it's a draft:** with a draft, and when it's published.
 - **Why it's withdrawn:** what you type when you withdraw a post, if anything.
-- **Questions:** what the site takes, and whether a published note's post is
-  a draft.
+- **Questions:** what the site takes, and, for a note you publish again,
+  its post as the site has it, to compare.
 - **Your token**, with every request, so your site knows it's you.
 
 ### 11.2 What it reads

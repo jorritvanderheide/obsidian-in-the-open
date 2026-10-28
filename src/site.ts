@@ -1,7 +1,7 @@
 // A site, as In the Open talks to it: its endpoint, found from its home page,
 // what it takes, and the requests that carry the token.
 import { randomBytes } from 'crypto';
-import { endpointFrom, failure, PublishError, readConfig, readDraft, secure, type Config, type Response } from './core/micropub';
+import { endpointFrom, failure, PublishError, readConfig, readSource, secure, type Config, type Response, type Source } from './core/micropub';
 import { page, send } from './http';
 
 export interface Site {
@@ -50,7 +50,23 @@ function query(site: Site, what: string): string {
 export async function isDraft(site: Site, url: string): Promise<boolean> {
 	if (!site.config.drafts) return false;
 	const answer = await call(site, query(site, `q=source&properties[]=post-status&url=${encodeURIComponent(url)}`), { method: 'GET' });
-	return readDraft(answer.body);
+	return readSource(answer.body).draft;
+}
+
+/**
+ * The post at `url` as the site has it, for comparing with the note before an
+ * update, or null when the site doesn't answer: a site that takes no drafts
+ * needn't know `q=source`, and is then updated without comparing. One that
+ * takes drafts has to answer it, so its failure is said.
+ */
+export async function sourceOf(site: Site, url: string): Promise<Source | null> {
+	try {
+		const answer = await call(site, query(site, `q=source&url=${encodeURIComponent(url)}`), { method: 'GET' });
+		return readSource(answer.body);
+	} catch (error) {
+		if (site.config.drafts) throw error;
+		return null;
+	}
 }
 
 /** Send JSON to the endpoint. */

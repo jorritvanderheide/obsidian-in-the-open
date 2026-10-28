@@ -71,15 +71,95 @@ export function readConfig(body: string): Config {
 	};
 }
 
-/** Whether a post is a draft, from `q=source`. Anything else is a published post. */
-export function readDraft(body: string): boolean {
+/**
+ * A post as the site has it, from `q=source`: only what it gave. A post
+ * that says nothing of its status is a published one.
+ */
+export interface Source {
+	draft: boolean;
+	title?: string;
+	summary?: string;
+	/** Markdown or HTML, as the site keeps it. */
+	content?: string;
+	categories?: string[];
+	references?: Reference[];
+}
+
+export function readSource(body: string): Source {
+	let props: Record<string, unknown> = {};
 	try {
-		const parsed = JSON.parse(body) as { properties?: Record<string, unknown> };
-		const status = parsed.properties?.['post-status'];
-		return Array.isArray(status) && status[0] === 'draft';
+		const parsed = JSON.parse(body) as { properties?: unknown };
+		if (parsed.properties !== null && typeof parsed.properties === 'object') props = parsed.properties as Record<string, unknown>;
 	} catch {
 		throw new PublishError("The site's Micropub endpoint didn't answer q=source with JSON.");
 	}
+	const list = (name: string): unknown[] | undefined => (Array.isArray(props[name]) ? (props[name] as unknown[]) : undefined);
+	const text = (name: string): string | undefined => {
+		const value = list(name)?.[0];
+		if (typeof value === 'string') return value;
+		// Micropub gives content with markup as an object: its HTML, or its text.
+		if (value !== null && typeof value === 'object') {
+			const { html, value: plain } = value as { html?: unknown; value?: unknown };
+			if (typeof html === 'string') return html;
+			if (typeof plain === 'string') return plain;
+		}
+		return undefined;
+	};
+	const source: Source = { draft: list('post-status')?.[0] === 'draft' };
+	const title = text('name');
+	if (title !== undefined) source.title = title;
+	const summary = text('summary');
+	if (summary !== undefined) source.summary = summary;
+	const content = text('content');
+	if (content !== undefined) source.content = content;
+	const categories = list('category');
+	if (categories !== undefined) source.categories = categories.filter((each): each is string => typeof each === 'string');
+	const references = list('references');
+	if (references !== undefined) {
+		source.references = references.flatMap((each) => {
+			const { key, text, url } = (each ?? {}) as Record<string, unknown>;
+			return typeof key === 'string' && typeof text === 'string' ? [{ key, text, url: typeof url === 'string' && url !== '' ? url : null }] : [];
+		});
+	}
+	return source;
+}
+
+/**
+ * The text, for comparing: line endings, space at the ends of lines and of
+ * the text aside, and each image by its alt text only, since a site may keep
+ * an image at an address of its own.
+ */
+function comparable(text: string): string {
+	return text
+		.replace(/\r\n?/g, '\n')
+		.replace(/!\[((?:[^\]\\]|\\.)*)\]\((?:<[^>]*>|[^)\s]*)(?:\s+"[^"]*")?\)/g, '![$1]()')
+		.replace(/(<img\b[^>]*?)\s+src\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '$1')
+		.replace(/[ \t]+$/gm, '')
+		.trim();
+}
+
+/**
+ * What an update would change in the post as the site has it, in words: "the
+ * title", "the text" and so on. Only what the site gave is compared, and
+ * images by their alt text, so an empty list can still hide a new picture.
+ */
+export function differences(post: Post, online: Source): string[] {
+	const changed: string[] = [];
+	if (online.title !== undefined && online.title.trim() !== post.title.trim()) changed.push('the title');
+	if (online.summary !== undefined && online.summary.trim() !== (post.summary ?? '').trim()) changed.push('the summary');
+	const content = 'markdown' in post.content ? post.content.markdown : post.content.html;
+	if (online.content !== undefined && comparable(online.content) !== comparable(content)) changed.push('the text');
+	if (online.categories !== undefined && [...online.categories].sort().join('\n') !== [...post.categories].sort().join('\n')) changed.push('the categories');
+	if (online.references !== undefined && post.references !== null) {
+		const same = (a: Reference[]) => JSON.stringify(a.map(({ key, text, url }) => [key, text.trim(), url ?? '']));
+		if (same(online.references) !== same(post.references)) changed.push('the references');
+	}
+	return changed;
+}
+
+/** Things in a sentence: "a", "a and b", "a, b and c". */
+export function listed(things: string[]): string {
+	return things.length <= 1 ? (things[0] ?? '') : `${things.slice(0, -1).join(', ')} and ${things.at(-1) ?? ''}`;
 }
 
 /** A work a post cites, as the references extension sends it. */

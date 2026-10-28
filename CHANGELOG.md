@@ -6,7 +6,8 @@ breaking is in [Compatibility](docs/compatibility.md).
 ## Unreleased
 
 - Publish a note to your website over Micropub, with its citations, its
-  reference list and its images, and update it by publishing it again.
+  reference list and its images, and update it by publishing it again. An
+  update says what changed, and sends nothing when nothing did.
 - Withdraw a post, and restore it, without breaking the links to it. Say
   why, and a site that takes it shows the reason on the post's page.
 - Publish a note as a draft first, to see it on your site before anyone

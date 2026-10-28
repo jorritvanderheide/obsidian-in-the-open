@@ -23,9 +23,9 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, createBody, imageType, images, multipart, PublishError, updateBody, withAddresses, type Post } from '../core/micropub';
+import { actionBody, createBody, differences, imageType, images, listed, multipart, PublishError, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
-import { connect, isDraft, post, upload, type Site } from '../site';
+import { connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
 import { POST_PROPERTY, STATUS_PROPERTY, type PostStatus } from '../core/status';
@@ -90,13 +90,14 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const existing = postOf(context, file);
 	const progress = new Notice(`Asking ${host} what it takes…`, 0);
 	let target: Site;
-	let wasDraft: boolean;
+	let online: Source | null;
 	try {
 		target = await site(context);
-		wasDraft = existing !== null && (await isDraft(target, existing));
+		online = existing === null ? null : await sourceOf(target, existing);
 	} finally {
 		progress.hide();
 	}
+	const wasDraft = target.config.drafts && online?.draft === true;
 	if (draft && !target.config.drafts) {
 		throw new PublishError(`${host} takes no drafts: it doesn't say so in its Micropub configuration, and a site that doesn't know drafts publishes one at once.`);
 	}
@@ -155,24 +156,8 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const media = target.config.mediaEndpoint;
 	if (pictures.length > 0 && media === null) throw new PublishError(`${host} takes no images (it has no media endpoint), and this note has some.`);
 
-	// A draft has nothing to say it was updated: only a published post does.
-	let updated: Date | null = null;
-	if (existing !== null && !wasDraft) {
-		const answer = await choose(
-			app,
-			`Update ${file.basename}?`,
-			(el) => {
-				el.createEl('p', { text: `It's at ${existing}, and publishing it again replaces it there.` });
-				el.createEl('p', { text: "Did it change in substance? Then the post says it was updated. A correction, such as a typo, doesn't." });
-			},
-			['Just a correction', 'Changed in substance'],
-		);
-		if (answer === null) return;
-		if (answer === 1) updated = new Date();
-	}
-
-	const sending = new Notice(draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`, 0);
-	let response;
+	const making = new Notice(`Preparing ${file.basename}…`, 0);
+	let body: Post;
 	try {
 		const addresses = new Map<string, string>();
 		for (const image of pictures) {
@@ -217,7 +202,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 
 		const properties = postProperties(app.metadataCache.getFileCache(file)?.frontmatter);
 		const title = typeof prepared.metadata.title === 'string' ? prepared.metadata.title : file.basename;
-		const body: Post = {
+		body = {
 			title,
 			summary,
 			content: format === 'markdown' ? { markdown: content } : { html: content },
@@ -226,6 +211,56 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			references,
 			status: draft ? 'draft' : wasDraft ? 'published' : null,
 		};
+	} finally {
+		making.hide();
+	}
+
+	// An update is compared with the post as the site has it, except a draft
+	// being published, whose status is the change.
+	const changed = existing !== null && online !== null && !(wasDraft && !draft) ? differences(body, online) : null;
+	if (changed !== null && changed.length === 0) {
+		if (pictures.length === 0) {
+			new Notice(`${file.basename} is up to date: your site has it as the note has it.`, 10000);
+			return;
+		}
+		const anyway = await confirm(
+			app,
+			`${file.basename} hasn't changed`,
+			(el) =>
+				el.createEl('p', {
+					text: "Your site has it as the note has it, apart from its pictures, which In the Open can't compare. Send it anyway, for a picture you changed?",
+				}),
+			'Send anyway',
+		);
+		if (!anyway) return;
+	}
+
+	// A draft has nothing to say it was updated: only a published post does.
+	let updated: Date | null = null;
+	if (existing !== null && !wasDraft) {
+		const answer = await choose(
+			app,
+			`Update ${file.basename}?`,
+			(el) => {
+				el.createEl('p', {
+					text:
+						changed === null
+							? `It's at ${existing}, and publishing it again replaces it there.`
+							: changed.length === 0
+								? `It's at ${existing}. Only its pictures may have changed.`
+								: `It's at ${existing}. What changed: ${listed(changed)}.`,
+				});
+				el.createEl('p', { text: "Did it change in substance? Then the post says it was updated. A correction, such as a typo, doesn't." });
+			},
+			['Just a correction', 'Changed in substance'],
+		);
+		if (answer === null) return;
+		if (answer === 1) updated = new Date();
+	}
+
+	const sending = new Notice(draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`, 0);
+	let response;
+	try {
 		response = await post(target, existing === null ? createBody(body) : updateBody(existing, body, updated));
 	} finally {
 		sending.hide();

@@ -43,19 +43,22 @@ decide nothing.
    without the token; `q=config` says whether it takes the references
    extension, and so whether the post goes as Markdown or as HTML, where
    images go, and whether it takes drafts. For a note with a post, `q=source`
-   says whether that post is a draft. The token comes from Obsidian's
+   gives that post as the site has it, draft or not. The token comes from Obsidian's
    keychain, and goes only over https, never through a redirect.
 3. **Read the note**, from the editor when it's open, and **prepare** it with
    the core: a link to a note with a post on this site goes to the post.
 4. **Confirm** the links that won't be links: to notes without a post, and to
    papers the bibliography lacks.
 5. **Check the images:** each needs alt text, and is a PNG or a JPEG.
-6. **Ask, for an update** of a published post, whether the change is one of
-   substance: only then does the post say it was updated.
-7. **Upload the images** to the media endpoint, and put their addresses in
+6. **Upload the images** to the media endpoint, and put their addresses in
    the note.
-8. **Run pandoc** with the core's `postArgs`, from a temporary folder, and read
+7. **Run pandoc** with the core's `postArgs`, from a temporary folder, and read
    the post and, as Markdown, its references.
+8. **Compare, for an update,** with the post as the site has it
+   (`differences`): what changed is said, and nothing changed is said too,
+   and nothing is sent, unless the note has pictures, which can't be compared.
+   For a published post, ask whether the change is one of substance: only then
+   does the post say it was updated.
 9. **Send it**, as a create or an update, with `post-status` for a draft or
    a draft being published. A new post's address goes into the
    note's `published-url`, and when the site answers `202`, In the Open asks
