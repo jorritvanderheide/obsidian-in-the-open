@@ -20,16 +20,17 @@ installed one, or the built-in one, which it downloads, checks and runs
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
 | `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config` and `q=source`, the requests' bodies, an answer's error, images and their upload. Pure, with a test named after it. |
-| `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`, and which posts another post may link to. Pure, with a test named after it. |
+| `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`, which posts another post may link to, and when a send makes a note public. Pure, with a test named after it. |
+| `src/core/links.ts` | Which published posts link to a note, to update once it has a post. Pure, with a test named after it. |
 | `src/core/template.ts` | The post template the plugin ships, and filling in its title. Pure, with a test named after it. |
 | `src/http.ts` | What goes over the wire: Node's `https`, which never follows a redirect with the token. |
 | `src/site.ts` | A site: its endpoint and what it takes, and the requests that carry the token. |
-| `src/commands/publish.ts` | Publishing a note, as a draft or not, updating it, withdrawing and restoring it, and discarding a draft. |
+| `src/commands/publish.ts` | Publishing a note, as a draft or not, updating it, withdrawing and restoring it, discarding a draft, and asking which posts that link to a newly public note to update. |
 | `src/commands/new-post.ts` | New post: a note from the template, seeded when it's missing, marked as a post. |
 | `src/commands/set-categories.ts` | Set categories: the site's categories, from `q=category`, or a new one, picked and written to the note. |
 | `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, the dialogs, the category picker (`category-picker.ts`), and a post's pill and next step in its title bar (`title-bar.ts`). |
 | `src/context.ts` | What a command needs from the plugin, and nothing else: the app, the settings, and saving them. |
-| `src/main.ts` | Registers the six commands, the file menu items, and the title bar, which follows the open notes. |
+| `src/main.ts` | Registers the six commands, the file menu items, and the title bar, which follows the open notes. Sends one note at a time, and after a note's first public send, updates the posts that link to it, one at a time, when you agree. |
 | `styles.css` | The title bar's pill. |
 | `src/modules.d.ts` | What esbuild bundles from the core: its filters as text and its font as bytes. |
 

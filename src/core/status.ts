@@ -40,6 +40,15 @@ export function linkable(status: PostStatus | null): boolean {
 }
 
 /**
+ * Whether a send makes a note public for the first time: a new post, or a
+ * draft being published. Until then, the posts that link to it show its link
+ * as words.
+ */
+export function goesPublic(existing: boolean, wasDraft: boolean, draft: boolean): boolean {
+	return !draft && (!existing || wasDraft);
+}
+
+/**
  * Where the note's post stands, or null for a note that isn't a post.
  *
  * A note is a post when it has either property. Without an address it is

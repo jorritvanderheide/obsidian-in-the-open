@@ -125,13 +125,27 @@ A link to a note you haven't published, or only sent as a draft, shows the
 same words it shows in Obsidian: `[[Raised beds|my post on beds]]` becomes
 "my post on beds", and `[[Raised beds]]` becomes "Raised beds". A draft's
 address is only for the people you give it to, so a post never links to one.
-To get a real link, publish that note first, then publish this one again.
+When you publish that note, In the Open offers to update this post, and the
+link goes to the new post.
 
 The same list has links to papers your bibliography doesn't have, and links
 to no note at all. Those go out as their names instead of citations. For a
 paper, usually Better BibTeX changed the key, or its auto-export hasn't run
 since you added the paper. You can publish anyway, or cancel and fix the link
 first.
+
+### "A post links to …" or "… posts link to …"
+
+The note you just published is public for the first time, and some of your
+published posts link to it. They went out while it had no post, so the link
+shows as plain words. Choose **Update it** or **Update them**, and each one is
+published again, one at a time, with the link to the new post. You get the
+usual questions for an update, like whether it's a real change.
+
+Each update sends its note as it is now. If you've changed one of them since
+you published it, and you're not ready to send that yet, choose **Cancel** and
+update that post later yourself. Drafts aren't listed: a draft picks up the
+link when you publish it.
 
 ### "… has no alt text, the words a reader gets when they can't see an image. …"
 

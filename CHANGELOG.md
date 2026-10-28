@@ -3,6 +3,12 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- When you publish a note for the first time, In the Open finds your
+  published posts that link to it, and offers to update them. Their links
+  were plain words while the note had no post, and now they go to it.
+
 ## 1.0.3
 
 - Before you publish, a link to a note without a post is listed by the words

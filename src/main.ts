@@ -1,6 +1,6 @@
 import { debounce, Notice, Plugin, TFile } from 'obsidian';
 import { newPost } from './commands/new-post';
-import { postOf, publish, withdraw } from './commands/publish';
+import { linkingToUpdate, postOf, publish, withdraw } from './commands/publish';
 import { setCategories } from './commands/set-categories';
 import { PublishError } from './core/micropub';
 import { loadSettings, type Settings } from './core/settings';
@@ -22,8 +22,8 @@ export default class InTheOpen extends Plugin {
 
 		// Publish any note; withdraw or restore only one that has a post.
 		const commands: { id: string; name: string; icon: string; published: boolean; run: (file: TFile) => Promise<void> }[] = [
-			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => this.send(file, () => publish(this, file, false)) },
-			{ id: 'draft', name: 'Publish note as a draft', icon: 'file-up', published: false, run: (file) => this.send(file, () => publish(this, file, true)) },
+			{ id: 'publish', name: 'Publish note', icon: 'send', published: false, run: (file) => this.publish(file, false) },
+			{ id: 'draft', name: 'Publish note as a draft', icon: 'file-up', published: false, run: (file) => this.publish(file, true) },
 			{ id: 'withdraw', name: 'Withdraw note', icon: 'archive', published: true, run: (file) => this.send(file, () => withdraw(this, file, false)) },
 			{ id: 'restore', name: 'Restore note', icon: 'archive-restore', published: true, run: (file) => this.send(file, () => withdraw(this, file, true)) },
 			{ id: 'set-categories', name: 'Set categories', icon: 'tags', published: false, run: (file) => setCategories(this, file) },
@@ -88,7 +88,7 @@ export default class InTheOpen extends Plugin {
 		() => {
 			if (this.unloaded) return;
 			decorate(this.app, {
-				publish: (file, draft) => this.attempt(this.send(file, () => publish(this, file, draft))),
+				publish: (file, draft) => this.attempt(this.publish(file, draft)),
 				withdraw: (file, back) => this.attempt(this.send(file, () => withdraw(this, file, back))),
 				busy: (file) => this.sending.has(file),
 			});
@@ -96,6 +96,28 @@ export default class InTheOpen extends Plugin {
 		20,
 		true,
 	);
+
+	/**
+	 * Publish a note. The first time it's public, the posts that link to it
+	 * show that link as words: after asking, each is updated, one at a time,
+	 * so the link goes to its post. One that fails says so, and the rest go on.
+	 */
+	private async publish(file: TFile, draft: boolean): Promise<void> {
+		let wentPublic = false;
+		await this.send(file, async () => {
+			wentPublic = await publish(this, file, draft);
+		});
+		if (!wentPublic) return;
+		for (const post of await linkingToUpdate(this, file)) {
+			try {
+				await this.send(post, async () => {
+					await publish(this, post, false);
+				});
+			} catch (error) {
+				this.report(error);
+			}
+		}
+	}
 
 	/**
 	 * One send at a time for each note, from the title bar, a command or a menu:
@@ -119,9 +141,11 @@ export default class InTheOpen extends Plugin {
 
 	/** Every failure becomes a notice. A rejection left unhandled is swallowed, and a publish that failed looks like one that never started. */
 	private attempt(done: Promise<void>) {
-		done.catch((error: unknown) => {
-			if (!(error instanceof PublishError)) console.error(error);
-			new Notice(error instanceof Error ? error.message : String(error), 0);
-		});
+		done.catch((error: unknown) => this.report(error));
+	}
+
+	private report(error: unknown) {
+		if (!(error instanceof PublishError)) console.error(error);
+		new Notice(error instanceof Error ? error.message : String(error), 0);
 	}
 }

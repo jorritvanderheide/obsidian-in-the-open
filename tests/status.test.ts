@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { linkable, refusal, statusOf } from '../src/core/status';
+import { goesPublic, linkable, refusal, statusOf } from '../src/core/status';
 
 describe('statusOf', () => {
 	it('knows a note that is no post', () => {
@@ -51,5 +51,18 @@ describe('linkable', () => {
 		expect(linkable('draft')).toBe(false);
 		expect(linkable('unpublished')).toBe(false);
 		expect(linkable(null)).toBe(false);
+	});
+});
+
+describe('goesPublic', () => {
+	it('is a new post, or a draft being published', () => {
+		expect(goesPublic(false, false, false)).toBe(true);
+		expect(goesPublic(true, true, false)).toBe(true);
+	});
+
+	it("isn't a draft, or an update of a published post", () => {
+		expect(goesPublic(false, false, true)).toBe(false);
+		expect(goesPublic(true, true, true)).toBe(false);
+		expect(goesPublic(true, false, false)).toBe(false);
 	});
 });

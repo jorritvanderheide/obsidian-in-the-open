@@ -166,6 +166,9 @@ If you want to work on the plugin, or make your site take its posts:
   same address, and tells you first what changed. If nothing did, it sends
   nothing. If the post was changed on your site, it asks before replacing
   that change.
+- **Links that catch up** - A link to a note you haven't published yet goes
+  out as plain words. When you publish that note, In the Open offers to
+  update the posts that link to it, so their links go to its post.
 - **Drafts first** - See a post on your site before anyone else does. A draft
   has its own address, but it stays out of your site's lists and feed until
   you publish it. Your site has to take drafts for this.
@@ -216,7 +219,7 @@ makes sense inside Obsidian:
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Published, they'd only be their query. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word. |
 | A link to a note you've published | A link to its post. |
-| A link to a note you haven't published, or only sent as a draft | Its words, as Obsidian shows them: the alias after the `\|`, or the note's name. In the Open lists these links before it sends, so you can publish anyway, or publish those notes first. |
+| A link to a note you haven't published, or only sent as a draft | Its words, as Obsidian shows them: the alias after the `\|`, or the note's name. In the Open lists these links before it sends. When you publish that note later, it offers to update the posts that link to it. |
 | `> [!note] Title` | A quote with the title in bold. |
 | `==highlight==` | Plain text, because a site has no highlight of its own. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |
@@ -341,7 +344,8 @@ pandoc's release on GitHub.
 
 ### 11.1 What it sends
 
-To your site, and only when you run a command:
+To your site, and only when you run a command, or agree to update the posts
+that link to a note you just published:
 
 - **The post:** The note's text after the steps in
   [What happens to your note](#61-what-happens-to-your-note), its title, and
@@ -371,8 +375,9 @@ ships with, a fingerprint of the file pandoc released.
 
 ### 11.2 What it reads
 
-- **Notes:** The note you publish, and the citation keys and `published-url`
-  of the notes it links to. The `published-url` and `post-status` of the
+- **Notes:** The note you publish, and the citation keys, `published-url` and
+  `post-status` of the notes it links to. The first time a note is public,
+  which of your notes link to it, and their `post-status`. The `published-url` and `post-status` of the
   notes you have open, for their title bar.
 - **Template:** `Post.md` in the template folder, when you make a new post.
 - **Bibliography:** The `.bib` file you set in **Bibliography**.

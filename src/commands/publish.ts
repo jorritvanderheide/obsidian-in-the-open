@@ -31,7 +31,8 @@ import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
-import { linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
+import { linkingPosts } from '../core/links';
+import { goesPublic, linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
 /** How long a new post may take to go live before In the Open stops waiting. */
@@ -54,8 +55,11 @@ export function postOf(context: Context, file: TFile): string | null {
 	return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
 }
 
-/** Publish a note, or send it as a draft, which only its address leads to until it's published. */
-export async function publish(context: Context, file: TFile, draft: boolean): Promise<void> {
+/**
+ * Publish a note, or send it as a draft, which only its address leads to until
+ * it's published. True when this made the note public for the first time.
+ */
+export async function publish(context: Context, file: TFile, draft: boolean): Promise<boolean> {
 	const { app, settings } = context;
 	const adapter = app.vault.adapter;
 	if (!(adapter instanceof FileSystemAdapter)) throw new PublishError('Publishing needs the desktop app.');
@@ -86,7 +90,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			placeholder: 'What the post is about',
 			cta: 'Save',
 		});
-		if (summary === null) return;
+		if (summary === null) return false;
 		const answer = summary;
 		await writeProperties(context, file, (frontmatter) => {
 			frontmatter.summary = answer;
@@ -124,7 +128,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			},
 			'Publish',
 		);
-		if (!yes) return;
+		if (!yes) return false;
 	}
 	const wasDraft = target.config.drafts && online?.draft === true;
 	if (draft && !target.config.drafts) {
@@ -171,7 +175,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	});
 	const { missing } = prepared;
 	const lost = missing.papers.length + missing.unresolved.length + missing.unpublished.length;
-	if (lost > 0 && !(await confirmMissing(context, missing, lost, bibliography ? basename(bibliography) : 'your bibliography'))) return;
+	if (lost > 0 && !(await confirmMissing(context, missing, lost, bibliography ? basename(bibliography) : 'your bibliography'))) return false;
 
 	const pictures = images(prepared.markdown);
 	const blind = pictures.filter((image) => image.alt === '');
@@ -193,7 +197,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	// Asked for before anything is uploaded, since the built-in pandoc may
 	// have to be downloaded first, which you may not want.
 	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
-	if (pandoc === null) return;
+	if (pandoc === null) return false;
 
 	const making = new Notice(`Preparing ${file.basename}…`, 0);
 	let body: Post;
@@ -263,7 +267,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	if (changed !== null && changed.length === 0) {
 		if (pictures.length === 0) {
 			new Notice(`${file.basename} is up to date. Your site already has it just as it is in the note.`, 10000);
-			return;
+			return false;
 		}
 		const anyway = await confirm(
 			app,
@@ -274,7 +278,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 				}),
 			'Send anyway',
 		);
-		if (!anyway) return;
+		if (!anyway) return false;
 	}
 
 	// A draft has nothing to say it was updated: only a published post does.
@@ -296,7 +300,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			},
 			['Just a correction', 'A real change'],
 		);
-		if (answer === null) return;
+		if (answer === null) return false;
 		if (answer === 1) updated = new Date();
 	}
 
@@ -317,7 +321,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 			},
 			'Replace it',
 		);
-		if (!replace) return;
+		if (!replace) return false;
 		response = await send(true);
 	}
 
@@ -329,7 +333,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 				: `Updated ${file.basename}.`;
 		await record(context, file, draft ? 'draft' : 'published');
 		new Notice(`${done} If your site builds its pages first, it may take a moment to show.`, 10000);
-		return;
+		return goesPublic(true, wasDraft, draft);
 	}
 	// The post is on the site from here on: a note that doesn't learn its
 	// address would make a second post the next time it's published.
@@ -350,6 +354,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	// as publishing its draft, is offered at once rather than after the build.
 	if (response.status === 202) void waitForIt(file.basename, url, draft);
 	else live(file.basename, url, draft);
+	return goesPublic(false, false, draft);
 }
 
 /** Withdraw the note's post, or bring it back. A draft is discarded instead. */
@@ -409,6 +414,65 @@ export async function showing<T>(text: string, work: () => Promise<T>): Promise<
 }
 
 /** Write where the note's post stands, and its address: a new one, or null to forget it. */
+/**
+ * The posts to update now that `file` is public, after asking: the published
+ * posts that link to it, which show that link as words. Empty when there are
+ * none, or the answer is no.
+ */
+export async function linkingToUpdate(context: Context, file: TFile): Promise<TFile[]> {
+	const { app } = context;
+	await settled(app, file);
+	const statusAt = (path: string) => {
+		const note = app.vault.getFileByPath(path);
+		return note === null ? null : statusOf(app.metadataCache.getFileCache(note)?.frontmatter);
+	};
+	const posts = linkingPosts(file.path, app.metadataCache.resolvedLinks, statusAt)
+		.map((path) => app.vault.getFileByPath(path))
+		.filter((note): note is TFile => note !== null);
+	if (posts.length === 0) return [];
+	const one = posts.length === 1;
+	const update = await confirm(
+		app,
+		one ? `A post links to ${file.basename}` : `${posts.length} posts link to ${file.basename}`,
+		(el) => {
+			el.createEl('p', {
+				text: one
+					? `It went out before ${file.basename} had a post, and shows the link as plain words. Update it, and the link leads to the new post:`
+					: `They went out before ${file.basename} had a post, and show the links as plain words. Update them, and the links lead to the new post:`,
+			});
+			const ul = el.createEl('ul');
+			for (const post of posts) ul.createEl('li', { text: post.basename });
+			el.createEl('p', {
+				text: one
+					? "It's sent as its note is now, with any other changes you've made since. You'll get the usual questions for an update."
+					: "Each is sent as its note is now, with any other changes you've made since. You'll get the usual questions for an update, one post at a time.",
+			});
+		},
+		one ? 'Update it' : 'Update them',
+	);
+	return update ? posts : [];
+}
+
+/**
+ * Until the metadata cache has the note's new address and status, which the
+ * links to it are read by, or a few seconds at most.
+ */
+function settled(app: App, file: TFile): Promise<void> {
+	const ready = () => linkable(statusOf(app.metadataCache.getFileCache(file)?.frontmatter));
+	if (ready()) return Promise.resolve();
+	return new Promise((resolve) => {
+		const done = () => {
+			app.metadataCache.offref(ref);
+			window.clearTimeout(timer);
+			resolve();
+		};
+		const ref = app.metadataCache.on('changed', (changed) => {
+			if (changed === file && ready()) done();
+		});
+		const timer = window.setTimeout(done, 5000);
+	});
+}
+
 function record(context: Context, file: TFile, status: PostStatus, url?: string | null): Promise<void> {
 	return writeProperties(context, file, (frontmatter) => {
 		if (url === null) delete frontmatter[POST_PROPERTY];
@@ -481,7 +545,7 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 					li.createEl('code', { text: words });
 					if (words !== note) li.appendText(`, which links to ${note}`);
 				}
-				el.createEl('p', { text: 'Publish those notes first, then publish this one again, and the links go to their posts.' });
+				el.createEl('p', { text: "When you publish one of those notes, In the Open offers to update this post, so its link goes there." });
 			}
 			if (missing.papers.length > 0) {
 				el.createEl('p', { text: `These link to papers that ${bib} doesn't have, so they'll show as plain names instead of citations:` });
