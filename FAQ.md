@@ -148,6 +148,20 @@ since you added the paper. A paper note without a citation key property is
 looked up by its name, so it only cites when it's named for its key. You can
 publish anyway, or cancel and fix the link first.
 
+### "Your site won't show everything as Obsidian does"
+
+The first time you send a note, In the Open lists what in it your site will
+show otherwise than Obsidian does, or not at all: callouts, which are quotes
+without their kind or folding, math and Mermaid diagrams, which show as their
+code, embedded notes and plugin blocks, which are left out, and links to a
+heading or a block in the note itself, which are their words. On a site that
+takes Markdown, highlights and image widths too. [What happens to your
+note](README.md#61-what-happens-to-your-note) has every one.
+
+Nothing is wrong with the note. Choose **Publish anyway** to send it as the
+list says, or **Cancel** to change it first. In the Open asks only the first
+time, so an update doesn't ask again.
+
 ### "A post links to …" or "… posts link to …"
 
 The note you just published is public for the first time, and some of your

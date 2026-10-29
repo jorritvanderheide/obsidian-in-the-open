@@ -23,7 +23,7 @@ installed one, or the built-in one, which it downloads, checks and runs
 | `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`, which posts another post may link to, and when a send makes a note public. Pure, with a test named after it. |
 | `src/core/links.ts` | Which published posts link to a note, to update once it has a post. Pure, with a test named after it. |
 | `src/core/sending.ts` | The new posts sent without hearing back, by their note's path, until the note has the post's address. Pure, with a test named after it. |
-| `src/core/steps.ts` | What publishing does next: whether a send may go, whether to compare and what to do when nothing changed, whether to ask what kind of update it is, the status the request sets, and the notices and questions those lead to. Pure, with a test named after it. |
+| `src/core/steps.ts` | What publishing does next: whether a send may go, whether to compare and what to do when nothing changed, whether to ask what kind of update it is, the status the request sets, whether to say what the post won't show as Obsidian does, and the notices and questions those lead to. Pure, with a test named after it. |
 | `src/core/template.ts` | The post template the plugin ships, and filling in its title. Pure, with a test named after it. |
 | `src/http.ts` | What goes over the wire: Node's `https`, which never follows a redirect with the token. |
 | `src/site.ts` | A site: its endpoint and what it takes, and the requests that carry the token, telling a request the site turned down from a server's own error. |

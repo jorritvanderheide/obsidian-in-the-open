@@ -3,6 +3,20 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- The first time you send a note, In the Open lists what in it your site won't
+  show as Obsidian does, before it sends: callouts, math, Mermaid diagrams,
+  embedded notes, plugin blocks and links to a heading in the note itself, and
+  on a site that takes Markdown, highlights and image widths.
+- Math is published as you wrote it, as code. On a site that takes Markdown
+  it had dollar signs around it, and on one that takes HTML it was spelled
+  out in letters and signs as far as they went.
+- [What happens to your note](README.md#61-what-happens-to-your-note) says
+  what becomes of tasks, math, Mermaid diagrams and links within the note,
+  and where a site that takes Markdown and one that takes HTML differ: a
+  highlight and an image's width go along only in HTML.
+
 ## 1.5.1
 
 - A Markdown link is read as a link to a note only when it points at one, a

@@ -170,6 +170,9 @@ If you want to work on the plugin, or make your site take its posts:
 - **Links that catch up** - A link to a note you haven't published yet goes
   out as plain words. When you publish that note, In the Open offers to
   update the posts that link to it, so their links go to its post.
+- **Says what won't show** - The first time you send a note, In the Open lists
+  what in it your site won't show as Obsidian does, like a callout's kind or an
+  embedded note, and what it shows instead.
 - **Drafts first** - See a post on your site before anyone else does. A draft
   has its own address, but it stays out of your site's lists and feed until
   you publish it. Your site has to take drafts for this.
@@ -207,7 +210,9 @@ If you want to work on the plugin, or make your site take its posts:
 ### 6.1 What happens to your note
 
 Before anything is sent, In the Open removes or rewrites everything that only
-makes sense inside Obsidian:
+makes sense inside Obsidian. The first time you send a note, it lists what in
+it your site won't show as Obsidian does, before it sends. Where the two kinds
+of site in [6.2](#62-what-your-site-gets) differ, the table says so:
 
 | In your note | On your site |
 | --- | --- |
@@ -215,15 +220,19 @@ makes sense inside Obsidian:
 | `^abc123` block IDs | Left out. |
 | An H1 on the first line | The post's title. Without one, the `title` property, then the file name. |
 | Properties | Only `summary`, `categories` and `slug` go along. |
-| `![[figure.png\|alt text]]` or `![alt text](figure.png)` | The image, uploaded to your site, with its alt text. An image from the web stays where it is, and your post shows it from there. A width after the alt text, `![[figure.png\|alt text\|300]]`, goes along. |
+| `![[figure.png\|alt text]]` or `![alt text](figure.png)` | The image, uploaded to your site, with its alt text. An image from the web stays where it is, and your post shows it from there. A width after the alt text, `![[figure.png\|alt text\|300]]`, goes along to a site that takes HTML. A site that takes Markdown shows the image as wide as it shows every image. |
 | An image with `*A raised bed in March.*` on the line right under it | A figure, with "A raised bed in March." as its caption. An image on its own gets no caption: its alt text is for readers who can't see it. |
-| An embedded note, PDF or canvas | Left out. |
+| An embedded note, or a part of one, a PDF or a canvas | Left out. |
 | `dataview`, `dataviewjs`, `tasks`, `query` and `base` blocks | Left out. Published, they'd only be their query. |
 | A line of `#tags` | Left out. A tag in a sentence stays as its word. |
 | A link to a note you've published | A link to its post. |
 | A link to a note you haven't published, or only sent as a draft | Its words, as Obsidian shows them: the alias after the `\|`, or the note's name. In the Open lists these links before it sends. When you publish that note later, it offers to update the posts that link to it. |
-| `> [!note] Title` | A quote with the title in bold. |
-| `==highlight==` | Plain text, because a site has no highlight of its own. |
+| A link to a heading or a block in the note itself, `[[#Method]]` | Its words, without a link. |
+| `> [!note] Title` | A quote with the title in bold. Its kind, like `tip` or `warning`, and its folding, `-` or `+`, stay in Obsidian. A callout without a title is a plain quote. |
+| `==highlight==` | Highlighted on a site that takes HTML. Plain text on one that takes Markdown, which has no highlight. |
+| `- [ ]` and `- [x]` tasks | A task list, each box ticked or not. |
+| `$E=mc^2$` and `$$` math | As you wrote it, as code. A site draws no math. |
+| A `mermaid` diagram | Its code. A site draws no diagrams. |
 | A backslash, like `C:\path\x` | As written, as Obsidian shows it. |
 | `[Smith](smith-2017.md)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`: a citation, a link to a post, or its words. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |

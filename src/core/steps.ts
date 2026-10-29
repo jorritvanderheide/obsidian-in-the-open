@@ -1,6 +1,7 @@
 // What publishing does next, decided from what the note and the site say.
 // Pure, so every turn of a publish is tested without Obsidian or a site:
 // src/commands/publish.ts asks the questions, sends and writes.
+import type { Unshown, UnshownKind } from 'obsidian-citation-core';
 import { differences, imageType, listed, type Image, type Post, type Source } from './micropub';
 
 /** One send of a note, as the steps below need it. */
@@ -102,4 +103,35 @@ export function updateSummary(existing: string, changed: string[] | null): strin
 export function updatedNotice(send: Send): string {
 	const done = send.draft ? `Updated the draft of ${send.name}.` : send.wasDraft ? `Published ${send.name}. It moves into your site's lists and feed.` : `Updated ${send.name}.`;
 	return `${done} If your site builds its pages first, it may take a moment to show.`;
+}
+
+/** Whether to say what the post won't show as Obsidian does: on a note's first send, when there is something to say. */
+export function saysUnshown(send: Send, unshown: Unshown[]): boolean {
+	return send.existing === null && unshown.length > 0;
+}
+
+/** What the post does with each kind of thing it won't show as Obsidian does, before the list of them. */
+export const UNSHOWN: Record<UnshownKind, string> = {
+	callout: 'Callouts will be quotes, with their title in bold. Their kind and their folding stay in Obsidian:',
+	highlight: 'Highlights will be plain text:',
+	width: 'Images will be as wide as your site shows them, not as wide as you made them:',
+	math: 'Math will show as you wrote it, as code:',
+	mermaid: 'Mermaid diagrams will show as their code:',
+	embed: 'Embedded notes, PDFs and canvases will be left out:',
+	'plugin block': 'Dataview, Tasks, search and Bases blocks will be left out:',
+	'link within': 'Links to a heading or a block in this note will be their words, without a link:',
+};
+
+/** How many of each kind are listed, before "and … more". */
+const LISTED = 5;
+/** How long one may be, as written, before it's cut. */
+const LONGEST = 60;
+
+/** The ones of a kind to list, each on one line and cut when long, and how many more there are. */
+export function unshownList(written: string[]): { items: string[]; more: number } {
+	const items = written.slice(0, LISTED).map((each) => {
+		const line = each.replace(/\s+/g, ' ').trim();
+		return line.length > LONGEST ? `${line.slice(0, LONGEST - 1).trimEnd()}…` : line;
+	});
+	return { items, more: Math.max(0, written.length - LISTED) };
 }

@@ -81,7 +81,7 @@ Content-Type: application/json
 | Property | Required | What it is |
 | --- | --- | --- |
 | `name` | yes | The title. |
-| `content` | yes | The text. To a site that takes the references extension, a plain string of CommonMark, with GFM tables, strikethrough and footnotes. To any other site, HTML, as `{"html": "..."}`, because Micropub reads a plain string as plain text. |
+| `content` | yes | The text. To a site that takes the references extension, a plain string of CommonMark, with GFM tables, strikethrough, footnotes and task lists. To any other site, HTML, as `{"html": "..."}`, because Micropub reads a plain string as plain text. |
 | `summary` | | One sentence about the post. |
 | `category` | | Its categories. A site may make a new one when a post names it, or refuse the post; the plugin asks before sending one the site doesn't list, since a new category is often a typo. |
 | `mp-slug` | | The slug it should have. The site may choose another. |

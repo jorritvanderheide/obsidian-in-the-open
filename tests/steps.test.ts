@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Post, Source } from '../src/core/micropub';
-import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, sentStatus, updatedNotice, updateSummary, whenUnchanged, type Send } from '../src/core/steps';
+import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, saysUnshown, sentStatus, unshownList, updatedNotice, updateSummary, whenUnchanged, type Send } from '../src/core/steps';
 
 const url = 'https://bw20.nl/log/beds/';
 const fresh: Send = { name: 'Beds', host: 'bw20.nl', draft: false, existing: null, wasDraft: false };
@@ -111,5 +111,32 @@ describe('updatedNotice', () => {
 		expect(updatedNotice({ ...draftOnline, draft: true })).toMatch(/^Updated the draft of Beds\. If your site builds/);
 		expect(updatedNotice(draftOnline)).toMatch(/^Published Beds\. It moves into your site's lists and feed\. /);
 		expect(updatedNotice(published)).toMatch(/^Updated Beds\. If your site builds its pages first, it may take a moment to show\.$/);
+	});
+});
+
+describe('saysUnshown', () => {
+	const callout = [{ kind: 'callout' as const, written: ['[!tip] Title'] }];
+
+	it('says it on a note\'s first send, when there is something to say', () => {
+		expect(saysUnshown(fresh, callout)).toBe(true);
+		expect(saysUnshown({ ...fresh, draft: true }, callout)).toBe(true);
+		expect(saysUnshown(fresh, [])).toBe(false);
+	});
+
+	it('says nothing on an update, a draft published included', () => {
+		expect(saysUnshown(published, callout)).toBe(false);
+		expect(saysUnshown(draftOnline, callout)).toBe(false);
+	});
+});
+
+describe('unshownList', () => {
+	it('lists the first five, each on one line, and counts the rest', () => {
+		expect(unshownList(['$$\n\\int x\n$$', 'b', 'c', 'd', 'e', 'f', 'g'])).toEqual({ items: ['$$ \\int x $$', 'b', 'c', 'd', 'e'], more: 2 });
+		expect(unshownList(['==a=='])).toEqual({ items: ['==a=='], more: 0 });
+	});
+
+	it('cuts one that is long', () => {
+		const { items } = unshownList([`[!note] ${'word '.repeat(20)}`]);
+		expect(items[0]).toBe('[!note] word word word word word word word word word word w…');
 	});
 });

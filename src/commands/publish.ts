@@ -24,6 +24,7 @@ import {
 	stylePath,
 	withFiles,
 	type Missing,
+	type Unshown,
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
@@ -34,7 +35,7 @@ import { choose, confirm } from '../ui/confirm';
 import { ask } from '../ui/prompt';
 import { linkingPosts } from '../core/links';
 import { forgotten, moved, readSending, sent, type Sending } from '../core/sending';
-import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, sentStatus, updatedNotice, updateSummary, whenUnchanged, type Send } from '../core/steps';
+import { asksWhatKind, changes, draftOnSite, draftRefusal, imageRefusal, saysUnshown, sentStatus, UNSHOWN, unshownList, updatedNotice, updateSummary, whenUnchanged, type Send } from '../core/steps';
 import { goesPublic, linkable, POST_PROPERTY, refusal, STATUS_PROPERTY, statusOf, type PostStatus } from '../core/status';
 import type { Context } from '../context';
 
@@ -192,6 +193,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const { missing } = prepared;
 	const lost = missing.papers.length + missing.unresolved.length + missing.unpublished.length;
 	if (lost > 0 && !(await confirmMissing(context, missing, lost, bibliography ? basename(bibliography) : 'your bibliography'))) return false;
+	if (saysUnshown(sending, prepared.unshown) && !(await confirmUnshown(context, prepared.unshown))) return false;
 
 	const pictures = images(prepared.markdown);
 	const media = target.config.mediaEndpoint;
@@ -619,6 +621,24 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 				el.createEl('p', { text: `These don't link to a note, and ${bib} has no key with their name either, so they'll show as plain text:` });
 				list(el, missing.unresolved);
 			}
+		},
+		'Publish anyway',
+	);
+}
+
+function confirmUnshown(context: Context, unshown: Unshown[]): Promise<boolean> {
+	return confirm(
+		context.app,
+		"Your site won't show everything as Obsidian does",
+		(el) => {
+			for (const { kind, written } of unshown) {
+				el.createEl('p', { text: UNSHOWN[kind] });
+				const { items, more } = unshownList(written);
+				const ul = el.createEl('ul');
+				for (const item of items) ul.createEl('li').createEl('code', { text: item });
+				if (more > 0) ul.createEl('li', { text: `and ${more} more` });
+			}
+			el.createEl('p', { text: 'In the Open says this only the first time you send a note.' });
 		},
 		'Publish anyway',
 	);
