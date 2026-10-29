@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.5.0
 
 - A backslash in a note is published as it shows in Obsidian, so a Windows
   path or code in a quote comes out whole. Pandoc read `\word` as a LaTeX
