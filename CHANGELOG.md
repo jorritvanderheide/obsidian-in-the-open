@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.3.0
 
 - An image with a line in italics right under it, like
   `*A raised bed in March.*`, is published as a figure with that line as its
