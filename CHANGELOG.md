@@ -3,6 +3,22 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- A backslash in a note is published as it shows in Obsidian, so a Windows
+  path or code in a quote comes out whole. Pandoc read `\word` as a LaTeX
+  command and left it out.
+- A citation key with a slash in it, like `[[jones/2019]]`, is published as a
+  citation. It used to go out as plain text without a warning.
+- A bibliography entry with its key on the line after the brace is read. Since
+  1.4.0, citing it in a sentence went out as plain text.
+- A Markdown link to a note, like `[Smith](smith-2017.md)`, which Obsidian
+  writes with "Use [[Wikilinks]]" turned off, works like a wikilink: a link to
+  a paper note is a citation, and a link to a note you've published links to
+  its post.
+- The warnings in the settings are worded as Due Credit's: "There's no file
+  at …, so publishing stops", and "citation style" under **Citation style**.
+
 ## 1.4.0
 
 - An embed with alt text and a width, like `![[figure.png|A chart|300]]`,

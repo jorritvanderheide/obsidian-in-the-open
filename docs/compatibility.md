@@ -65,6 +65,10 @@ citation**, and In the Open reads them through the same core, as it does the
 one form Paper Trail's **Insert annotation** writes. No longer reading one is
 breaking for all three plugins.
 
+A new form is read before Paper Trail writes it: the core learns it and is
+tagged, Due Credit and In the Open are released on that core, and only then
+does Paper Trail write it.
+
 ## The core
 
 How a note is read, which links cite and how a post is put together are the

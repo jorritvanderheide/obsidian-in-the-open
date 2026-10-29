@@ -30,10 +30,10 @@ installed one, or the built-in one, which it downloads, checks and runs
 | `src/commands/publish.ts` | Publishing a note, as a draft or not, updating it, withdrawing and restoring it, discarding a draft, and asking which posts that link to a newly public note to update. |
 | `src/commands/new-post.ts` | New post: a note from the template, seeded when it's missing, marked as a post. |
 | `src/commands/set-categories.ts` | Set categories: the site's categories, from `q=category`, or a new one, picked and written to the note. |
-| `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, the dialogs, the category picker (`category-picker.ts`), and a post's pill and next step in its title bar (`title-bar.ts`). |
+| `src/ui/` | The settings tab, with the token as one of Obsidian's secrets, the dialogs, the category picker (`category-picker.ts`), and a post's status and next step in its title bar (`title-bar.ts`). |
 | `src/context.ts` | What a command needs from the plugin, and nothing else: the app, the settings, and saving them. |
 | `src/main.ts` | Registers the six commands, the file menu items, and the title bar, which follows the open notes. Sends one note at a time, and after a note's first public send, updates the posts that link to it, one at a time, when you agree. |
-| `styles.css` | The title bar's pill. |
+| `styles.css` | The post's status in the title bar. |
 | `src/modules.d.ts` | What esbuild bundles from the core: its filters as text and its font as bytes. |
 
 **Every decision belongs in the core**, or, for Micropub, in pure code here

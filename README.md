@@ -5,8 +5,8 @@
 Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
 which turns your Zotero library into a reading queue, with a note for each
 paper, and [Due Credit](https://community.obsidian.md/plugins/due-credit), which
-exports a note to Word, PDF or LaTeX with its links turned into real citations.
-See [Works well with](#10-works-well-with).
+exports a note to Word, PDF, Markdown or LaTeX with its links turned into real
+citations. See [Works well with](#10-works-well-with).
 
 <br/>
 
@@ -224,6 +224,8 @@ makes sense inside Obsidian:
 | A link to a note you haven't published, or only sent as a draft | Its words, as Obsidian shows them: the alias after the `\|`, or the note's name. In the Open lists these links before it sends. When you publish that note later, it offers to update the posts that link to it. |
 | `> [!note] Title` | A quote with the title in bold. |
 | `==highlight==` | Plain text, because a site has no highlight of its own. |
+| A backslash, like `C:\path\x` | As written, as Obsidian shows it. |
+| `[Smith](smith-2017.md)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`: a citation, a link to a post, or its words. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |
 | Your headings | A level down, under the post's title, which the site shows as the page's heading. |
 
@@ -313,6 +315,11 @@ file explorer or on its tab.
 | **Citation key property** | `citekey` | The property that holds a paper note's citation key. A link to a paper note cites its key, whatever the note is called. Paper Trail writes `citekey`. |
 | **Citation style** | Chicago author-date | The name of a style Zotero has installed, such as `apa` or `ieee`, or the path to a `.csl` file. Leave it empty for Chicago author-date. |
 
+A setting that has to agree with your vault or your computer says so right
+under it, in the settings: a site that isn't https, a bibliography or style
+that isn't there, a papers folder with no notes in it, or a citation key
+property no note has.
+
 <br/>
 
 ## 10 Works well with
@@ -323,10 +330,11 @@ together nicely.
 ### 10.1 Paper Trail
 
 [Paper Trail](https://community.obsidian.md/plugins/paper-trail) turns your
-Zotero library into a reading queue, with a note for each paper. Each paper
-note gets a `citekey` property, which keeps your citations working even when
-Better BibTeX changes a key. Its **Insert annotation** quotes a passage from a
-paper, with a citation that In the Open publishes.
+Zotero library into a reading queue, with a note for each paper. With Better
+BibTeX, each paper note gets a `citekey` property, which keeps your citations
+working even when Better BibTeX changes a key. Without it, the notes have no
+key, so a link to one is published as plain text. Its **Insert annotation**
+quotes a passage from a paper, with a citation that In the Open publishes.
 
 ### 10.2 Due Credit
 
@@ -383,14 +391,17 @@ ships with, a fingerprint of the file pandoc released.
 
 - **Notes:** The note you publish, and the citation keys, `published-url` and
   `post-status` of the notes it links to. The first time a note is public,
-  which of your notes link to it, and their `post-status`. The `published-url` and `post-status` of the
-  notes you have open, for their title bar.
+  which of your notes link to it, and their `post-status`. The `published-url`
+  and `post-status` of the notes you have open, for their title bar.
 - **Template:** `Post.md` in the template folder, when you make a new post.
 - **Bibliography:** The `.bib` file you set in **Bibliography**.
 - **Citation style:** From Zotero's styles folder (`~/Zotero/styles`), or the
   `.csl` file you set.
 - **Obsidian's settings:** Whether strict line breaks are on, from the vault's
   `app.json`.
+- **The settings tab:** The path and properties of every note, while it's
+  open, to say when your **Papers folder** has no notes or no note has your
+  **Citation key property**.
 - **Your PATH:** The folders your computer looks in for programs, to find an
   installed pandoc.
 - **The built-in pandoc:** `pandoc-3.13.wasm` in your cache folder, when

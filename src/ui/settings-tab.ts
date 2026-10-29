@@ -30,7 +30,7 @@ export class SettingsTab extends PluginSettingTab {
 		const adapter = this.app.vault.adapter;
 		if (value === '' || !(adapter instanceof FileSystemAdapter)) return '';
 		const path = settingPath(value, adapter.getBasePath(), homedir());
-		return existsSync(path) ? '' : ` ⚠ There's no file at ${path}. ${stops} until you fix or clear this.`;
+		return existsSync(path) ? '' : ` ⚠ There's no file at ${path}, so ${stops} until you fix or clear this.`;
 	}
 
 	private siteStatus(): string {
@@ -42,7 +42,7 @@ export class SettingsTab extends PluginSettingTab {
 		const value = this.plugin.settings.csl;
 		if (value === '') return '';
 		const path = stylePath(value, homedir());
-		return existsSync(path) ? '' : ` ⚠ There's no style at ${path}.`;
+		return existsSync(path) ? '' : ` ⚠ There's no citation style at ${path}.`;
 	}
 
 	private papersStatus(): string {
@@ -115,7 +115,7 @@ export class SettingsTab extends PluginSettingTab {
 						name: 'Bibliography',
 						desc:
 							'The .bib file Better BibTeX keeps up to date. It can be in your vault, or anywhere else with a path that starts with / or ~. A link to one of its citation keys, like [[marsh2024]], is published as a citation. Leave it empty to publish without citations.' +
-							this.fileStatus(this.plugin.settings.bibliography, 'Publishing stops'),
+							this.fileStatus(this.plugin.settings.bibliography, 'publishing stops'),
 						control: { type: 'text', key: 'bibliography', placeholder: 'Literature/library.bib' },
 					},
 					{
