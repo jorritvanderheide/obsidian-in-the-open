@@ -69,6 +69,10 @@ A new form is read before Paper Trail writes it: the core learns it and is
 tagged, Due Credit and In the Open are released on that core, and only then
 does Paper Trail write it.
 
+Paper Trail 2.1.0 names a note for a key with a colon or a slash with a dash,
+keeping the key in `citekey`. Its citations need In the Open 1.4.0 for a colon
+and 1.5.0 for a slash.
+
 ## The core
 
 How a note is read, which links cite and how a post is put together are the

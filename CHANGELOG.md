@@ -3,6 +3,18 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- A Markdown link is read as a link to a note only when it points at one, a
+  `.md` file. 1.5.0 also listed links to web pages, folders and PDFs before
+  publishing. A Markdown link in a table no longer splits its cell, a path with
+  parentheses is read whole, and an image inside a link, a footnote and math
+  are left alone.
+- A backslash before a space is published as written, so a quote ending in
+  `C:\temp\` keeps its last backslash.
+- The list before publishing reads a `]` in a link's words.
+- The temporary folders publishing uses are called `obsidian-citation-core-…`.
+
 ## 1.5.0
 
 - A backslash in a note is published as it shows in Obsidian, so a Windows
