@@ -4,14 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    # The core, for its own checks at the commit this plugin is built with.
-    # npm takes the same commit from its GitHub mirror (package.json), and
-    # checks.core-pin holds the two together. Update both with:
-    # nix flake update citation-core, then
-    # npm install git+https://github.com/jorritvanderheide/obsidian-citation-core.git#<rev>
-    # With its own nixpkgs, not this one's. The pandoc its tests expect it
-    # fetches by URL and hash itself, so that stays the same either way.
-    citation-core.url = "git+https://codeberg.org/BW20/obsidian-citation-core";
   };
 
   outputs =
@@ -19,7 +11,6 @@
       self,
       nixpkgs,
       flake-utils,
-      citation-core,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -27,12 +18,6 @@
       let
         pkgs = import nixpkgs { inherit system; };
         package = builtins.fromJSON (builtins.readFile ./package.json);
-        inherit (pkgs) lib;
-        # The core's commit as npm has it: the part of its address after `#`.
-        lock = builtins.fromJSON (builtins.readFile ./package-lock.json);
-        npmCore = lib.last (
-          lib.splitString "#" lock.packages."node_modules/obsidian-citation-core".resolved
-        );
       in
       {
         packages.default = pkgs.buildNpmPackage {
@@ -62,19 +47,9 @@
 
         # CI runs nix flake check, which builds this, so npmDepsHash can't fall
         # behind package-lock.json unnoticed. The core's own checks, its tests
-        # with pandoc among them, run too, at the commit this plugin is built
-        # from.
-        checks = {
-          default = self.packages.${system}.default;
-          core = citation-core.checks.${system}.default;
-          # npm's core and the flake's are one commit, or the core's checks would
-          # pass for code the plugin doesn't bundle.
-          core-pin =
-            if npmCore == citation-core.rev then
-              pkgs.emptyFile
-            else
-              throw "package-lock.json has the core at ${npmCore}, flake.lock at ${citation-core.rev}: move both to one commit.";
-        };
+        # with pandoc among them, run in the core, before the version this
+        # plugin pins is tagged.
+        checks.default = self.packages.${system}.default;
 
         devShells.default = pkgs.mkShell {
           buildInputs = [ pkgs.nodejs_24 ];

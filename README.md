@@ -481,8 +481,11 @@ built:
 gh attestation verify main.js --repo jorritvanderheide/obsidian-in-the-open
 ```
 
-The citation tests also run through a real pandoc, always the same version.
-A change in pandoc's output shows up as a failing test.
+The citation tests run through a real pandoc, always the same version, in
+[obsidian-citation-core](https://codeberg.org/BW20/obsidian-citation-core),
+which holds the citation code. A release only uses a version of it that
+passed them, so a change in pandoc's output shows up as a failing test before
+it reaches you.
 
 <br/>
 

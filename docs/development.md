@@ -32,21 +32,20 @@ npm run build   # type check and production build
 
 CI runs all three, on Node 24, for every push to `main` and every pull
 request, and again before every release (`.github/workflows/ci.yml`). It also
-runs `nix flake check`, which builds the plugin with Nix, runs its tests,
-and runs the core's checks: after a change to `package-lock.json`, update `npmDepsHash` in
-`flake.nix`, as its comment says.
+runs `nix flake check`, which builds the plugin with Nix and runs its tests:
+after a change to `package-lock.json`, update `npmDepsHash` in `flake.nix`, as
+its comment says.
 
 ## The core's version
 
-The core is pinned twice, at one commit: in `package.json`, which npm builds
-with, and in `flake.lock`, which `nix flake check` runs the core's own checks
-at. `checks.core-pin` fails when the two disagree. A plugin pins only a tagged
-core version. To move to a newer one, once its tag is on Codeberg and the
-GitHub mirror:
+The core is pinned once, in `package.json`, which npm builds with. A plugin
+pins only a tagged core version, and the core's own checks, its filter tests
+through a real pandoc among them, pass on a commit before it is tagged, so
+they don't run again here. To move to a newer one, once its tag is on Codeberg
+and the GitHub mirror:
 
 ```sh
-nix flake update citation-core
-rev=$(node -p "JSON.parse(require('fs').readFileSync('flake.lock', 'utf8')).nodes['citation-core'].locked.rev")
+rev=$(git ls-remote https://codeberg.org/BW20/obsidian-citation-core.git refs/tags/<x.y.z> | cut -f1)
 npm install "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#$rev"
 nix run nixpkgs#prefetch-npm-deps -- package-lock.json   # the new npmDepsHash
 ```

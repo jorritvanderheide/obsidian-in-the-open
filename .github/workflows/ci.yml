@@ -31,8 +31,7 @@ jobs:
             - run: npm run lint
             - run: npm test
 
-    # The flake's package, so its npmDepsHash can't fall behind package-lock.json,
-    # and the core's checks, its filter tests among them, with the pandoc they expect.
+    # The flake's package, so its npmDepsHash can't fall behind package-lock.json.
     nix:
         runs-on: ubuntu-latest
         timeout-minutes: 30
