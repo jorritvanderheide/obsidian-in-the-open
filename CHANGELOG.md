@@ -3,6 +3,14 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- An image with a line in italics right under it, like
+  `*A raised bed in March.*`, is published as a figure with that line as its
+  caption. That's how a caption looks in Obsidian. A site that takes
+  Markdown gets the image and the caption in italics as two paragraphs, and
+  can show them as a figure.
+
 ## 1.2.2
 
 - An image alone in its paragraph no longer shows its alt text under it on

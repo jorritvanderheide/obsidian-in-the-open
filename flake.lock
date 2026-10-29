@@ -6,11 +6,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1793258119,
-        "narHash": "sha256-a3VVDtOnBSUYrIOoQDWYV7R6q/v5i3vvcJ5PUzO92kY=",
+        "lastModified": 1793265460,
+        "narHash": "sha256-GmfQmx6VHF5Bb4F7XBrGeC82nW0OiUqoyj4B2pMU9yQ=",
         "ref": "refs/heads/main",
-        "rev": "b6b7caa7e69ba8ffab7e578b0d47c0daecec50b9",
-        "revCount": 14,
+        "rev": "5f9cf3f87b04e0f6d8790aee518a0d841f50da84",
+        "revCount": 16,
         "type": "git",
         "url": "https://codeberg.org/BW20/obsidian-citation-core"
       },

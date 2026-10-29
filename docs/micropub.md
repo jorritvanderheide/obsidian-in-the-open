@@ -102,6 +102,11 @@ that it still isn't after a few minutes.
   another post on the same site is that post's URL, as its `Location` gave
   it.
 - **Every image is a URL the media endpoint returned**, and has alt text.
+- **A figure is an image in a paragraph of its own, followed by a paragraph
+  that is all italics**, its caption. CommonMark has no figures, so a site
+  that takes the references extension finds them this way; in HTML a figure
+  is a `<figure>` with a `<figcaption>`. An image alone in its paragraph,
+  without that caption, is only an image: its alt text is not a caption.
 
 Each image is uploaded before the post, to the media endpoint, as
 `multipart/form-data` with the file in a field called `file`. The endpoint
