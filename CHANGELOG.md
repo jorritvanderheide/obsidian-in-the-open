@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.6.0
 
 - The first time you send a note, In the Open lists what in it your site won't
   show as Obsidian does, before it sends: callouts, math, Mermaid diagrams,
