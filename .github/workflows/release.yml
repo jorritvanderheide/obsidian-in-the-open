@@ -12,20 +12,29 @@ on:
 permissions:
     contents: read
 
+# One release run per tag at a time.
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
+
 jobs:
     ci:
         uses: ./.github/workflows/ci.yml
 
+    # Builds and attests, and can't touch the repository: no write access, no
+    # token left in the checkout, and no dependency's install script runs.
     build:
         needs: [ci]
         runs-on: ubuntu-latest
         timeout-minutes: 15
         permissions:
-            contents: write
+            contents: read
             id-token: write
             attestations: write
         steps:
             - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+              with:
+                  persist-credentials: false
 
             # Obsidian installs the release whose tag is the version in
             # manifest.json, so the three must agree.
@@ -48,34 +57,55 @@ jobs:
 
             - name: Build plugin
               run: |
-                  npm ci
+                  npm ci --ignore-scripts
                   npm run build
 
-            - name: Check for optional styles
-              id: styles
+            # What a user downloads, and the notes: the version's part of
+            # CHANGELOG.md, if it has one.
+            - name: Collect the release
               run: |
-                  [ -f styles.css ] && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
+                  mkdir release
+                  cp main.js manifest.json release/
+                  if [ -f styles.css ]; then cp styles.css release/; fi
+                  awk -v v="## $GITHUB_REF_NAME" '$0 == v { on = 1; next } /^## / { on = 0 } on' CHANGELOG.md > notes.md
 
             - name: Attest build provenance
               uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
               with:
-                  subject-path: |
-                      main.js
-                      ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+                  subject-path: release/*
+
+            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: release
+                  path: |
+                      release/
+                      notes.md
+                  if-no-files-found: error
+
+    # Only puts what build attested into a draft release. The one job that can
+    # write to the repository runs none of its code.
+    release:
+        needs: [build]
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: release
 
             - name: Create release
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   tag="$GITHUB_REF_NAME"
-                  name=$(node -p "require('./manifest.json').name")
+                  name=$(node -p "require('./release/manifest.json').name")
                   # Tags like 1.2.0-beta.1 are pre-releases, for beta testers.
                   prerelease=()
                   case "$tag" in *-*) prerelease=(--prerelease) ;; esac
-                  # The notes are the version's part of CHANGELOG.md, if it has one.
-                  awk -v v="## $tag" '$0 == v { on = 1; next } /^## / { on = 0 } on' CHANGELOG.md > notes.md
                   notes=(--generate-notes)
                   if grep -q '[^[:space:]]' notes.md; then notes=(--notes-file notes.md); fi
-                  gh release create "$tag" \
+                  gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
                     --verify-tag --draft "${prerelease[@]}" --title "$name $tag" "${notes[@]}" \
-                    main.js manifest.json ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+                    release/*

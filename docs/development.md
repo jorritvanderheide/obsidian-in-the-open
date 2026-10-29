@@ -72,10 +72,12 @@ under `## Unreleased`.
    core's commit has to be on Codeberg and its GitHub mirror first, since npm
    takes it from the mirror and Nix from Codeberg.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
-   checks, makes sure the tag is the version in `manifest.json`,
-   `package.json` and `versions.json`, builds it, attests `main.js` and
-   `styles.css`, and creates a **draft** GitHub release named like "In the
-   Open 1.0.0", with the version's part of `CHANGELOG.md` as its notes.
+   checks, makes sure the tag is the version in `manifest.json`, `package.json`
+   and `versions.json`, and builds it without running any dependency's install
+   script. It attests `main.js`, `manifest.json` and `styles.css`, and a second
+   job, the only one that can write to the repository, puts them in a **draft**
+   GitHub release named like "In the Open 1.0.0", with the version's part of
+   `CHANGELOG.md` as its notes.
 5. **Publish the draft.** Obsidian's community directory installs from GitHub
    releases, and a tag alone is not one. The first release is also submitted
    to the directory, in obsidianmd/obsidian-releases.
