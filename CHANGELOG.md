@@ -11,6 +11,20 @@ breaking is in [Compatibility](docs/compatibility.md).
   Debian 13 install a pandoc in that range. In the Open now says so once a
   session, and still publishes. A pandoc older than 3.0 can't read a note at
   all, and the message now says which version is needed.
+- A backslash before a space goes to pandoc as you wrote it again, as before
+  1.5.1, and pandoc reads it as a space that doesn't break. 1.5.1 kept it as
+  a backslash, but that also doubled backslashes in a link's words, in
+  indented code and in raw HTML. Write `\\` for a backslash before a space.
+- A Markdown link to a note without `.md`, `[Smith](smith-2017)`, is a
+  citation, a link to a post or its words, as Obsidian reads it, and so is
+  one with a title or with brackets in its words. A link after an escaped
+  backslash is read too, and one in a table row without a leading `|` no
+  longer splits its cell.
+- Math is found as pandoc finds it. A link next to a price, like `\$5`, is
+  read, math no longer runs past a blank line, and the list of what your site
+  won't show no longer takes a price for math.
+- The list before publishing reads your bibliography's keys exactly as
+  publishing does, so it no longer misses or adds the odd citation.
 
 ## 1.6.0
 

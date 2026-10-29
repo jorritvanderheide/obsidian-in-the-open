@@ -82,8 +82,8 @@ with pandoc" in the README here.
 3. **Push** the commit, then tag it, named for the version without a `v`:
    `jj tag set <x.y.z> -r <commit>`, and `git push codeberg <x.y.z>`, since jj
    doesn't push tags. Codeberg is the only remote: GitHub mirrors it. The
-   core's commit has to be on Codeberg and its GitHub mirror first, since npm
-   takes it from the mirror and Nix from Codeberg.
+   core's commit has to be on its GitHub mirror first, since npm takes it
+   from there.
 4. When the tag reaches GitHub, `.github/workflows/release.yml` runs the CI
    checks, makes sure the tag is the version in `manifest.json`, `package.json`
    and `versions.json`, and builds it without running any dependency's install

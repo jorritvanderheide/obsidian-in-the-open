@@ -234,8 +234,8 @@ of site in [6.2](#62-what-your-site-gets) differ, the table says so:
 | `- [ ]` and `- [x]` tasks | A task list, each box ticked or not. |
 | `$E=mc^2$` and `$$` math | As you wrote it, as code. A site draws no math. |
 | A `mermaid` diagram | Its code. A site draws no diagrams. |
-| A backslash, like `C:\path\x` | As written, as Obsidian shows it. |
-| `[Smith](smith-2017.md)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`: a citation, a link to a post, or its words. |
+| A backslash, like `C:\path\x` | As written, as Obsidian shows it. Before a space, pandoc reads one as a space that doesn't break, so write `\\` for a backslash there. |
+| `[Smith](smith-2017.md)` or `[Smith](smith-2017)`, a Markdown link to a note | The same as `[[smith-2017\|Smith]]`: a citation, a link to a post, or its words. |
 | `[^1]` and `^[inline]` footnotes | Footnotes. |
 | Your headings | A level down, under the post's title, which the site shows as the page's heading. |
 
