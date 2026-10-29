@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.5.1
 
 - A Markdown link is read as a link to a note only when it points at one, a
   `.md` file. 1.5.0 also listed links to web pages, folders and PDFs before
