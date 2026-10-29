@@ -19,7 +19,7 @@ installed one, or the built-in one, which it downloads, checks and runs
 | Path | What it holds |
 | --- | --- |
 | `src/core/settings.ts` | The settings shape, defaults and loading. Pure, with a test named after it. |
-| `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config` and `q=source`, the requests' bodies, an answer's error, images and their upload. Pure, with a test named after it. |
+| `src/core/micropub.ts` | Micropub as In the Open speaks it: finding the endpoint, `q=config` and `q=source`, the requests' bodies, an answer's error, images and their upload, whether an address is on your site, and whether a post goes out as Markdown or HTML. Pure, with a test named after it. |
 | `src/core/status.ts` | Where a note's post stands, from its `published-url` and `post-status`, which posts another post may link to, and when a send makes a note public. Pure, with a test named after it. |
 | `src/core/links.ts` | Which published posts link to a note, to update once it has a post. Pure, with a test named after it. |
 | `src/core/sending.ts` | The new posts sent without hearing back, by their note's path, until the note has the post's address. Pure, with a test named after it. |

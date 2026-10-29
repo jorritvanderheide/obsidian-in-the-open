@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, siteHost, unknownCategories, updateBody, withAddresses, placeholders, withUploads, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, siteHost, onSite, postFormat, unknownCategories, updateBody, withAddresses, placeholders, withUploads, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -255,5 +255,21 @@ describe('siteHost', () => {
 		for (const site of ['bw20.nl', 'http://bw20.nl', 'not an address']) {
 			expect(() => siteHost(site)).toThrow(`${site} isn't an address In the Open can publish to. Set your site's address in Settings → In the Open, starting with https://, as https://example.org.`);
 		}
+	});
+});
+
+describe('onSite', () => {
+	it('is true for an address under the site, and not for the site itself or one that only starts alike', () => {
+		expect(onSite('https://bw20.nl/log/quiet', 'https://bw20.nl')).toBe(true);
+		expect(onSite('https://bw20.nl', 'https://bw20.nl')).toBe(false);
+		expect(onSite('https://bw20.nl.example.org/log', 'https://bw20.nl')).toBe(false);
+		expect(onSite('http://bw20.nl/log/quiet', 'https://bw20.nl')).toBe(false);
+	});
+});
+
+describe('postFormat', () => {
+	it('is Markdown for a site that takes the references extension, and HTML for any other', () => {
+		expect(postFormat({ mediaEndpoint: null, references: 1, drafts: false })).toBe('markdown');
+		expect(postFormat({ mediaEndpoint: null, references: null, drafts: true })).toBe('html');
 	});
 });

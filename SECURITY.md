@@ -20,11 +20,15 @@ your report before anything about it is made public.
 ## What counts
 
 In the Open sends the note you publish to the site you set, with your token.
-It reads that note, your bibliography and your citation style. Into that note
-it writes only the post's address and status, a summary you type in, and
-categories you set. **New post** also makes a note, and the template it starts
-from. Once, if you agree, In the Open downloads the built-in pandoc from
-pandoc's release on GitHub into your cache folder, outside the vault.
+It reads that note and the citation keys and posts of the notes it links to,
+your bibliography, your citation style, whether strict line breaks are on in
+your vault's settings, and the folders on your PATH, to find pandoc. For each
+publish, it writes the files pandoc needs to a temporary folder and removes
+them afterwards. Into the note you publish it writes only the post's address
+and status, a summary you type in, and categories you set. **New post** also
+makes a note, and the template it starts from. Once, if you agree, In the Open
+downloads the built-in pandoc from pandoc's release on GitHub into your cache
+folder, outside the vault.
 [Section 11 of the README](README.md#11-network-and-file-disclosure) has the
 full list. These are security problems:
 

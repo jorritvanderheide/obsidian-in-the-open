@@ -65,6 +65,15 @@ citation**, and In the Open reads them through the same core, as it does the
 one form Paper Trail's **Insert annotation** writes. No longer reading one is
 breaking for all three plugins.
 
+## The core
+
+How a note is read, which links cite and how a post is put together are the
+core's doing, so the promises on this page hold for the core version a
+release bundles. A release that moves to a new one reads the core's
+[`CHANGELOG.md`](https://codeberg.org/BW20/obsidian-citation-core/src/branch/main/CHANGELOG.md)
+since the last, checks each change against this page, and writes what users
+notice under `## Unreleased`.
+
 ## Obsidian and pandoc
 
 - **`minAppVersion`** is 1.13.0. Raising it isn't breaking, because

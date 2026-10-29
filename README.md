@@ -10,6 +10,7 @@ exports a note to Word, PDF or LaTeX with the same citations. See
 
 <br/>
 
+![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=Downloads&query=%24%5B%22in-the-open%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)
 ![Obsidian Compatibility](https://img.shields.io/badge/Obsidian-v1.13.0+-483699?logo=obsidian&style=flat-square)
 ![Desktop only](https://img.shields.io/badge/platform-desktop-483699?style=flat-square)
 [![Checks](https://github.com/jorritvanderheide/obsidian-in-the-open/actions/workflows/ci.yml/badge.svg)](https://github.com/jorritvanderheide/obsidian-in-the-open/actions/workflows/ci.yml)
@@ -354,7 +355,9 @@ that link to a note you just published:
 - **References:** Every work the note cites, from your bibliography. A site
   with the references extension gets them on their own. Any other site gets
   them as the reference list at the end of the post.
-- **Images:** The images in the note.
+- **Images:** The images in the note, uploaded before the post is sent. If
+  sending the post fails after that, they stay on your site, and the next
+  publish uploads them again: Micropub has no way to take an image back.
 - **Whether it's a draft:** A draft is sent with `post-status` set to
   `draft`, and publishing it sends `published`.
 - **Why it's withdrawn:** What you type when you withdraw a post, if anything.

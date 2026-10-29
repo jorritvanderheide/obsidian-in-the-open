@@ -40,8 +40,9 @@ and runs the core's checks: after a change to `package-lock.json`, update `npmDe
 
 The core is pinned twice, at one commit: in `package.json`, which npm builds
 with, and in `flake.lock`, which `nix flake check` runs the core's own checks
-at. `checks.core-pin` fails when the two disagree. To move to a newer core,
-once its commit is on Codeberg and the GitHub mirror:
+at. `checks.core-pin` fails when the two disagree. A plugin pins only a tagged
+core version. To move to a newer one, once its tag is on Codeberg and the
+GitHub mirror:
 
 ```sh
 nix flake update citation-core
@@ -50,7 +51,11 @@ npm install "git+https://github.com/jorritvanderheide/obsidian-citation-core.git
 nix run nixpkgs#prefetch-npm-deps -- package-lock.json   # the new npmDepsHash
 ```
 
-Then build and test here.
+npm writes the dependency as `github:…#<rev>` in `package.json`, and resolves
+it to a `git+ssh://` address in `package-lock.json`. A checkout without SSH
+keys builds from it all the same, as CI does. Then build and test here, read
+the core's `CHANGELOG.md` since the last version, and write what users notice
+under `## Unreleased`.
 
 ## Releasing
 

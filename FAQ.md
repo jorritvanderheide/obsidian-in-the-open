@@ -6,6 +6,7 @@ Can't find your answer here? Please
 - [Connecting to your site](#connecting-to-your-site)
 - [Pandoc](#pandoc)
 - [Publishing](#publishing)
+- [Other](#other)
 
 ## Connecting to your site
 
@@ -143,8 +144,9 @@ link goes to the new post.
 The same list has links to papers your bibliography doesn't have, and links
 to no note at all. Those go out as their names instead of citations. For a
 paper, usually Better BibTeX changed the key, or its auto-export hasn't run
-since you added the paper. You can publish anyway, or cancel and fix the link
-first.
+since you added the paper. A paper note without a citation key property is
+looked up by its name, so it only cites when it's named for its key. You can
+publish anyway, or cancel and fix the link first.
 
 ### "A post links to …" or "… posts link to …"
 
@@ -191,3 +193,16 @@ this note, by hand or by another tool. Publishing the note again would replace
 that change, so In the Open asks first. **Replace it** sends the note as it
 is. To keep the change, copy it into the note first, then publish. Not every
 site keeps track of this. One that doesn't is simply updated.
+
+## Other
+
+### Does it work on mobile?
+
+No. In the Open runs pandoc, installed or built-in, and both need parts of
+Obsidian that only the desktop app has.
+
+### Why don't the commands have hotkeys?
+
+You already have hotkeys In the Open knows nothing about, and a default that
+collides with one of yours is worse than no default. Pick your own in Settings
+→ Hotkeys.

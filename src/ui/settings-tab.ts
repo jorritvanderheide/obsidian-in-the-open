@@ -1,8 +1,7 @@
 import { existsSync } from 'fs';
 import { homedir } from 'os';
-import { join } from 'path';
 import { FileSystemAdapter, PluginSettingTab, SecretComponent, type App, type SettingDefinitionItem } from 'obsidian';
-import { cslPath, expandHome, settingPath } from 'obsidian-citation-core';
+import { keyPropertyStatus, papersFolderStatus, settingPath, stylePath } from 'obsidian-citation-core';
 import { secure } from '../core/micropub';
 import { loadSettings, type Settings } from '../core/settings';
 import type InTheOpen from '../main';
@@ -42,9 +41,24 @@ export class SettingsTab extends PluginSettingTab {
 	private cslStatus(): string {
 		const value = this.plugin.settings.csl;
 		if (value === '') return '';
-		const home = homedir();
-		const path = cslPath(expandHome(value, home), join(home, 'Zotero', 'styles'));
+		const path = stylePath(value, homedir());
 		return existsSync(path) ? '' : ` ⚠ There's no style at ${path}.`;
+	}
+
+	private papersStatus(): string {
+		const folder = this.plugin.settings.literatureFolder;
+		if (folder === '') return '';
+		const status = papersFolderStatus(this.app.vault.getMarkdownFiles().map((file) => file.path), folder);
+		return status === null ? '' : ` ⚠ ${status}`;
+	}
+
+	// Said without a warning sign: naming paper notes for their keys works
+	// without the property, and someone who does is not doing it wrong.
+	private keyStatus(): string {
+		const property = this.plugin.settings.keyProperty;
+		if (property === '') return '';
+		const status = keyPropertyStatus(this.app.vault.getMarkdownFiles().map((file) => this.app.metadataCache.getFileCache(file)?.frontmatter), property);
+		return status === null ? '' : ` ${status}`;
 	}
 
 	getSettingDefinitions(): SettingDefinitionItem[] {
@@ -106,12 +120,12 @@ export class SettingsTab extends PluginSettingTab {
 					},
 					{
 						name: 'Papers folder',
-						desc: "Where your paper notes are. Before you publish, In the Open lists any link to a paper that isn't in your bibliography, so a changed key can't quietly turn a citation into plain text.",
+						desc: "Where your paper notes are. Before you publish, In the Open lists any link to a paper that isn't in your bibliography, so a changed key can't quietly turn a citation into plain text." + this.papersStatus(),
 						control: { type: 'folder', key: 'literatureFolder', placeholder: 'Literature' },
 					},
 					{
 						name: 'Citation key property',
-						desc: 'The property that holds a paper note’s citation key. A link to a paper note cites its key, whatever the note is called. Paper Trail writes citekey.',
+						desc: 'The property that holds a paper note’s citation key. A link to a paper note cites its key, whatever the note is called. Paper Trail writes citekey.' + this.keyStatus(),
 						control: { type: 'text', key: 'keyProperty', placeholder: 'citekey' },
 					},
 					{

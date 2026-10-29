@@ -9,10 +9,10 @@ import {
 	bibKeys,
 	BUILT_IN,
 	builtInFolder,
-	cslPath,
-	expandHome,
 	ExportError,
 	lineBreaks,
+	missingBibliography,
+	missingStyle,
 	noteStyle,
 	postArgs,
 	postProperties,
@@ -21,12 +21,13 @@ import {
 	pandocFor,
 	seen,
 	settingPath,
+	stylePath,
 	withFiles,
 	type Missing,
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, placeholders, PublishError, RefusedError, siteHost, unknownCategories, updateBody, withAddresses, withUploads, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, onSite, placeholders, postFormat, PublishError, RefusedError, siteHost, unknownCategories, updateBody, withAddresses, withUploads, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
@@ -93,13 +94,9 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const home = homedir();
 
 	const bibliography = settings.bibliography ? settingPath(settings.bibliography, vault, home) : null;
-	if (bibliography && !existsSync(bibliography)) {
-		throw new PublishError(`There's no bibliography at ${bibliography}. Point the Bibliography setting at your Better BibTeX export, or clear it to publish without citations.`);
-	}
-	const csl = settings.csl ? cslPath(expandHome(settings.csl, home), join(home, 'Zotero', 'styles')) : null;
-	if (csl && !existsSync(csl)) {
-		throw new PublishError(`There's no citation style at ${csl}. Use the name of a style Zotero has installed, such as apa, or the path to a .csl file.`);
-	}
+	if (bibliography && !existsSync(bibliography)) throw new PublishError(missingBibliography(bibliography, 'publish'));
+	const csl = settings.csl ? stylePath(settings.csl, home) : null;
+	if (csl && !existsSync(csl)) throw new PublishError(missingStyle(csl));
 
 	// Asked for before anything is sent, and kept in the note, so it's asked
 	// once. The metadata cache may not have the new property yet when the post
@@ -156,7 +153,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const { wasDraft } = sending;
 	const refusedDraft = draftRefusal(sending, target.config.drafts);
 	if (refusedDraft !== null) throw new PublishError(refusedDraft);
-	const format: Format = target.config.references !== null ? 'markdown' : 'html';
+	const format: Format = postFormat(target.config);
 
 	// The editor rather than the file when the note is open, since the file
 	// can be a couple of seconds behind what you just typed.
@@ -181,7 +178,7 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const linkedPost = (linkpath: string) => {
 		const dest = app.metadataCache.getFirstLinkpathDest(linkpath, file.path);
 		const url = dest && linkable(statusOf(app.metadataCache.getFileCache(dest)?.frontmatter)) ? postOf(context, dest) : null;
-		return url !== null && url.startsWith(`${settings.site}/`) ? url : null;
+		return url !== null && onSite(url, settings.site) ? url : null;
 	};
 	const prepared = prepare(text, lookup, {
 		name: file.basename,
@@ -424,7 +421,6 @@ export async function showing<T>(text: string, work: () => Promise<T>): Promise<
 	}
 }
 
-/** Write where the note's post stands, and its address: a new one, or null to forget it. */
 /**
  * The posts to update now that `file` is public, after asking: the published
  * posts that link to it, which show that link as words. Empty when there are
@@ -499,7 +495,7 @@ async function relink(context: Context, file: TFile, host: string): Promise<void
 	});
 	if (answer === null) return;
 	const url = answer.trim();
-	if (!url.startsWith(`${settings.site}/`)) throw new PublishError(`${url} isn't an address on ${host}. Paste the address of the post on your site, starting with ${settings.site}/.`);
+	if (!onSite(url, settings.site)) throw new PublishError(`${url} isn't an address on ${host}. Paste the address of the post on your site, starting with ${settings.site}/.`);
 	const page = await showing(`Looking for ${file.basename} on ${host}…`, () => send(url).catch(() => null));
 	if (page?.status !== 200) throw new PublishError(`There's no post at ${url}, or ${host} didn't show it. Open the address in a browser to check it, then try again.`);
 	const draft = await isDraft(await site(context), url);
@@ -539,6 +535,7 @@ export function noteDeleted(app: App, path: string): void {
 	forget(app, path);
 }
 
+/** Write where the note's post stands, and its address: a new one, or null to forget it. */
 function record(context: Context, file: TFile, status: PostStatus, url?: string | null): Promise<void> {
 	return writeProperties(context, file, (frontmatter) => {
 		if (url === null) delete frontmatter[POST_PROPERTY];
@@ -616,7 +613,7 @@ function confirmMissing(context: Context, missing: Missing, count: number, bib: 
 			if (missing.papers.length > 0) {
 				el.createEl('p', { text: `These link to papers that ${bib} doesn't have, so they'll show as plain names instead of citations:` });
 				list(el, missing.papers);
-				el.createEl('p', { text: "Usually Better BibTeX changed the key, or its auto-export hasn't run since you added the paper." });
+				el.createEl('p', { text: `Usually Better BibTeX changed the key, or its auto-export hasn't run since you added the paper. A paper note without a ${context.settings.keyProperty} property is looked up by its name, so it only cites when it's named for its key.` });
 			}
 			if (missing.unresolved.length > 0) {
 				el.createEl('p', { text: `These don't link to a note, and ${bib} has no key with their name either, so they'll show as plain text:` });

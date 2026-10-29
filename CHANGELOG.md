@@ -8,6 +8,20 @@ breaking is in [Compatibility](docs/compatibility.md).
 - An embed with alt text and a width, like `![[figure.png|A chart|300]]`,
   is published 300 pixels wide with "A chart" as its alt text. Before, the
   width was lost and became part of the alt text.
+- A citation key with a colon in it, like `[[smith:2017]]`, is published as a
+  citation. It used to go out as plain text, and the list before publishing
+  didn't say so.
+- A word after an `@` in a sentence, like a handle in a passage you quoted,
+  stays as you wrote it when your bibliography has no entry by that name. It
+  used to be published as "(jack?)". In brackets, `[@key]` is still a
+  citation.
+- The settings say when there are no notes in your **Papers folder**, and when
+  no note has your **Citation key property**.
+- When a link to a paper note won't cite, the list before publishing also
+  says that a note without a citation key property only cites when it's named
+  for its key.
+- When a citation style isn't found, the message says you can use the path to
+  the `.csl` file, for a Zotero that keeps its data somewhere else.
 
 ## 1.3.0
 

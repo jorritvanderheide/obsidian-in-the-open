@@ -275,6 +275,24 @@ export function failure(response: Response): string {
 }
 
 /**
+ * Whether an address is on the site, under the **Site** setting, which has no
+ * slash at its end. A link in a post becomes a link to another post only when
+ * that post is on this site, and only an address on it is linked to a note.
+ */
+export function onSite(url: string, site: string): boolean {
+	return url.startsWith(`${site}/`);
+}
+
+/**
+ * How a post's text goes out: Markdown to a site that takes the references
+ * extension, and HTML to any other, because Micropub reads a plain string as
+ * plain text.
+ */
+export function postFormat(config: Config): 'markdown' | 'html' {
+	return config.references !== null ? 'markdown' : 'html';
+}
+
+/**
  * The site's host, from the **Site** setting, checked before anything is
  * asked or written: an https address, or a sentence saying what to set.
  */
