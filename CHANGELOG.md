@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.2.2
 
 - An image alone in its paragraph no longer shows its alt text under it on
   your site. The alt text is still there for readers who can't see the image.

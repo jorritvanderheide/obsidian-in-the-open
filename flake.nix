@@ -41,7 +41,7 @@
           inherit (package) version;
           src = ./.;
           # Update with: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-Yqc1M+ga7pTlz8972BxTm2m5vTfmkKi3ubdtg4/0zks=";
+          npmDepsHash = "sha256-ehFSqWWy3wT4zxd/wZ8NYC5UOKzjeKg9Grvq1jSVi6k=";
           nodejs = pkgs.nodejs_24;
           # The tests run with the build, so nix flake check is the whole check.
           doCheck = true;
