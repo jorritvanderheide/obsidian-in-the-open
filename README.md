@@ -5,8 +5,8 @@
 Works well with [Paper Trail](https://community.obsidian.md/plugins/paper-trail),
 which turns your Zotero library into a reading queue, with a note for each
 paper, and [Due Credit](https://community.obsidian.md/plugins/due-credit), which
-exports a note to Word, PDF or LaTeX with the same citations. See
-[Works well with](#10-works-well-with).
+exports a note to Word, PDF or LaTeX with its links turned into real citations.
+See [Works well with](#10-works-well-with).
 
 <br/>
 
@@ -331,8 +331,9 @@ paper, with a citation that In the Open publishes.
 ### 10.2 Due Credit
 
 [Due Credit](https://community.obsidian.md/plugins/due-credit) exports a note
-to Word, PDF or LaTeX. Its **Insert citation** picks a paper from your
-bibliography and writes the link that In the Open publishes as a citation.
+to Word, PDF, Markdown or LaTeX with pandoc, and turns your links into real
+citations. Its **Insert citation** picks a paper from your bibliography and
+writes the link that In the Open publishes as a citation.
 Both plugins read a note with the same code, so a note reads the same on your
 site as in the file you send your supervisor.
 
