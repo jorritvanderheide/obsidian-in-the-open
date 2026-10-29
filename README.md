@@ -76,8 +76,8 @@ In the Open needs Obsidian 1.13 or later, on desktop.
    tells you when the draft is up. A draft stays out of your site's lists and
    feed, so only people with its address can find it. You can read it on your
    site before anyone else does.
-5. **Publish it.** Press the button again. The pill beside it says where the
-   post stands. Click the pill to update, open or withdraw the post.
+5. **Publish it.** Press the button again. Beside it, the title bar says where
+   the post stands. Click that word to update, open or withdraw the post.
 
 <br/>
 
@@ -153,10 +153,10 @@ If you want to work on the plugin, or make your site take its posts:
 
 - **New post** - A note from your post template, with the properties a post
   needs. The template is yours to edit.
-- **In the title bar** - A pill says whether the post is a draft, published
+- **In the title bar** - A word says whether the post is a draft, published
   or withdrawn, and a button beside it offers the next step.
 
-  ![A draft's title bar, with the Draft pill and the Publish button beside it](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/title-bar.png)
+  ![A draft's title bar, with the word Draft and the Publish button beside it](https://raw.githubusercontent.com/jorritvanderheide/obsidian-in-the-open/main/images/title-bar.png)
 
 - **Categories from your site** - **Set categories** offers the categories
   your site already has. You can add a new one too, and a site that takes new
