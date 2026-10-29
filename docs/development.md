@@ -46,7 +46,7 @@ GitHub mirror:
 
 ```sh
 nix flake update citation-core
-rev=$(jq -r '.nodes."citation-core".locked.rev' flake.lock)
+rev=$(node -p "JSON.parse(require('fs').readFileSync('flake.lock', 'utf8')).nodes['citation-core'].locked.rev")
 npm install "git+https://github.com/jorritvanderheide/obsidian-citation-core.git#$rev"
 nix run nixpkgs#prefetch-npm-deps -- package-lock.json   # the new npmDepsHash
 ```
@@ -56,6 +56,20 @@ it to a `git+ssh://` address in `package-lock.json`. A checkout without SSH
 keys builds from it all the same, as CI does. Then build and test here, read
 the core's `CHANGELOG.md` since the last version, and write what users notice
 under `## Unreleased`.
+
+## Tests
+
+Tests are in `tests/`, one per file in `src/core/`, named after it. Two more
+cover the network: `http.test.ts` runs `src/http.ts` against a real server on
+this computer, and `site.test.ts` runs `src/site.ts` with that mocked. The
+core's tests, the filters through a real pandoc among them, are in the core.
+
+### Moving to a newer pandoc
+
+The core's tests expect pandoc 3.13, the built-in pandoc's version, which the
+core's flake pins twice: pandoc's static build, and its WebAssembly build. To
+move to a newer one, do it in the core, as its README says, and update "tested
+with pandoc" in the README here.
 
 ## Releasing
 
@@ -81,3 +95,19 @@ under `## Unreleased`.
 5. **Publish the draft.** Obsidian's community directory installs from GitHub
    releases, and a tag alone is not one. The first release is also submitted
    to the directory, in obsidianmd/obsidian-releases.
+
+## Updating an action
+
+The workflows pin every action to a commit, with the version in a comment, so a
+tag that is moved later can't change what builds a release. Nothing updates
+them automatically, so look at them before a release. To move one to a newer
+version, look up the commit the tag points to and replace both the hash and the
+comment:
+
+```sh
+gh api repos/actions/checkout/commits/v6.1.0 --jq .sha
+```
+
+Both workflows also default to read-only. In the release workflow, the build job
+asks only to sign the attestation, and the release job only to write the
+release, which runs none of the repository's code.

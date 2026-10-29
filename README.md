@@ -419,8 +419,9 @@ ships with, a fingerprint of the file pandoc released.
   categories**. Nothing else in your notes.
 - **New posts:** The note **New post** makes, where Obsidian puts new notes.
 - **Template:** `Post.md` in the template folder, when you make a new post
-  and there's no file with that name. If the file is already there, In the
-  Open never overwrites it, edited or not.
+  and there's no file with that name, and the template folder if it isn't
+  there yet. If the file is already there, In the Open never overwrites it,
+  edited or not.
 - **The built-in pandoc:** When you agree to download it, `pandoc-3.13.wasm`
   (62 MB) in your user cache folder, outside the vault:
   `~/.cache/obsidian-citation-core` on Linux (or in `$XDG_CACHE_HOME`),

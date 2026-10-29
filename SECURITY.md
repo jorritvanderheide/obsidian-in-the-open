@@ -30,9 +30,10 @@ files pandoc needs to a temporary folder and removes them afterwards, and until
 it hears back about a new post, it keeps the note's path and the time in
 Obsidian's local storage on this device. Into the note you publish it writes
 only the post's address and status, a summary you type in, and categories you
-set. **New post** also makes a note, and the template it starts from. Once, if
-you agree, In the Open downloads the built-in pandoc from pandoc's release on
-GitHub into your cache folder, outside the vault.
+set. **New post** also makes a note, and the template it starts from, in a
+template folder it makes if there's none. Once, if you agree, In the Open
+downloads the built-in pandoc from pandoc's release on GitHub into your cache
+folder, outside the vault.
 [Section 11 of the README](README.md#11-network-and-file-disclosure) has the
 full list. These are security problems:
 
