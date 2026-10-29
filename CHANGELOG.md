@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.2.1
 
 - Images are uploaded only once the post is sure to go. An update with
   nothing to send, or one you cancel at a question, no longer uploads them.
