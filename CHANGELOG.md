@@ -3,6 +3,12 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- An embed with alt text and a width, like `![[figure.png|A chart|300]]`,
+  is published 300 pixels wide with "A chart" as its alt text. Before, the
+  width was lost and became part of the alt text.
+
 ## 1.3.0
 
 - An image with a line in italics right under it, like
