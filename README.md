@@ -36,7 +36,8 @@ website. Any site that supports it can take your posts.
 ## 1 Installation
 
 1. **Pandoc.** It's the program that turns a note into a post. If you have it
-   installed, In the Open uses yours, and it's tested with pandoc 3.13. If you
+   installed, In the Open uses yours. It needs pandoc 3.6.4 or later, and it's
+   tested with 3.13. If you
    don't have it, or can't install programs (say, on a computer your work
    manages), In the Open offers to download pandoc's own built-in version the
    first time you publish. That's 17 MB, once.
@@ -458,8 +459,9 @@ ships with, a fingerprint of the file pandoc released.
 - **Pandoc:** The pandoc you set in **Pandoc**. If none is installed, the
   built-in one, which runs inside Obsidian. The built-in pandoc sees only your
   vault, the folders your bibliography and citation style are in, and its
-  temporary folders, and none of the rest of your disk. An installed pandoc
-  can read and write anything you can.
+  temporary folders, and none of the rest of your disk. Before each publish,
+  In the Open asks an installed pandoc its version (`pandoc --version`). An
+  installed pandoc can read and write anything you can.
 
 In the Open runs nothing besides pandoc.
 

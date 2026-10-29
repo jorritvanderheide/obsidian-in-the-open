@@ -204,6 +204,8 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	// have to be downloaded first, which you may not want.
 	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
 	if (pandoc === null) return false;
+	// Once a session, for a pandoc that turns some citations into text.
+	if (pandoc.notice) new Notice(pandoc.notice, 0);
 
 	// Each image is uploaded only once the post is sure to go. Until then a
 	// placeholder stands in for it, which the comparison ignores.

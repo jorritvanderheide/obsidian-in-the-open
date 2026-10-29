@@ -70,6 +70,22 @@ settings to pandoc's full path instead. To find that path, run `which pandoc`
 set it back to `pandoc`. Then In the Open finds an installed pandoc by itself,
 or offers its built-in one.
 
+### "Your pandoc is version …, and it needs to be 3.6.4 or later. Update pandoc, or set the full path to a newer one in Settings → In the Open."
+
+The pandoc In the Open found is older than 3.0, and can't read the links in
+your note at all. Update it from [pandoc's website](https://pandoc.org/installing.html).
+If you have a newer pandoc somewhere else, set its full path in **Pandoc**.
+
+### "Your pandoc is version …, which turns some citations into plain text. Update it to 3.6.4 or later."
+
+Pandoc 3.0 to 3.6.3 runs, but leaves some citations as plain text without
+saying so. A citation key with a colon, like `[[smith:2017]]`, stays text, and
+so does a link to a heading. Sometimes every citation stays as written.
+In the Open says this once a session and publishes anyway.
+Ubuntu 24.04 and Debian 13 install a pandoc in this range. Update it from
+[pandoc's website](https://pandoc.org/installing.html), or set the full path
+to a newer one in **Pandoc**.
+
 ### "Couldn't download pandoc: …"
 
 The download from GitHub failed, or the built-in pandoc couldn't be saved in
