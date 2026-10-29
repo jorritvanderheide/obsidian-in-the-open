@@ -330,7 +330,32 @@ export function images(markdown: string): Image[] {
 	return found;
 }
 
-/** The note with each image's file swapped for the address the media endpoint gave it. */
+/**
+ * An address for each image's file to stand in until it's uploaded, by file.
+ * Pandoc leaves an address like it as it is, and none is part of another.
+ * `.invalid` is a name no site can have.
+ */
+export function placeholders(pictures: Image[]): Map<string, string> {
+	const stand = new Map<string, string>();
+	for (const image of pictures) {
+		if (stand.has(image.path)) continue;
+		const ext = /\.[^./\\]+$/.exec(image.path)?.[0]?.toLowerCase() ?? '';
+		stand.set(image.path, `https://in-the-open.invalid/image-${stand.size + 1}${ext}`);
+	}
+	return stand;
+}
+
+/** The post with each placeholder swapped for the address its image was uploaded to. */
+export function withUploads(post: Post, stand: Map<string, string>, addresses: Map<string, string>): Post {
+	let text = 'markdown' in post.content ? post.content.markdown : post.content.html;
+	for (const [path, placeholder] of stand) {
+		const address = addresses.get(path);
+		if (address !== undefined) text = text.split(placeholder).join(address);
+	}
+	return { ...post, content: 'markdown' in post.content ? { markdown: text } : { html: text } };
+}
+
+/** The note with each image's file swapped for an address: its placeholder, or where the media endpoint put it. */
 export function withAddresses(markdown: string, addresses: Map<string, string>): string {
 	return markdown.replace(IMAGE, (image: string, alt: string, path: string, title?: string) => {
 		const address = addresses.get(path);

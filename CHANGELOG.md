@@ -3,6 +3,11 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- Images are uploaded only once the post is sure to go. An update with
+  nothing to send, or one you cancel at a question, no longer uploads them.
+
 ## 1.2.0
 
 - Markdown images of files in your vault, like `![A raised bed](bed.png)`,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Response } from '../src/core/micropub';
+import { actionBody, createBody, endpointFrom, failure, imageType, images, multipart, categoryChoices, differences, listed, readCategories, readConfig, readSource, secure, siteHost, unknownCategories, updateBody, withAddresses, placeholders, withUploads, type Post, type Response } from '../src/core/micropub';
 
 const answer = (body: string, headers: Record<string, string> = {}, status = 200): Response => ({ status, headers, body });
 
@@ -147,6 +147,23 @@ describe('images', () => {
 		const titled = '![A bed](</v/bed.png> "In March")';
 		expect(images(titled)).toEqual([{ alt: 'A bed', path: '/v/bed.png' }]);
 		expect(withAddresses(titled, new Map([['/v/bed.png', 'https://bw20.nl/media/b.png']]))).toBe('![A bed](<https://bw20.nl/media/b.png> "In March")');
+	});
+
+	it('gives each file a placeholder, once, that pandoc leaves alone and none is part of another', () => {
+		const pictures = Array.from({ length: 10 }, (_, i) => ({ alt: 'A', path: `/v/${i + 1}.png` }));
+		const stand = placeholders([...pictures, { alt: 'Again', path: '/v/1.png' }, { alt: 'B', path: 'C:\\v\\bed.JPG' }]);
+		expect(stand.size).toBe(11);
+		expect(stand.get('/v/1.png')).toBe('https://in-the-open.invalid/image-1.png');
+		expect(stand.get('C:\\v\\bed.JPG')).toBe('https://in-the-open.invalid/image-11.jpg');
+	});
+
+	it('puts each uploaded address where its placeholder was', () => {
+		const stand = new Map([['/v/a.png', 'https://in-the-open.invalid/image-1.png'], ['/v/b.png', 'https://in-the-open.invalid/image-10.png']]);
+		const addresses = new Map([['/v/a.png', 'https://bw20.nl/media/a.png'], ['/v/b.png', 'https://bw20.nl/media/b.png']]);
+		const post = (text: string): Post => ({ title: 'T', summary: null, content: { html: text }, categories: [], slug: null, references: null, status: null });
+		expect(withUploads(post('<img src="https://in-the-open.invalid/image-1.png"><img src="https://in-the-open.invalid/image-10.png">'), stand, addresses).content).toEqual({
+			html: '<img src="https://bw20.nl/media/a.png"><img src="https://bw20.nl/media/b.png">',
+		});
 	});
 
 	it('knows which images a site takes', () => {

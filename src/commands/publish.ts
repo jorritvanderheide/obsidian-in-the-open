@@ -26,7 +26,7 @@ import {
 	type Post as Format,
 	type Vault,
 } from 'obsidian-citation-core';
-import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, PublishError, RefusedError, siteHost, unknownCategories, updateBody, withAddresses, type Post, type Source } from '../core/micropub';
+import { actionBody, ConflictError, createBody, imageType, images, listed, multipart, placeholders, PublishError, RefusedError, siteHost, unknownCategories, updateBody, withAddresses, withUploads, type Post, type Source } from '../core/micropub';
 import { send } from '../http';
 import { categoriesOf, connect, isDraft, post, sourceOf, upload, type Site } from '../site';
 import { choose, confirm } from '../ui/confirm';
@@ -206,15 +206,13 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 	const pandoc = await pandocToRun(app, settings.pandocPath, vault);
 	if (pandoc === null) return false;
 
+	// Each image is uploaded only once the post is sure to go. Until then a
+	// placeholder stands in for it, which the comparison ignores.
+	const stand = placeholders(pictures);
 	const making = new Notice(`Preparing ${file.basename}…`, 0);
 	let body: Post;
 	try {
-		const addresses = new Map<string, string>();
-		for (const image of pictures) {
-			const data = await readFile(image.path);
-			addresses.set(image.path, await upload(target, media ?? '', (boundary) => multipart(basename(image.path), imageType(image.path) ?? '', data, boundary)));
-		}
-		const markdown = withAddresses(prepared.markdown, addresses);
+		const markdown = withAddresses(prepared.markdown, stand);
 
 		let appConfig: unknown = null;
 		try {
@@ -302,6 +300,18 @@ export async function publish(context: Context, file: TFile, draft: boolean): Pr
 		);
 		if (answer === null) return false;
 		if (answer === 1) updated = new Date();
+	}
+
+	if (stand.size > 0) {
+		const addresses = await showing(`Uploading ${stand.size === 1 ? 'an image' : `${stand.size} images`}…`, async () => {
+			const uploaded = new Map<string, string>();
+			for (const path of stand.keys()) {
+				const data = await readFile(path);
+				uploaded.set(path, await upload(target, media ?? '', (boundary) => multipart(basename(path), imageType(path) ?? '', data, boundary)));
+			}
+			return uploaded;
+		});
+		body = withUploads(body, stand, addresses);
 	}
 
 	const sendingText = draft ? `Sending the draft of ${file.basename}…` : `Publishing ${file.basename}…`;
