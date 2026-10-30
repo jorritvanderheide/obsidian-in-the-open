@@ -3,7 +3,7 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
-## Unreleased
+## 1.7.1
 
 - A `%%comment%%` stays out of a post in more kinds of note. A line
   of ```` ``` ```` indented four spaces opened a code block that ran to the

@@ -1,7 +1,7 @@
 {
 	"id": "in-the-open",
 	"name": "In the Open",
-	"version": "1.7.0",
+	"version": "1.7.1",
 	"minAppVersion": "1.13.0",
 	"description": "Publish a note to your website over Micropub, with its links turned into real citations.",
 	"author": "Jorrit van der Heide",
