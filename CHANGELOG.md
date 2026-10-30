@@ -3,6 +3,16 @@
 What changed in each release of In the Open, newest first. What counts as
 breaking is in [Compatibility](docs/compatibility.md).
 
+## Unreleased
+
+- The README and SECURITY.md now say that In the Open reads the images in the
+  note you publish, from wherever their path points. They already said the
+  images are uploaded.
+- They also said the built-in pandoc can't see anything on your disk outside
+  the folders In the Open gives it. Node, which runs it inside Obsidian,
+  doesn't guarantee that, so they now say what In the Open gives it and that
+  Node doesn't enforce the limit.
+
 ## 1.7.0
 
 - In the Open asks an installed pandoc its version before it runs it. Pandoc

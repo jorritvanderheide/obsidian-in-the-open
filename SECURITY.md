@@ -20,9 +20,10 @@ your report before anything about it is made public.
 ## What counts
 
 In the Open sends the note you publish to the site you set, with your token. It
-reads that note and the citation keys and posts of the notes it links to, your
-bibliography, your citation style, whether strict line breaks are on in your
-vault's settings, and the folders on your PATH, to find pandoc. The first time
+reads that note and the images in it, the citation keys and posts of the notes
+it links to, your bibliography, your citation style, whether strict line
+breaks are on in your vault's settings, and the folders on your PATH, to find
+pandoc. The first time
 a note is public, it reads which of your notes link to it. It reads the post
 status of the notes you have open, for their title bar, and the settings tab
 reads the path and properties of every note. For each publish, it writes the
@@ -51,9 +52,9 @@ full list. These are security problems:
 - The text of a note changing what pandoc reads, writes or runs, or making
   In the Open run anything but pandoc.
 - The built-in pandoc being kept or run without matching the hash In the Open
-  ships with, the fingerprint of pandoc's release file. Or the built-in pandoc
-  seeing more of your disk than the vault, the folders of the files it needs,
-  and its temporary folders.
+  ships with, the fingerprint of pandoc's release file. Or In the Open giving
+  the built-in pandoc more of your disk than the vault, the folders of the
+  files it needs, and its temporary folders.
 - Something you wrote for yourself, like a comment, reaching your site.
 
 Problems in your site's Micropub endpoint belong to whoever makes it, and

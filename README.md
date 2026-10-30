@@ -403,6 +403,8 @@ ships with, a fingerprint of the file pandoc released.
   `post-status` of the notes it links to. The first time a note is public,
   which of your notes link to it, and their `post-status`. The `published-url`
   and `post-status` of the notes you have open, for their title bar.
+- **Images:** The images in the note you publish, to upload them, from the
+  vault or from wherever on your disk their path points.
 - **Template:** `Post.md` in the template folder, when you make a new post.
 - **Bibliography:** The `.bib` file you set in **Bibliography**.
 - **Citation style:** From Zotero's styles folder (`~/Zotero/styles`), or the
@@ -457,9 +459,12 @@ ships with, a fingerprint of the file pandoc released.
 ### 11.5 What it runs
 
 - **Pandoc:** The pandoc you set in **Pandoc**. If none is installed, the
-  built-in one, which runs inside Obsidian. The built-in pandoc sees only your
-  vault, the folders your bibliography and citation style are in, and its
-  temporary folders, and none of the rest of your disk. Before each publish,
+  built-in one, which runs inside Obsidian. In the Open only gives the
+  built-in pandoc your vault, the folders your bibliography and citation
+  style are in, and its temporary folders. Node, which runs it inside
+  Obsidian, doesn't guarantee that a program can't get past those folders,
+  for example through a link in your vault to a folder outside it. So don't
+  rely on those folders to keep a file private from it. Before each publish,
   In the Open asks an installed pandoc its version (`pandoc --version`). An
   installed pandoc can read and write anything you can.
 
