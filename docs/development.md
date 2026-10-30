@@ -95,6 +95,12 @@ with pandoc" in the README here.
    releases, and a tag alone is not one. The first release is also submitted
    to the directory, in obsidianmd/obsidian-releases.
 
+`scripts/release.sh <x.y.z> "<what the release is>"` does all five, from an
+empty working-copy change on top of the commits to release. It stops before
+anything is pushed when a check fails, or when the subject is 72 characters
+or more, the message or the notes have a bare `@`, or `main` on Codeberg has
+moved. `--dry-run` goes as far as the push, then puts everything back.
+
 ## Updating an action
 
 The workflows pin every action to a commit, with the version in a comment, so a
