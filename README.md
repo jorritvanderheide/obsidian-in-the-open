@@ -355,6 +355,12 @@ writes the link that In the Open publishes as a citation.
 Both plugins read a note with the same code, so a note reads the same on your
 site as in the file you send your supervisor.
 
+### 10.3 Take the Floor
+
+[Take the Floor](https://community.obsidian.md/plugins/take-the-floor) presents a note as slides, with
+your speaker notes on your own screen. It reads a note the same way In the Open does, with the same code.
+Give both plugins the same **Bibliography** and **Citation style**, and a post and a talk cite the same way.
+
 <br/>
 
 ## 11 Network and file disclosure
